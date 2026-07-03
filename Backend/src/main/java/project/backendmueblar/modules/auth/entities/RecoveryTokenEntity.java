@@ -22,7 +22,7 @@ public class RecoveryTokenEntity {
     @Column(name = "id_token")
     private Long tokenId;
 
-    @Column(name = "token_", nullable = false)
+    @Column(name = "token_", unique = true, nullable = false)
     private String token;
 
     @Column(name = "creado_at", nullable = false)

@@ -34,7 +34,7 @@ export default function Hero() {
           </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-4">
-            <Button to="/#categorias" variant="primary" size="lg">
+            <Button to="/colecciones" variant="primary" size="lg">
               Ver Colecciones
             </Button>
             <Button to="/descargar" variant="outline" size="lg">

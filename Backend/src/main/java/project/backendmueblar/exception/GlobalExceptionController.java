@@ -60,6 +60,22 @@ public class GlobalExceptionController {
         return ResponseEntity.status(500).body(buildErrorResponse(ex));
     }
 
+
+    @ExceptionHandler(RecoveryTokenNotFoundException.class)
+    public ResponseEntity<Map<String, List<Map<String, String>>>> handleRecoveryTokenNotFoundException(RecoveryTokenNotFoundException ex) {
+        return ResponseEntity.status(404).body(buildErrorResponse(ex));
+    }
+
+    @ExceptionHandler(UserIDNotMatchException.class)
+    public ResponseEntity<Map<String, List<Map<String, String>>>> handleUserIDNotMatchException(UserIDNotMatchException ex) {
+        return ResponseEntity.status(403).body(buildErrorResponse(ex));
+    }
+
+    @ExceptionHandler(RecoveryTokenIsExpired.class)
+    public ResponseEntity<Map<String, List<Map<String, String>>>> handleRecoveryTokenIsExpired(RecoveryTokenIsExpired ex) {
+        return ResponseEntity.status(401).body(buildErrorResponse(ex));
+    }
+
     // Exception for @Valid -> DTOs //
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, List<Map<String, String>>>> handleValidationErrors(MethodArgumentNotValidException ex) {
@@ -78,3 +94,4 @@ public class GlobalExceptionController {
         return ResponseEntity.status(400).body(responseMap);
     }
 }
+

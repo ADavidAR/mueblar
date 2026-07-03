@@ -1,59 +1,25 @@
 import Figure from '../components/ui/Figure'
-import Button from '../components/ui/Button'
 import { Eyebrow } from '../components/ui/Tags'
-import PartnerCard from '../components/partners/PartnerCard'
 
-/* Datos de socios a nivel de módulo (no se recrean en cada render). */
-const PARTNERS = [
-  {
-    category: 'Ferretería',
-    name: 'Ferretería El Record',
-    description:
-      'Líderes en suministros industriales y soluciones para el hogar. Tradición y excelencia técnica en cada proyecto constructivo.',
-    location: 'San Pedro Sula, Honduras',
-  },
-  {
-    category: 'Mueblería',
-    name: 'Muebles Elements',
-    description:
-      'Diseño contemporáneo que redefine los espacios modernos. Piezas exclusivas que fusionan estética y funcionalidad ergonómica.',
-    location: 'Tegucigalpa, Honduras',
-  },
-  {
-    category: 'Decoración',
-    name: 'Larach & Cía',
-    description:
-      'El referente nacional en ferretería y hogar. Calidad garantizada y una gama inigualable de productos para transformar tus ambientes.',
-    location: 'Multiplaza, Honduras',
-  },
-  {
-    category: 'Mueblería',
-    name: 'Amueblar',
-    description:
-      'Personalización y confort. Especialistas en crear muebles que cuentan historias y se adaptan a la personalidad de cada usuario.',
-    location: 'Colonia Palmira, Honduras',
-  },
-]
-
-function PartnersHero() {
+function NosotrosHero() {
   return (
     <section className="mx-auto max-w-[1280px] px-6 pt-36 md:px-10">
       <div className="grid items-center gap-10 md:grid-cols-2">
         <div>
-          <Eyebrow>Red de Colaboradores</Eyebrow>
+          <Eyebrow>Quiénes Somos</Eyebrow>
           <h1 className="mt-4 font-display text-5xl leading-tight text-ink md:text-6xl">
-            Nuestros Socios
+            Nosotros
           </h1>
           <p className="mt-6 max-w-md text-[15px] leading-relaxed text-muted">
-            Conectamos con los proveedores líderes en Honduras para ofrecerte una
-            experiencia de visualización en AR sin precedentes. Calidad artesanal y
-            tecnología de vanguardia.
+            Somos un equipo apasionado por transformar la manera en que las personas
+            diseñan sus espacios. Combinamos Realidad Aumentada con el mejor catálogo
+            de muebles y decoración para que cada decisión sea una certeza, no una apuesta.
           </p>
         </div>
         <Figure
           src="/images/partners-showroom.jpg"
           tone="office"
-          alt="Showroom de mobiliario de un socio"
+          alt="Showroom de mobiliario"
           className="min-h-[260px] md:min-h-[320px]"
         />
       </div>
@@ -61,46 +27,46 @@ function PartnersHero() {
   )
 }
 
-function PartnersGrid() {
+function MisionVision() {
   return (
-    <section className="mx-auto mt-16 max-w-[1280px] px-6 md:px-10">
-      {/* gap-px sobre fondo de línea: genera separadores limpios de 1px en la cuadrícula */}
+    <section className="mx-auto mt-24 mb-28 max-w-[1280px] px-6 md:px-10">
       <div className="grid gap-px overflow-hidden rounded-2xl border border-line bg-line md:grid-cols-2">
-        {PARTNERS.map((p) => (
-          <div key={p.name} className="bg-bg">
-            <PartnerCard {...p} />
-          </div>
-        ))}
-      </div>
-    </section>
-  )
-}
 
-function PartnersCta() {
-  return (
-    <section className="mt-24">
-      <div className="mx-auto max-w-[1280px] px-6 py-20 text-center md:px-10 md:py-28">
-        <h2 className="mx-auto max-w-2xl font-display text-4xl leading-tight text-ink md:text-5xl">
-          Impulsa tu marca con la{' '}
-          <span className="underline decoration-copper decoration-2 underline-offset-8">
-            Realidad Aumentada.
-          </span>
-        </h2>
-        <p className="mx-auto mt-6 max-w-xl text-[15px] leading-relaxed text-muted">
-          Únete a la plataforma que está transformando cómo los hondureños compran
-          muebles. Muestra tus productos en el espacio real de tus clientes.
-        </p>
-        <Button variant="copper" size="lg" className="mt-10" to="/register">
-          Convertirse en Socio
-        </Button>
+        <div className="bg-panel p-10 md:p-14">
+          <Eyebrow className="mb-4">Misión</Eyebrow>
+          <h2 className="font-display text-3xl leading-snug text-ink md:text-4xl">
+            Diseñar con certeza,{' '}
+            <span className="underline decoration-copper decoration-2 underline-offset-8">
+              no con suposiciones.
+            </span>
+          </h2>
+          <p className="mt-6 text-[15px] leading-relaxed text-muted">
+            Nuestra misión es democratizar el diseño de interiores poniendo en manos
+            de cualquier persona una tecnología de Realidad Aumentada accesible y precisa.
+            Queremos que cada hondureño pueda ver sus muebles en su espacio real antes
+            de tomar cualquier decisión de compra, eliminando la incertidumbre y
+            convirtiendo cada remodelación en una experiencia segura, creativa y satisfactoria.
+          </p>
+        </div>
+
+        <div className="bg-bg p-10 md:p-14">
+          <Eyebrow className="mb-4">Visión</Eyebrow>
+          <h2 className="font-display text-3xl leading-snug text-ink md:text-4xl">
+            El futuro del diseño{' '}
+            <span className="underline decoration-copper decoration-2 underline-offset-8">
+              está en tu espacio.
+            </span>
+          </h2>
+          <p className="mt-6 text-[15px] leading-relaxed text-muted">
+            Aspiramos a ser la plataforma de referencia en Latinoamérica para la
+            previsualización de interiores con AR, conectando consumidores, diseñadores
+            y fabricantes en un ecosistema digital donde cada espacio se concibe con
+            precisión y confianza. Imaginamos un mundo donde remodelar un hogar sea
+            tan intuitivo como mover muebles en pantalla.
+          </p>
+        </div>
+
       </div>
-      <Figure
-        src="/images/partners-cta.jpg"
-        tone="stone"
-        alt="Silla de diseño en un estudio"
-        rounded="rounded-none"
-        className="min-h-[320px]"
-      />
     </section>
   )
 }
@@ -108,9 +74,8 @@ function PartnersCta() {
 export default function PartnersPage() {
   return (
     <>
-      <PartnersHero />
-      <PartnersGrid />
-      <PartnersCta />
+      <NosotrosHero />
+      <MisionVision />
     </>
   )
 }

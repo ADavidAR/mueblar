@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class EmailService {
     private final JavaMailSender mailSender;
 
-    public void sendRecoveryEmail(String recipientEmail, String token) {
+    public void sendRecoveryEmail(String recipientEmail, String token, String id) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -20,7 +20,8 @@ public class EmailService {
             helper.setTo(recipientEmail);
             helper.setSubject("MueblAR - Recuperación de Contraseña");
 
-            String urlRecoveryPassword = "http://localhost:5173/reset-password/" + token;
+            String urlRecoveryPassword = "http://localhost:5173/reset-password/" + token + "/" + id;
+            System.out.println(urlRecoveryPassword);
 
             String contenidoHtml =
                     "<div style=\"font-family: Arial, sans-serif; text-align: center; padding: 30px; color: #333;\">" +

@@ -13,8 +13,9 @@ import { useAuth } from '../../context/AuthContext'
 */
 
 const NAV_LINKS = [
-  { label: 'Colecciones', to: '/#categorias' },
-  { label: 'Socios', to: '/nosotros' },
+  { label: 'Inicio', to: '/' },
+  { label: 'Colecciones', to: '/colecciones' },
+  { label: 'Nosotros', to: '/nosotros' },
 ]
 
 function navLinkClass({ isActive }) {
@@ -66,7 +67,8 @@ export default function Navbar() {
   const { isAuthenticated, user, logout } = useAuth()
   const navigate = useNavigate()
   const { pathname } = useLocation()
-  const hideNav = AUTH_ROUTES.includes(pathname)
+  const hideNav =
+    AUTH_ROUTES.includes(pathname) || pathname.startsWith('/reset-password')
 
   function handleLogout() {
     logout() // limpia estado + borra token
