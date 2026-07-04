@@ -35,7 +35,7 @@ async function deleteSessionToken() {
   }
 }
 
-async function request(path, options = {}) {
+export const request = async (path, options = {}) => {
   const { skipAuth = false, ...fetchOptions } = options
   const token = !skipAuth ? await getSessionToken() : null
 

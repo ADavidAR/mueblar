@@ -1,5 +1,5 @@
 import { KeyboardAvoidingView, Pressable, ScrollView, Text, View, Platform, Animated } from "react-native";
-import { Link, useRouter } from "expo-router";
+import { Link, useRouter, useTheme } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ArrowLeftIcon, ArrowRightIcon, SearchIcon } from "../Icons";
@@ -29,18 +29,16 @@ export default function MainScreen({
             behavior={Platform.OS === "ios" ? "padding" : undefined}
             className="flex-1 bg-stone-50 dark:bg-surface"
         >
-            <ScrollView
-                keyboardShouldPersistTaps="handled"
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{
-                    flexGrow: 1,
+            <View
+                className="flex-1 bg-stone-50 dark:bg-surface"
+                style={{
                     paddingTop: insets.top + 12,
-                    paddingBottom: insets.bottom + 24,
+                    paddingBottom: insets.bottom + 24
                 }}
             >
                 { hasTopBar
                 ? ( 
-                <View className="h-10 flex-row items-center justify-between px-6">
+                <View className="h-14 flex-row items-center justify-between px-6">
                     { showBack
                     ? ( 
                     <View className="flex-1 flex-row items-center">
@@ -92,9 +90,9 @@ export default function MainScreen({
                 </View>)
                 : null}
                 <Animated.View style={[fade, { flex: 1 }]}>
-                    <View className={`flex-1 px-7 ${contentClassName}`}>{children}</View>
+                    <View className={`flex-1  px-7 ${contentClassName}`}>{children}</View>
                 </Animated.View>
-            </ScrollView>
+            </View>
         </KeyboardAvoidingView>
     )
 }
