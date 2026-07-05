@@ -148,6 +148,9 @@ public class CatalogService {
         repositoryProduct.flush();
 
         List<VariationRequestDTO> variationRequestDTOList = productCreateRequestDTO.getVariations();
+
+        // Obtencion De Los Skus Finales de Variation Request, y Eliminacion de Variaciones Provenientes de la
+        // Base de Datos Comparado con dichos Skus Obtenidos
         List<String> skusFromRequest = new ArrayList<>();
         for (VariationRequestDTO variationRequestDTO : variationRequestDTOList) {
             if (variationRequestDTO.getSku() != null) {
@@ -156,8 +159,8 @@ public class CatalogService {
         }
         Iterator<VariationEntity> iterator = variationEntityList.iterator();
         while (iterator.hasNext()) {
-            VariationEntity var = iterator.next();
-            if (!skusFromRequest.contains(var.getSku())) {
+            VariationEntity variationEntityFromDB = iterator.next();
+            if (!skusFromRequest.contains(variationEntityFromDB.getSku())) {
                 iterator.remove();
             }
         }
