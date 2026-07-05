@@ -2,7 +2,6 @@ package project.backendmueblar.modules.catalog.dtos.response;
 
 import lombok.Getter;
 import lombok.Setter;
-import project.backendmueblar.modules.catalog.dtos.AttributeSummaryDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -19,5 +18,5 @@ public class VariationResponseDTO {
     private Boolean enabled; //
     private Map<String, Object> instance_params; //
     private List<String> imgs; //
-    private List<AttributeSummaryDTO> atribs;
+    private List<AttributeSummaryResponseDTO> atribs;
 }

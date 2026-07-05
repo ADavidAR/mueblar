@@ -7,8 +7,11 @@ import org.springframework.stereotype.Service;
 import project.backendmueblar.exception.catalog.NotExistentResourceException;
 import project.backendmueblar.exception.catalog.ProductAlreadyExistException;
 import project.backendmueblar.exception.catalog.ResourceNotFoundException;
-import project.backendmueblar.modules.catalog.dtos.*;
+import project.backendmueblar.modules.catalog.dtos.request.AttributeSummaryRequestDTO;
+import project.backendmueblar.modules.catalog.dtos.request.CategoryRequestDTO;
 import project.backendmueblar.modules.catalog.dtos.request.ProductCreateRequestDTO;
+import project.backendmueblar.modules.catalog.dtos.request.VariationRequestDTO;
+import project.backendmueblar.modules.catalog.dtos.response.AttributeSummaryResponseDTO;
 import project.backendmueblar.modules.catalog.dtos.response.CategoryResponseDTO;
 import project.backendmueblar.modules.catalog.dtos.response.ProductResponseDTO;
 import project.backendmueblar.modules.catalog.dtos.response.VariationResponseDTO;
@@ -23,12 +26,7 @@ public class CatalogService {
 
     private final RepositoryProduct repositoryProduct;
     private final RepositoryCategory repositoryCategory;
-    private final RepositoryVariation repositoryVariation;
-    private final RepositoryThumbnail repositoryThumbnail;
     private final RepositoryAttribute repositoryAttribute;
-    private final RepositoryAttribute_X_Variation repositoryAttribute_X_Variation;
-    private final RepositoryAttribute_X_Product repositoryAttribute_X_Product;
-    private final RepositoryProduct_X_Category repositoryProduct_X_Category;
 
     @Transactional
     public void createProductAndVariations(ProductCreateRequestDTO productCreateRequestDTO) {
@@ -43,83 +41,266 @@ public class CatalogService {
         productEntity.setDimensions(productCreateRequestDTO.getDimensions());
         productEntity.setEnabled(productCreateRequestDTO.getEnable());
 
-        ProductEntity productEntitySaved = repositoryProduct.save(productEntity);
-
         Set<String> attributes_X_Product = new HashSet<>();
+        List<Attribute_X_ProductEntity> attributes_X_ProductEntityList = new ArrayList<>();
+        List<VariationEntity> variationEntityList = new ArrayList<>();
+        List<Product_X_CategoryEntity> product_x_categoryEntityList = new ArrayList<>();
 
-        List<VariationResponseDTO> variationResponseDTOList = productCreateRequestDTO.getVariations();
-        for(VariationResponseDTO thisVariationResponseDTO : variationResponseDTOList) {
+        List<VariationRequestDTO> variationRequestDTOList = productCreateRequestDTO.getVariations();
+        for(VariationRequestDTO thisVariationRequestDTO : variationRequestDTOList) {
             VariationEntity thisVariationEntity = new VariationEntity();
-            thisVariationEntity.setSku(thisVariationResponseDTO.getSku());
-            thisVariationEntity.setVariationName(thisVariationResponseDTO.getName());
-            thisVariationEntity.setInstationParameters(thisVariationResponseDTO.getInstance_params());
-            thisVariationEntity.setModel3dPath(thisVariationResponseDTO.getModel_3d());
-            thisVariationEntity.setPrice(thisVariationResponseDTO.getPrice());
-            thisVariationEntity.setIsTop(thisVariationResponseDTO.getTop());
-            thisVariationEntity.setEnabled(thisVariationResponseDTO.getEnabled());
-            thisVariationEntity.setProductEntity(productEntitySaved);
+            thisVariationEntity.setSku(thisVariationRequestDTO.getSku());
+            thisVariationEntity.setVariationName(thisVariationRequestDTO.getName());
+            thisVariationEntity.setInstationParameters(thisVariationRequestDTO.getInstance_params());
+            thisVariationEntity.setModel3dPath(thisVariationRequestDTO.getModel_3d());
+            thisVariationEntity.setPrice(thisVariationRequestDTO.getPrice());
+            thisVariationEntity.setIsTop(thisVariationRequestDTO.getTop());
+            thisVariationEntity.setEnabled(thisVariationRequestDTO.getEnabled());
 
-            VariationEntity variationEntitySaved = repositoryVariation.save(thisVariationEntity);
+            thisVariationEntity.setProductEntity(productEntity);
 
             List<ThumbnailEntity> thumbnailEntityList = new ArrayList<>();
             ThumbnailEntity thumbnailEntity = new ThumbnailEntity();
-            thumbnailEntity.setThumbnailPath(thisVariationResponseDTO.getThumbnail());
+            thumbnailEntity.setThumbnailPath(thisVariationRequestDTO.getThumbnail());
             thumbnailEntity.setIsTop(true);
-            thumbnailEntity.setVariationEntity(variationEntitySaved);
-            repositoryThumbnail.save(thumbnailEntity);
+            thumbnailEntity.setVariationEntity(thisVariationEntity);
             thumbnailEntityList.add(thumbnailEntity);
 
-            List<String> thumbnailResponseList = thisVariationResponseDTO.getImgs();
-            for(String thisThumbnailResponse: thumbnailResponseList) {
+            List<String> thumbnailResponseList = thisVariationRequestDTO.getImgs();
+            for(String thisThumbnailRequest : thumbnailResponseList) {
                 ThumbnailEntity thisThumbnailEntity = new ThumbnailEntity();
-                thisThumbnailEntity.setThumbnailPath(thisThumbnailResponse);
+                thisThumbnailEntity.setThumbnailPath(thisThumbnailRequest);
                 thisThumbnailEntity.setIsTop(false);
-                thisThumbnailEntity.setVariationEntity(variationEntitySaved);
-                repositoryThumbnail.save(thisThumbnailEntity);
+                thisThumbnailEntity.setVariationEntity(thisVariationEntity);
                 thumbnailEntityList.add(thisThumbnailEntity);
             }
-
             thisVariationEntity.setThumbnailEntities(thumbnailEntityList);
 
             List<Attribute_X_VariationEntity> attribute_X_variationEntityList = new ArrayList<>();
-            List<AttributeSummaryDTO> attributeSummaryDTOList = thisVariationResponseDTO.getAtribs();
-            for(AttributeSummaryDTO thisAttributeSummaryDTO : attributeSummaryDTOList) {
-                Optional<AttributeEntity> optionalAttribute = repositoryAttribute.findByAttributeId(thisAttributeSummaryDTO.getId());
+            List<AttributeSummaryRequestDTO> attributeSummaryRequestDTOList = thisVariationRequestDTO.getAtribs();
+            for(AttributeSummaryRequestDTO thisAttributeSummaryRequestDTO : attributeSummaryRequestDTOList) {
+                Optional<AttributeEntity> optionalAttribute = repositoryAttribute.findByAttributeId(thisAttributeSummaryRequestDTO.getId());
                 if(optionalAttribute.isEmpty()) {
                     throw new ResourceNotFoundException("Attribute was not found");
                 }
 
                 AttributeEntity thisAttributeEntity = optionalAttribute.get();
-
                 Attribute_X_VariationEntity thisAttribute_X_VariationEntity = new Attribute_X_VariationEntity();
-                thisAttribute_X_VariationEntity.setAttributeValue(thisAttributeSummaryDTO.getValue());
+                thisAttribute_X_VariationEntity.setAttributeValue(thisAttributeSummaryRequestDTO.getValue());
                 thisAttribute_X_VariationEntity.setAttributeEntity(thisAttributeEntity);
-                thisAttribute_X_VariationEntity.setVariationEntity(variationEntitySaved);
-                repositoryAttribute_X_Variation.save(thisAttribute_X_VariationEntity);
+                thisAttribute_X_VariationEntity.setVariationEntity(thisVariationEntity);
                 attribute_X_variationEntityList.add(thisAttribute_X_VariationEntity);
 
                 if (!attributes_X_Product.contains(thisAttributeEntity.getAttributeId())) {
                     Attribute_X_ProductEntity thisAttribute_x_ProductEntity = new Attribute_X_ProductEntity();
                     thisAttribute_x_ProductEntity.setAttributeEntity(thisAttributeEntity);
-                    thisAttribute_x_ProductEntity.setProductEntity(productEntitySaved);
-                    repositoryAttribute_X_Product.save(thisAttribute_x_ProductEntity);
+                    thisAttribute_x_ProductEntity.setProductEntity(productEntity);
+                    attributes_X_ProductEntityList.add(thisAttribute_x_ProductEntity);
+
                     attributes_X_Product.add(thisAttributeEntity.getAttributeId());
                 }
             }
             thisVariationEntity.setAttributeXVariationEntities(attribute_X_variationEntityList);
+            variationEntityList.add(thisVariationEntity);
         }
 
-        List<CategoryResponseDTO> categoryResponseDTOList = productCreateRequestDTO.getCategories();
-        for(CategoryResponseDTO thisCategoryResponseDTO : categoryResponseDTOList) {
+        List<CategoryRequestDTO> categoryRequestDTOList = productCreateRequestDTO.getCategories();
+        for(CategoryRequestDTO thisCategoryResponseDTO : categoryRequestDTOList) {
             Optional<CategoryEntity> optionalCategory = repositoryCategory.findByCategoryId(thisCategoryResponseDTO.getId());
             if(optionalCategory.isEmpty()){
                 throw new ResourceNotFoundException("Category not found");
             }
             Product_X_CategoryEntity thisProduct_X_CategoryEntity = new Product_X_CategoryEntity();
             thisProduct_X_CategoryEntity.setCategoryEntity(optionalCategory.get());
-            thisProduct_X_CategoryEntity.setProductEntity(productEntitySaved);
-            repositoryProduct_X_Category.save(thisProduct_X_CategoryEntity);
+            thisProduct_X_CategoryEntity.setProductEntity(productEntity);
+            thisProduct_X_CategoryEntity.setProductEntity(productEntity);
+            product_x_categoryEntityList.add(thisProduct_X_CategoryEntity);
         }
+
+        productEntity.setVariationEntityList(variationEntityList);
+        productEntity.setProductXCategoryEntityList(product_x_categoryEntityList);
+        productEntity.setAttributeXProductEntities(attributes_X_ProductEntityList);
+
+        repositoryProduct.save(productEntity);
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
+
+    @Transactional
+    public void updateProductAndVariations(ProductCreateRequestDTO productCreateRequestDTO, String modelOfProduct) {
+        Optional<ProductEntity> optionalProduct = repositoryProduct.findByModelName(modelOfProduct);
+        if(optionalProduct.isEmpty()) {
+            throw new ResourceNotFoundException("Product not found. Cannot Update It");
+        }
+
+        ProductEntity thisProductEntity = optionalProduct.get();
+        thisProductEntity.setDescription(productCreateRequestDTO.getDescription());
+        thisProductEntity.setDimensions(productCreateRequestDTO.getDimensions());
+        thisProductEntity.setEnabled(productCreateRequestDTO.getEnable());
+
+        Set<String> attributes_X_Product = new HashSet<>();
+        List<Attribute_X_ProductEntity> attributes_X_ProductEntityList = thisProductEntity.getAttributeXProductEntities();
+        attributes_X_ProductEntityList.clear();
+        List<Product_X_CategoryEntity> product_x_categoryEntityList = thisProductEntity.getProductXCategoryEntityList();
+        product_x_categoryEntityList.clear();
+        List<VariationEntity> variationEntityList = thisProductEntity.getVariationEntityList();
+
+        repositoryProduct.flush();
+
+        List<VariationRequestDTO> variationRequestDTOList = productCreateRequestDTO.getVariations();
+        List<String> skusFromRequest = new ArrayList<>();
+        for (VariationRequestDTO variationRequestDTO : variationRequestDTOList) {
+            if (variationRequestDTO.getSku() != null) {
+                skusFromRequest.add(variationRequestDTO.getSku());
+            }
+        }
+        Iterator<VariationEntity> iterator = variationEntityList.iterator();
+        while (iterator.hasNext()) {
+            VariationEntity var = iterator.next();
+            if (!skusFromRequest.contains(var.getSku())) {
+                iterator.remove();
+            }
+        }
+
+        for(VariationRequestDTO thisVariationRequestDTO : variationRequestDTOList) {
+            VariationEntity existVariation = null;
+            for (VariationEntity variationFromDB : variationEntityList) {
+                if (variationFromDB.getSku().equals(thisVariationRequestDTO.getSku())) {
+                    existVariation = variationFromDB;
+                    break;
+                }
+            }
+
+            if(existVariation == null) {
+                VariationEntity thisVariationEntity = new VariationEntity();
+                thisVariationEntity.setSku(thisVariationRequestDTO.getSku());
+                thisVariationEntity.setVariationName(thisVariationRequestDTO.getName());
+                thisVariationEntity.setInstationParameters(thisVariationRequestDTO.getInstance_params());
+                thisVariationEntity.setModel3dPath(thisVariationRequestDTO.getModel_3d());
+                thisVariationEntity.setPrice(thisVariationRequestDTO.getPrice());
+                thisVariationEntity.setIsTop(thisVariationRequestDTO.getTop());
+                thisVariationEntity.setEnabled(thisVariationRequestDTO.getEnabled());
+
+                thisVariationEntity.setProductEntity(thisProductEntity);
+
+                List<ThumbnailEntity> thumbnailEntityList = new ArrayList<>();
+                ThumbnailEntity thumbnailEntity = new ThumbnailEntity();
+                thumbnailEntity.setThumbnailPath(thisVariationRequestDTO.getThumbnail());
+                thumbnailEntity.setIsTop(true);
+                thumbnailEntity.setVariationEntity(thisVariationEntity);
+                thumbnailEntityList.add(thumbnailEntity);
+
+                List<String> thumbnailResponseList = thisVariationRequestDTO.getImgs();
+                for(String thisThumbnailRequest : thumbnailResponseList) {
+                    ThumbnailEntity thisThumbnailEntity = new ThumbnailEntity();
+                    thisThumbnailEntity.setThumbnailPath(thisThumbnailRequest);
+                    thisThumbnailEntity.setIsTop(false);
+                    thisThumbnailEntity.setVariationEntity(thisVariationEntity);
+                    thumbnailEntityList.add(thisThumbnailEntity);
+                }
+                thisVariationEntity.setThumbnailEntities(thumbnailEntityList);
+
+                List<Attribute_X_VariationEntity> attribute_X_variationEntityList = new ArrayList<>();
+                List<AttributeSummaryRequestDTO> attributeSummaryRequestDTOList = thisVariationRequestDTO.getAtribs();
+                for(AttributeSummaryRequestDTO thisAttributeSummaryRequestDTO : attributeSummaryRequestDTOList) {
+                    Optional<AttributeEntity> optionalAttribute = repositoryAttribute.findByAttributeId(thisAttributeSummaryRequestDTO.getId());
+                    if(optionalAttribute.isEmpty()) {
+                        throw new ResourceNotFoundException("Attribute was not found");
+                    }
+
+                    AttributeEntity thisAttributeEntity = optionalAttribute.get();
+                    Attribute_X_VariationEntity thisAttribute_X_VariationEntity = new Attribute_X_VariationEntity();
+                    thisAttribute_X_VariationEntity.setAttributeValue(thisAttributeSummaryRequestDTO.getValue());
+                    thisAttribute_X_VariationEntity.setAttributeEntity(thisAttributeEntity);
+                    thisAttribute_X_VariationEntity.setVariationEntity(thisVariationEntity);
+                    attribute_X_variationEntityList.add(thisAttribute_X_VariationEntity);
+
+                    if (!attributes_X_Product.contains(thisAttributeEntity.getAttributeId())) {
+                        Attribute_X_ProductEntity thisAttribute_x_ProductEntity = new Attribute_X_ProductEntity();
+                        thisAttribute_x_ProductEntity.setAttributeEntity(thisAttributeEntity);
+                        thisAttribute_x_ProductEntity.setProductEntity(thisProductEntity);
+                        attributes_X_ProductEntityList.add(thisAttribute_x_ProductEntity);
+
+                        attributes_X_Product.add(thisAttributeEntity.getAttributeId());
+                    }
+                }
+                thisVariationEntity.setAttributeXVariationEntities(attribute_X_variationEntityList);
+                variationEntityList.add(thisVariationEntity);
+
+            } else {
+                VariationEntity thisVariationEntity = existVariation;
+                thisVariationEntity.setVariationName(thisVariationRequestDTO.getName());
+                thisVariationEntity.setInstationParameters(thisVariationRequestDTO.getInstance_params());
+                thisVariationEntity.setModel3dPath(thisVariationRequestDTO.getModel_3d());
+                thisVariationEntity.setPrice(thisVariationRequestDTO.getPrice());
+                thisVariationEntity.setIsTop(thisVariationRequestDTO.getTop());
+                thisVariationEntity.setEnabled(thisVariationRequestDTO.getEnabled());
+
+                thisVariationEntity.setProductEntity(thisProductEntity);
+
+                List<ThumbnailEntity> thumbnailEntityList = thisVariationEntity.getThumbnailEntities();
+                thumbnailEntityList.clear();
+                List<Attribute_X_VariationEntity> attribute_X_variationEntityList = thisVariationEntity.getAttributeXVariationEntities();
+                attribute_X_variationEntityList.clear();
+
+                ThumbnailEntity thumbnailEntity = new ThumbnailEntity();
+                thumbnailEntity.setThumbnailPath(thisVariationRequestDTO.getThumbnail());
+                thumbnailEntity.setIsTop(true);
+                thumbnailEntity.setVariationEntity(thisVariationEntity);
+                thumbnailEntityList.add(thumbnailEntity);
+
+                List<String> thumbnailRequestList = thisVariationRequestDTO.getImgs();
+                for(String thisThumbnailRequest : thumbnailRequestList) {
+                    ThumbnailEntity thisThumbnailEntity = new ThumbnailEntity();
+                    thisThumbnailEntity.setThumbnailPath(thisThumbnailRequest);
+                    thisThumbnailEntity.setIsTop(false);
+                    thisThumbnailEntity.setVariationEntity(thisVariationEntity);
+                    thumbnailEntityList.add(thisThumbnailEntity);
+                }
+                thisVariationEntity.setThumbnailEntities(thumbnailEntityList);
+
+                List<AttributeSummaryRequestDTO> attributeSummaryRequestDTOList = thisVariationRequestDTO.getAtribs();
+                for(AttributeSummaryRequestDTO thisAttributeSummaryRequestDTO : attributeSummaryRequestDTOList) {
+                    Optional<AttributeEntity> optionalAttribute = repositoryAttribute.findByAttributeId(thisAttributeSummaryRequestDTO.getId());
+                    if(optionalAttribute.isEmpty()) {
+                        throw new ResourceNotFoundException("Attribute was not found");
+                    }
+
+                    AttributeEntity thisAttributeEntity = optionalAttribute.get();
+                    Attribute_X_VariationEntity thisAttribute_X_VariationEntity = new Attribute_X_VariationEntity();
+                    thisAttribute_X_VariationEntity.setAttributeValue(thisAttributeSummaryRequestDTO.getValue());
+                    thisAttribute_X_VariationEntity.setAttributeEntity(thisAttributeEntity);
+                    thisAttribute_X_VariationEntity.setVariationEntity(thisVariationEntity);
+
+                    attribute_X_variationEntityList.add(thisAttribute_X_VariationEntity);
+
+                    if (!attributes_X_Product.contains(thisAttributeEntity.getAttributeId())) {
+                        Attribute_X_ProductEntity thisAttribute_x_ProductEntity = new Attribute_X_ProductEntity();
+                        thisAttribute_x_ProductEntity.setAttributeEntity(thisAttributeEntity);
+                        thisAttribute_x_ProductEntity.setProductEntity(thisProductEntity);
+                        attributes_X_ProductEntityList.add(thisAttribute_x_ProductEntity);
+
+                        attributes_X_Product.add(thisAttributeEntity.getAttributeId());
+                    }
+                }
+                thisVariationEntity.setAttributeXVariationEntities(attribute_X_variationEntityList);
+            }
+        }
+
+        List<CategoryRequestDTO> categoryRequestDTOList = productCreateRequestDTO.getCategories();
+
+        for(CategoryRequestDTO thisCategoryResponseDTO : categoryRequestDTOList) {
+            Optional<CategoryEntity> optionalCategory = repositoryCategory.findByCategoryId(thisCategoryResponseDTO.getId());
+            if(optionalCategory.isEmpty()){
+                throw new ResourceNotFoundException("Category not found");
+            }
+            Product_X_CategoryEntity thisProduct_X_CategoryEntity = new Product_X_CategoryEntity();
+            thisProduct_X_CategoryEntity.setCategoryEntity(optionalCategory.get());
+            thisProduct_X_CategoryEntity.setProductEntity(thisProductEntity);
+
+            product_x_categoryEntityList.add(thisProduct_X_CategoryEntity);
+        }
+        repositoryProduct.save(thisProductEntity);
     }
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
@@ -171,21 +352,21 @@ public class CatalogService {
         return categoryResponseDTOList;
     }
 
-    private List<AttributeSummaryDTO> getAttributeSummaryDTOS(VariationEntity thisVariationEntity) {
+    private List<AttributeSummaryResponseDTO> getAttributeSummaryDTOS(VariationEntity thisVariationEntity) {
         List<Attribute_X_VariationEntity> attribute_X_VariationEntityList = thisVariationEntity.getAttributeXVariationEntities();
-        List<AttributeSummaryDTO> attributeSummaryDTOList = new ArrayList<>();
+        List<AttributeSummaryResponseDTO> attributeSummaryResponseDTOList = new ArrayList<>();
 
         for (Attribute_X_VariationEntity thisAttribute_X_VariationEntity : attribute_X_VariationEntityList) {
             AttributeEntity thisAttributeEntity = thisAttribute_X_VariationEntity.getAttributeEntity();
 
-            AttributeSummaryDTO attributeSummaryDTO = new AttributeSummaryDTO();
+            AttributeSummaryResponseDTO attributeSummaryResponseDTO = new AttributeSummaryResponseDTO();
 
-            attributeSummaryDTO.setId(thisAttributeEntity.getAttributeId());
-            attributeSummaryDTO.setValue(thisAttribute_X_VariationEntity.getAttributeValue());
+            attributeSummaryResponseDTO.setId(thisAttributeEntity.getAttributeId());
+            attributeSummaryResponseDTO.setValue(thisAttribute_X_VariationEntity.getAttributeValue());
 
-            attributeSummaryDTOList.add(attributeSummaryDTO);
+            attributeSummaryResponseDTOList.add(attributeSummaryResponseDTO);
         }
-        return attributeSummaryDTOList;
+        return attributeSummaryResponseDTOList;
     }
 
     private List<VariationResponseDTO> getVariationResponseDTOS(ProductEntity thisProductEntity, boolean simpleVariation) {
@@ -220,8 +401,8 @@ public class CatalogService {
                 //
                 thisVariationResponseDTO.setEnabled(thisVariationEntity.getEnabled());
                 //
-                List<AttributeSummaryDTO> attributeSummaryDTOList = getAttributeSummaryDTOS(thisVariationEntity);
-                thisVariationResponseDTO.setAtribs(attributeSummaryDTOList);
+                List<AttributeSummaryResponseDTO> attributeSummaryResponseDTOList = getAttributeSummaryDTOS(thisVariationEntity);
+                thisVariationResponseDTO.setAtribs(attributeSummaryResponseDTOList);
 
                 variationResponseDTOList.add(thisVariationResponseDTO);
             }

@@ -17,7 +17,7 @@ import java.util.Map;
 public class ProductCreateRequestDTO {
     @Valid
     @NotEmpty(message = "Al menos una (1) Categoria del Producto es obligatoria. No ha sido recibida ")
-    private List<CategoryResponseDTO> categories;
+    private List<CategoryRequestDTO> categories;
 
     @NotBlank(message = "La Descripcion es obligatoria. No ha sido recibida")
     private String description;
@@ -31,6 +31,7 @@ public class ProductCreateRequestDTO {
     @NotBlank(message = "El Modelo del Producto es obligatorio. No ha sido recibida.")
     private String model;
 
+    @Valid
     @NotEmpty(message = "Al menos (1) Variacion del Producto es obligatoria. No ha sido recibida. ")
-    private List<VariationResponseDTO> variations;
+    private List<VariationRequestDTO> variations;
 }

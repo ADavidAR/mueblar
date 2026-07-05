@@ -28,4 +28,9 @@ public class RestControllerCatalog {
         return ResponseEntity.status(201).build();
     }
 
+    @PutMapping(value = "/{model}", consumes = "application/json")
+    public ResponseEntity<?> updateProduct(@PathVariable("model") String modelOfProduct, @Valid @RequestBody ProductCreateRequestDTO productUpdateDTO) {
+        catalogService.updateProductAndVariations(productUpdateDTO, modelOfProduct);
+        return ResponseEntity.status(200).build();
+    }
 }
