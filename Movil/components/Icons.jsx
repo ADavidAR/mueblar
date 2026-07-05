@@ -14,6 +14,10 @@ export const CheckIcon = ({ size = 12, color = '#ffffff', ...props }) => (
     <FontAwesome6 name="check" size={size} color={color} {...props} />
 )
 
+export const CircleCheckIcon = ({ size = 12, color = '#ffffff', ...props }) => (
+    <FontAwesome6 name="circle-check" size={size} color={color} {...props} />
+)
+
 export const SunIcon = ({ size = 20, color = COLORS.copper, ...props }) => (
     <FontAwesome6 name="sun" size={size} color={color} {...props} />
 )
@@ -32,6 +36,10 @@ export const ArrowRightIcon = ({ size = 18, color = COLORS.copper, ...props }) =
 
 export const ChevronDownIcon = ({ size = 14, color = COLORS.iconMuted, ...props }) => (
     <FontAwesome6 name="chevron-down" size={size} color={color} {...props} />
+)
+
+export const ChevronUpIcon = ({ size = 14, color = COLORS.iconMuted, ...props }) => (
+    <FontAwesome6 name="chevron-up" size={size} color={color} {...props} />
 )
 
 export const ShieldKeyIcon = ({ size = 20, color = COLORS.copper, ...props }) => (

@@ -22,11 +22,11 @@ export default function ProductCard ({ item, topVariation }) {
                         <EmptyHeartIcon color="white" />
                     </Pressable>
 
-                    <Text className="text-white mt-2">
+                    <Text className="text-surface dark:text-white mt-2">
                         {item.model}
                     </Text>
 
-                    <Text className="text-white">
+                    <Text className="text-surface dark:text-white">
                         {`L ${topVariation.price}`}
                     </Text>
                 </View>

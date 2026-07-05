@@ -1,5 +1,5 @@
-import { KeyboardAvoidingView, Pressable, ScrollView, Text, View, Platform, Animated } from "react-native";
-import { Link, useRouter, useTheme } from "expo-router";
+import { KeyboardAvoidingView, Pressable, Text, View, Platform, Animated } from "react-native";
+import { Link, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ArrowLeftIcon, ArrowRightIcon, SearchIcon } from "../Icons";
@@ -39,58 +39,61 @@ export default function MainScreen({
                 { hasTopBar
                 ? ( 
                 <View className="h-14 flex-row items-center justify-between px-6">
-                    { showBack
-                    ? ( 
                     <View className="flex-1 flex-row items-center">
-                        <Pressable
-                            onPress={() => router.back()}
-                            hitSlop={10}
-                            className="flex-row items-center active:opacity-60"
-                        >
-                            <ArrowLeftIcon />
-                            { backLabel 
-                            ? <Text className="ml-2 font-semibold text-stone-900 dark:text-stone-100">
-                                {backLabel}
-                            </Text>
-                            : null }
-                        </Pressable>
-                    </View>)
-                    : null}
-                    <View className="flex-1 flex-row items-center">
+                        { showBack
+                        ? ( 
+                            <Pressable
+                                onPress={() => router.back()}
+                                hitSlop={10}
+                                className="flex-row items-center active:opacity-60"
+                            >
+                                <ArrowLeftIcon />
+                                { backLabel && (
+                                    <Text className="ml-2 font-semibold text-stone-900 dark:text-stone-100">
+                                        {backLabel}
+                                    </Text>
+                                )}
+                            </Pressable>)
+                        : null}
                         { showSearch
                         ? (
-                        <Pressable
+                            <Pressable
                             onPress={onSearchPress}
                             hitSlop={10}
                             className="flex-row items-center active:opacity-60"
-                        >
+                            >
                             <SearchIcon />
                         </Pressable>
                         )
                         : null}
                     </View>
 
-                    <View className="flex-1 items-center">{showBrand ? <Brand /> : null}</View>
+                    <View className="flex-1 items-center">
+                        {showBrand ? <Brand /> : null}
+                    </View>
+
                     <View className="flex-1 items-end">
                         {showProfile
                         ? (
                             <Link
-                            asChild
-                            href="/view/profile"
+                                asChild
+                                href="/view/profile"
                             >
                                 <Pressable className="flex-row items-center active:opacity-60">
-                                    <Text className="mr-2 font-semibold text-stone-900 dark:text-stone-100">Perfil</Text>
+                                    <Text className="mr-2 font-semibold text-stone-900 dark:text-stone-100">
+                                        Perfil
+                                    </Text>
                                     <ArrowRightIcon />
                                 </Pressable>
                             </Link>
                         ) 
                         : null}
+                        {showThemeToggle ? (<ThemeToggle />) : null}
                     </View>
-                    {showThemeToggle ? (<View className="flex-1 items-end"> <ThemeToggle /> </View>) : null}
                 </View>)
                 : null}
                 <Animated.View style={[fade, { flex: 1 }]}>
-                    <View className={`flex-1  px-7 ${contentClassName}`}>{children}</View>
+                    <View className={`flex-1 px-7 ${contentClassName}`}>{children}</View>
                 </Animated.View>
             </View>
         </KeyboardAvoidingView>

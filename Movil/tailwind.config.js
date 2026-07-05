@@ -17,8 +17,10 @@ module.exports = {
           dark: "#9c5e46",
           50: "#f6ece6",
         },
-        earth: "#1c1917",
-        creamy: "#f5f5f4",
+        earth: {
+          DEFAULT: "#1c1917",
+          light: "#292524"
+        },
         surface: "#161412",
         card: "#1f1c19",
       },

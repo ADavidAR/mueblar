@@ -36,35 +36,37 @@ async function deleteSessionToken() {
 }
 
 export const request = async (path, options = {}) => {
-  const { skipAuth = false, ...fetchOptions } = options
-  const token = !skipAuth ? await getSessionToken() : null
+    const { skipAuth = false, ...fetchOptions } = options
+    const token = !skipAuth ? await getSessionToken() : null
 
-  const res = await fetch(`${BASE_URL}${path}`, {
-    ...fetchOptions,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...fetchOptions.headers
+    const res = await fetch(`${BASE_URL}${path}`, {
+        ...fetchOptions,
+        headers: {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` }),
+        ...fetchOptions.headers
+        }
+    })
+
+    if (!res.ok) {
+        const text = await res.text()
+        let message = `Error ${res.status}`
+
+        try {
+            const parsed = JSON.parse(text)
+            message = parsed?.message ?? parsed?.errors?.[0]?.message ?? message
+        } catch {
+            message = text || message
+        }
+
+        const err = new Error(message)
+        err.status = res.status
+        throw err
     }
-  })
 
-  if (!res.ok) {
     const text = await res.text()
-    let message = `Error ${res.status}`
-    try {
-      const parsed = JSON.parse(text)
-      message = parsed?.message ?? parsed?.errors?.[0]?.message ?? message
-    } catch {
-      message = text || message
-    }
-    const err = new Error(message)
-    err.status = res.status
-    throw err
-  }
-
-  const text = await res.text()
-  if (!text) return null
-  try { return JSON.parse(text) } catch { return text }
+    if (!text) return null
+    try { return JSON.parse(text) } catch { return text }
 }
 
 export const isAuthenticated = async () => ( await getSessionToken() )
@@ -104,3 +106,18 @@ export const resetPassword = (email, password) =>
     method: 'POST',
     body: JSON.stringify({ email, password })
   })
+
+export const getPermitsForUrl = async (url) => {
+  const { permits } = await request("/api/auth/permits", {
+    skipAuth: false,
+    method: "POST",
+    body: JSON.stringify({url})
+  })
+
+  return {
+    access: Boolean( permits & 8 ),
+    create: Boolean( permits & 4 ),
+    delete: Boolean( permits & 2 ),
+    modify: Boolean( permits & 1 )
+  }
+}

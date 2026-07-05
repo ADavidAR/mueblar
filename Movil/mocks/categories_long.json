@@ -1,0 +1,110 @@
+[
+    {
+        "id": 1,
+        "name": "Salón"
+    },
+    {
+        "id": 2,
+        "name": "Sofás"
+    },
+    {
+        "id": 3,
+        "name": "Comedor"
+    },
+    {
+        "id": 4,
+        "name": "Mesas"
+    },
+    {
+        "id": 5,
+        "name": "Oficina"
+    },
+    {
+        "id": 6,
+        "name": "Sillas"
+    },
+    {
+        "id": 7,
+        "name": "Dormitorio"
+    },
+    {
+        "id": 8,
+        "name": "Camas"
+    },
+    {
+        "id": 9,
+        "name": "Armarios"
+    },
+    {
+        "id": 10,
+        "name": "Sillones"
+    },
+    {
+        "id": 11,
+        "name": "Aparadores"
+    },
+    {
+        "id": 12,
+        "name": "Jardín"
+    },
+    {
+        "id": 13,
+        "name": "Conjuntos"
+    },
+    {
+        "id": 14,
+        "name": "Mesitas"
+    },
+    {
+        "id": 15,
+        "name": "Estanterías"
+    },
+    {
+        "id": 16,
+        "name": "Cocina"
+    },
+    {
+        "id": 17,
+        "name": "Taburetes"
+    },
+    {
+        "id": 18,
+        "name": "Recibidor"
+    },
+    {
+        "id": 19,
+        "name": "Consolas"
+    },
+    {
+        "id": 20,
+        "name": "Cómodas"
+    },
+    {
+        "id": 21,
+        "name": "Infantil"
+    },
+    {
+        "id": 22,
+        "name": "Tumbonas"
+    },
+    {
+        "id": 23,
+        "name": "Zapateros"
+    },
+    {
+        "id": 24,
+        "name": "Puffs"
+    },
+    {
+        "id": 25,
+        "name": "Baño"
+    },
+    {
+        "id": 26,
+        "name": "Tocadores"
+    },
+    {
+        "id": 27,
+        "name": "Muebles TV"
+    }
+]

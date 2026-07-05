@@ -12,8 +12,8 @@ export default function Profile() {
             <View className="bg-stone-50 dark:bg-surface flex-1 justify-start items-center">
                 <Text className="color-slate-50 my-5" >Perfil</Text>
                 <Pressable 
-                className="w-20 aspect-square bg-red-800"
-                onPress={() => {
+                    className="w-20 aspect-square bg-red-800"
+                    onPress={() => {
                         logoutUser()
                         router.navigate("/view/login")
                     }}
