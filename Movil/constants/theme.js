@@ -12,6 +12,7 @@ export const COLORS = {
   copperDark: '#9c5e46',
   // Superficies usadas por valores arbitrarios de Tailwind en las vistas.
   surfaceDark: '#161412',
+  surfaceLessDark: '#1d1c1c',
   cardDark: '#1f1c19',
   placeholder: '#8a817b',
   iconMuted: '#a8a29e',

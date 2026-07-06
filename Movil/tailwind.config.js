@@ -14,6 +14,7 @@ module.exports = {
         copper: {
           DEFAULT: "#b5745a",
           light: "#c89178",
+          lighter: "#D8C2B9",
           dark: "#9c5e46",
           50: "#f6ece6",
         },

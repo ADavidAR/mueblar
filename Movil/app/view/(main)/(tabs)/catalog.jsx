@@ -1,14 +1,14 @@
 import { useState } from "react"
 
-import MainScreen from "../../../components/main/MainScreen"
-import ProductsList from "../../../components/main/ProductsList"
-import SearchModal from "../../../components/main/SearchModal"
-import { FiltersProvider } from "../../../context/FiltersContext"
+import MainScreen from "../../../../components/main/MainScreen"
+import ProductsList from "../../../../components/main/ProductsList"
+import SearchModal from "../../../../components/main/SearchModal"
+import { FiltersProvider } from "../../../../context/FiltersContext"
 
 export default function Catalog() {
     const [ showSearchModal, toggleSearchModal ] = useState(false)
-    const [ shouldLoad, toggleShouldLoad ] = useState(false)
-
+    const [ shouldLoad, toggleShouldLoad ] = useState(true)
+    
     return (
         <FiltersProvider>
             <SearchModal 

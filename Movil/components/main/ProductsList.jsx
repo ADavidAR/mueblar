@@ -1,7 +1,7 @@
-import { ActivityIndicator, FlatList, Text, View } from "react-native"
+import { ActivityIndicator, FlatList, Text, View, RefreshControl } from "react-native"
 import { useCallback, useEffect, useRef, useState } from "react"
 
-import ProductCard from "../ui/ProductCard"
+import { AnimatedProductCard } from "../ui/ProductCard"
 import { PRODUCTS_FETCHING } from "../../constants/products"
 import { COLORS } from "../../constants/theme"
 import { useFilters } from "../../hooks/useFilters"
@@ -12,6 +12,8 @@ export default function ProductsList({ shouldReload, stopReloading }) {
     const [page, setPage] = useState(1)
     const [loading, setLoading] = useState(false)
     const [hasMore, setHasMore] = useState(true)
+    const [refreshing, setRefreshing] = useState(false)
+    const [shouldReset, setShouldReset] = useState(false)
     const flatListRef = useRef(null)
     
     const loadMoreItems = useCallback(  async () => {
@@ -32,6 +34,26 @@ export default function ProductsList({ shouldReload, stopReloading }) {
         }
     }, [hasMore, loading, page, getFilteredProduucts])
 
+    const handleRefresh = useCallback( async () => {
+        setShouldReset(true)
+        setRefreshing(true)
+        setHasMore(true)
+        
+        try {
+            const freshItems = await getFilteredProduucts(0)
+            if (freshItems.length === 0) {
+                setHasMore(false)
+            } else {
+                setProducts(freshItems)
+            }
+        } catch (error) {
+            console.error("Error reloading data:", error)
+        } finally {
+            setRefreshing(false)
+            setPage(1)
+        }
+    }, [getFilteredProduucts])
+
     useEffect(() => {
         if(shouldReload) {
             const initialLoad = async () => {
@@ -40,6 +62,8 @@ export default function ProductsList({ shouldReload, stopReloading }) {
                     animated: true,
 
                 })
+                setShouldReset(true)
+                setHasMore(true)
                 try {
                     const newItems = await getFilteredProduucts(0)
                     if (newItems.length === 0) {
@@ -51,9 +75,8 @@ export default function ProductsList({ shouldReload, stopReloading }) {
                     console.error("Error fetching data:", error)
                 } finally {
                     setPage(1)
-                    setHasMore(true)
                     setLoading(false)
-                    stopReloading(true)
+                    stopReloading()
                 }
             }
             initialLoad()
@@ -76,7 +99,15 @@ export default function ProductsList({ shouldReload, stopReloading }) {
                 ref={flatListRef}
                 onEndReachedThreshold={0.5}
                 onEndReached={loadMoreItems}
-                scrollTo
+                refreshControl={
+                    <RefreshControl 
+                        refreshing={refreshing}
+                        onRefresh={handleRefresh}
+                        colors={["#b5745a"]}
+                        tintColor={"#b5745a"}
+
+                    />
+                }
 
                 ListHeaderComponent={() => (
                     <View className="z-0 bg-stone-50 dark:bg-surface items-center">
@@ -95,10 +126,16 @@ export default function ProductsList({ shouldReload, stopReloading }) {
                 numColumns={2}
                 columnWrapperStyle={{ justifyContent: 'space-between' }}
                 contentContainerStyle={{ gap: 16 }}
-                renderItem={({ item }) => {
+                renderItem={({ item, index }) => {
                     const topVariation = item.variations.find(v => v.top)
                     return (
-                        <ProductCard item={item} topVariation={topVariation}/>
+                        <AnimatedProductCard 
+                            index={index % 10}
+                            shouldReset={shouldReset}
+                            stopReset={() => setShouldReset(false)}
+                            item={item}
+                            topVariation={topVariation}
+                        />
                     )
                 }}
             />

@@ -32,8 +32,8 @@ export default function MainScreen({
             <View
                 className="flex-1 bg-stone-50 dark:bg-surface"
                 style={{
-                    paddingTop: insets.top + 12,
-                    paddingBottom: insets.bottom + 24
+                    paddingTop: insets.top,
+                    paddingBottom: insets.bottom 
                 }}
             >
                 { hasTopBar

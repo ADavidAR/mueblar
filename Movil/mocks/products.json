@@ -15,6 +15,11 @@
         "imgs": [
           "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80",
           "https://images.unsplash.com/photo-1484101403633-562f891dc89a?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Gris Claro" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Lino" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Roble" }
         ]
       },
       {
@@ -25,6 +30,11 @@
         "top": false,
         "imgs": [
           "https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Azul Marino" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Lino" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Roble" }
         ]
       }
     ]
@@ -44,6 +54,10 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1615066390971-03e4e1c36ddf?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Marrón Nogal" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Nogal Macizo" }
         ]
       }
     ]
@@ -63,6 +77,11 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1505797149-43b0069ec26b?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Negro" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Malla Transpirable" },
+          { "attribType": { "id": "MATERIAL" }, "id": "plastico", "value": "Policarbonato Reforzado" }
         ]
       },
       {
@@ -73,6 +92,11 @@
         "top": false,
         "imgs": [
           "https://images.unsplash.com/photo-1580481072645-022f9a6dbf27?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Blanco" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Malla Transpirable" },
+          { "attribType": { "id": "MATERIAL" }, "id": "plastico", "value": "Policarbonato Reforzado" }
         ]
       }
     ]
@@ -89,9 +113,13 @@
         "thumbnail": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=300&q=80",
         "sku": "CAM-VEL-004-GR",
         "price": 420.00,
-        "top": false,
+        "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Gris Antracita" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Terciopelo" }
         ]
       },
       {
@@ -99,9 +127,13 @@
         "thumbnail": "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=300&q=80",
         "sku": "CAM-VEL-004-RO",
         "price": 420.00,
-        "top": true,
+        "top": false,
         "imgs": [
-          "https://images.unsplash.com/photo-122771739844-6a9f6d5f14af?auto=format&fit=crop&w=1200&q=80"
+          "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Rosa Viejo" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Terciopelo" }
         ]
       }
     ]
@@ -121,6 +153,11 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Oro y Blanco" },
+          { "attribType": { "id": "MATERIAL" }, "id": "marmol", "value": "Mármol de Carrara" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Acero Dorado" }
         ]
       }
     ]
@@ -140,6 +177,11 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Blanco Artik" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Melamina de Alta Densidad" },
+          { "attribType": { "id": "MATERIAL" }, "id": "cristal", "value": "Espejo Templado" }
         ]
       }
     ]
@@ -159,6 +201,11 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Negro y Blanco" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Algodón Jacquard" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Pino Estructural" }
         ]
       }
     ]
@@ -178,6 +225,11 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1562184560-a11b7cf7c169?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Blanco" },
+          { "attribType": { "id": "MATERIAL" }, "id": "plastico", "value": "Polipropileno" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Haya Natural" }
         ]
       },
       {
@@ -188,6 +240,11 @@
         "top": false,
         "imgs": [
           "https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Negro Mate" },
+          { "attribType": { "id": "MATERIAL" }, "id": "plastico", "value": "Polipropileno" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Haya Natural" }
         ]
       }
     ]
@@ -207,6 +264,11 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Roble / Negro" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Madera de Roble Reciclada" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Acero al Carbono" }
         ]
       }
     ]
@@ -226,6 +288,11 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1593085260707-5377ba34f9a8?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Marrón Envejecido" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Pino Recuperado" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Hierro Forjado" }
         ]
       }
     ]
@@ -245,6 +312,11 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Marrón" },
+          { "attribType": { "id": "MATERIAL" }, "id": "plastico", "value": "Ratán Sintético (PE)" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Poliéster Impermeable" }
         ]
       }
     ]
@@ -264,6 +336,10 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Blanco Glacial" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "MDF Lacado" }
         ]
       }
     ]
@@ -283,6 +359,10 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Marrón Claro" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Tablero Aglomerado Roble" }
         ]
       }
     ]
@@ -302,6 +382,11 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Marrón Camel" },
+          { "attribType": { "id": "MATERIAL" }, "id": "cuero", "value": "Piel Sintética PU" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Acero Cromado" }
         ]
       }
     ]
@@ -321,6 +406,10 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Transparente" },
+          { "attribType": { "id": "MATERIAL" }, "id": "cristal", "value": "Cristal Templado de 10mm" }
         ]
       }
     ]
@@ -340,6 +429,10 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Blanco / Natural" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Pino Macizo y MDF" }
         ]
       }
     ]
@@ -359,6 +452,11 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1549488344-1f9b8d2bd1f3?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Gris Marengo" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Chenilla Chenille" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Herrajes de Acero Extensibles" }
         ]
       }
     ]
@@ -378,6 +476,10 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Azul y Blanco" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "DM Compacto Lacado" }
         ]
       }
     ]
@@ -397,6 +499,10 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1604014237800-1c9102c219da?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Pino Miel" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Pino Macizo Silvestre" }
         ]
       }
     ]
@@ -416,6 +522,11 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Gris Acero" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Chapa de Acero Galvanizado" },
+          { "attribType": { "id": "MATERIAL" }, "id": "plastico", "value": "Ruedas de Nailon" }
         ]
       }
     ]
@@ -435,6 +546,11 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1592078615290-033ee584e267?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Marrón Chocolate" },
+          { "attribType": { "id": "MATERIAL" }, "id": "cuero", "value": "Piel Rectificada Premium" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Motor de Acero" }
         ]
       }
     ]
@@ -454,6 +570,11 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1560185007-c5ca9d2c014d?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Beige / Blanco" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Aluminio Anodizado" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Textileno Técnico" }
         ]
       }
     ]
@@ -473,6 +594,11 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Negro Roble" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Chapa de Roble Tintado" },
+          { "attribType": { "id": "MATERIAL" }, "id": "cristal", "value": "Vidrio Templado Fumé" }
         ]
       }
     ]
@@ -492,6 +618,10 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Blanco Bicolor" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Melamina Estructurada Haya" }
         ]
       }
     ]
@@ -511,6 +641,11 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Verde Menta" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Madera Industrializada MDF" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Patas de Acero Tubular" }
         ]
       }
     ]
@@ -530,6 +665,11 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1581428982868-e410dd047a90?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Amarillo Mostaza" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Lona Poliéster Oxford" },
+          { "attribType": { "id": "MATERIAL" }, "id": "plastico", "value": "Perlas de EPS" }
         ]
       }
     ]
@@ -549,6 +689,11 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1620626011160-9928f1b2b634?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Gris Cemento" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Tablero Marino Hidrófugo" },
+          { "attribType": { "id": "MATERIAL" }, "id": "marmol", "value": "Cerámica Vitrificada" }
         ]
       }
     ]
@@ -568,6 +713,11 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Blanco Nieve" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Madera de Pino y DM" },
+          { "attribType": { "id": "MATERIAL" }, "id": "cristal", "value": "Espejo de Alta Reflexión" }
         ]
       }
     ]
@@ -587,6 +737,11 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Blanco e Inox" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Acero Inoxidable AISI 304" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Madera de Bambú" }
         ]
       }
     ]
@@ -606,6 +761,11 @@
         "top": true,
         "imgs": [
           "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Gris Grafito / Roble" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Tablero de Partículas Melaminizado" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Pistones de Gas Hidráulicos" }
         ]
       }
     ]
