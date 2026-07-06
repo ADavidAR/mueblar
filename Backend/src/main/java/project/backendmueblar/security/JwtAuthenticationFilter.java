@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -32,26 +33,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String urlRequested =  request.getRequestURI();
         String httpMethod = request.getMethod().toUpperCase();
 
-        if(authHeader != null && authHeader.startsWith("Bearer ")){
+        if(authHeader != null && authHeader.startsWith("Bearer ")) {
             String userEmail = jwtService.extractEmail(authHeader);
-            Map<String, Integer> endpointPatternPermissionMap = jwtService.extractEndpointAndPermission(authHeader.substring(7), urlRequested);
 
-            if (endpointPatternPermissionMap != null) {
-                for (String patternAllowed : endpointPatternPermissionMap.keySet()) {
-                    if (pathMatcher.match(patternAllowed, urlRequested)) {
-                        if(endpointPatternPermissionMap.get(patternAllowed) != null){
-                            if(userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                                if (!urlHasEnoughPermissionsAPI(endpointPatternPermissionMap, patternAllowed, httpMethod)) {
-                                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado: No tienes los permisos necesarios para esta acción.");
-                                    return;
-                                }
-                                if (jwtService.validateJWTIntegrity(authHeader.substring(7))) {
-                                    UsernamePasswordAuthenticationToken contextAuthenticationToken = new UsernamePasswordAuthenticationToken(userEmail, null, List.of());
-                                    SecurityContextHolder.getContext().setAuthentication(contextAuthenticationToken);
+            if (urlRequested.equals("/api/auth/permits")) {
+                if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    if (jwtService.validateJWTIntegrity(authHeader.substring(7))) {
+                        UsernamePasswordAuthenticationToken contextAuthenticationToken = new UsernamePasswordAuthenticationToken(userEmail, null, List.of());
+                        SecurityContextHolder.getContext().setAuthentication(contextAuthenticationToken);
+                    }
+                }
+            } else {
+                Map<String, Integer> endpointPatternPermissionMap = jwtService.extractEndpointAndPermission(authHeader.substring(7), urlRequested);
+                if (endpointPatternPermissionMap != null) {
+                    for (String patternAllowed : endpointPatternPermissionMap.keySet()) {
+                        System.out.println(patternAllowed);
+                        if (pathMatcher.match(patternAllowed, urlRequested)) {
+                            if (endpointPatternPermissionMap.get(patternAllowed) != null) {
+                                if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                                    if (!urlHasEnoughPermissionsAPI(endpointPatternPermissionMap, patternAllowed, httpMethod)) {
+                                        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado: No tienes los permisos necesarios para esta acción.");
+                                        return;
+                                    }
+                                    if (jwtService.validateJWTIntegrity(authHeader.substring(7))) {
+                                        UsernamePasswordAuthenticationToken contextAuthenticationToken = new UsernamePasswordAuthenticationToken(userEmail, null, List.of());
+                                        SecurityContextHolder.getContext().setAuthentication(contextAuthenticationToken);
+                                    }
                                 }
                             }
+                            break;
                         }
-                        break;
                     }
                 }
             }

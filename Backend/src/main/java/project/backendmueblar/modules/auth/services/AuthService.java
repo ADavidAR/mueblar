@@ -164,7 +164,7 @@ public class AuthService {
         }
         String jwt = authHeader.substring(7);
 
-        if (jwtService.extractEndpointAndPermission(jwt, urlRequestDTO.getUrl()).get(urlRequestDTO.getUrl()) == null) {
+        if ((jwtService.extractEndpointAndPermission(jwt, urlRequestDTO.getUrl())) == null) {
             throw new EndpointNotExistForUser("URL / API does not exist");
         }
 
