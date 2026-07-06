@@ -8,6 +8,8 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import org.springframework.util.AntPathMatcher;
+import project.backendmueblar.exception.auth.NotPatternURLFoundTokenException;
 import project.backendmueblar.exception.auth.ViolatedJWTIntegrity;
 import project.backendmueblar.modules.users.entities.UserEntity;
 import javax.crypto.SecretKey;
@@ -20,11 +22,13 @@ public class JwtService {
     @Value("${security.jwt.secret-key}")
     private String secretKey;
 
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+
     public String generateToken(UserEntity  userEntity, Map<String, Integer> endpoints, Long expirationTime) {
         return Jwts.builder()
                 .id(userEntity.getUserId().toString())
                 .claims(Map.of("roleId", userEntity.getRoleEntity().getRoleId()))
-                .claims(endpoints)
+                .claim("permissions", endpoints)
                 .subject(userEntity.getEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expirationTime))
@@ -52,18 +56,41 @@ public class JwtService {
         return claims.getSubject();
     }
 
+    private String extractPatternEndpointAndPermission(String token, String endpointURI) {
+        Claims claims = Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token).getPayload();
+
+        Map<String, Integer> completeMap = claims.get("permissions", Map.class);
+        for(String patternAllowed : completeMap.keySet()) {
+            if(pathMatcher.match(patternAllowed, endpointURI)){
+                return patternAllowed;
+            }
+        }
+        return null;
+    }
+
     // Se retornara un Mapa en caso de que se necesite posteriormente
-    public Map<String, Integer> extractEndpointAndPermission(String token, String endpoint) {
+    public Map<String, Integer> extractEndpointAndPermission(String token, String endpointURI) {
 
         // Private Method
         validateJWTIntegrity(token);
 
+        String possibleEndpoint = extractPatternEndpointAndPermission(token, endpointURI);
+        if(possibleEndpoint == null) {
+            throw new NotPatternURLFoundTokenException("Not exist an Pattern for that endpoint in that token");
+        }
+
         Claims claims = Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token).getPayload();
-        Integer specificPermissionInteger = claims.get(String.format("%s", endpoint), Integer.class);
+        Map<String, Integer> completeMap = claims.get("permissions", Map.class);
 
-        Map<String, Integer> endpointAndPermissionMap = new HashMap<>();
-        endpointAndPermissionMap.put(endpoint, specificPermissionInteger);
+        for (String endpoint : completeMap.keySet()) {
+            if (pathMatcher.match(possibleEndpoint, endpoint)) {
+                Map<String, Integer> endpointAndPermissionMap = new HashMap<>();
+                endpointAndPermissionMap.put(possibleEndpoint, completeMap.get(endpoint));
 
-        return endpointAndPermissionMap;
+                return endpointAndPermissionMap;
+            }
+        }
+
+        throw new NotPatternURLFoundTokenException("Not exist an Pattern for that endpoint in that token");
     }
 }

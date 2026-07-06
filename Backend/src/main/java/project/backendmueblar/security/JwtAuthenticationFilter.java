@@ -8,6 +8,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import project.backendmueblar.modules.auth.services.JwtService;
 
@@ -19,6 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -32,10 +34,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if(authHeader != null && authHeader.startsWith("Bearer ")){
             String userEmail = jwtService.extractEmail(authHeader);
-            Map<String, Integer> endpointPermissionMap = jwtService.extractEndpointAndPermission(authHeader.substring(7), urlRequested);
-            if(endpointPermissionMap.get(urlRequested) != null){
+
+            Map<String, Integer> endpointPatternPermissionMap = jwtService.extractEndpointAndPermission(authHeader.substring(7), urlRequested);
+
+            System.out.println("=== 🔍 DIAGNÓSTICO PROFUNDO ===");
+            System.out.println("1. URL Solicitada: " + urlRequested);
+            System.out.println("2. Mapa extraído del JWT: " + endpointPatternPermissionMap);
+
+            Integer permissions = null;
+            String patternURL = null;
+            if (endpointPatternPermissionMap != null) {
+                for (String patternAllowed : endpointPatternPermissionMap.keySet()) {
+                    boolean isMatch = pathMatcher.match(patternAllowed, urlRequested);
+                    System.out.println("   -> Evaluando patrón: [" + patternAllowed + "] contra URL. ¿Coincide?: " + isMatch);
+
+                    if (isMatch) {
+                        permissions = endpointPatternPermissionMap.get(patternAllowed);
+                        patternURL = patternAllowed;
+                        break;
+                    }
+                }
+            }
+
+            System.out.println("3. Permisos finales obtenidos (Bits): " + permissions);
+
+            if(permissions != null){
                 if(userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    if (!urlHasEnoughPermissionsAPI(endpointPermissionMap, urlRequested, httpMethod)) {
+                    if (!urlHasEnoughPermissionsAPI(endpointPatternPermissionMap, patternURL, httpMethod)) {
                         response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado: No tienes los permisos necesarios para esta acción.");
                         return;
                     }
