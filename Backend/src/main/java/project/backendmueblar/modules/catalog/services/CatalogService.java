@@ -27,6 +27,7 @@ public class CatalogService {
     private final RepositoryProduct repositoryProduct;
     private final RepositoryCategory repositoryCategory;
     private final RepositoryAttribute repositoryAttribute;
+    private final RepositoryVariation repositoryVariation;
 
     @Transactional
     public void createProductAndVariations(ProductCreateRequestDTO productCreateRequestDTO) {
@@ -127,13 +128,22 @@ public class CatalogService {
     // ----------------------------------------------------------------------------------------------------------------------------------------//
 
     @Transactional
-    public void updateProductAndVariations(ProductCreateRequestDTO productCreateRequestDTO, String modelOfProduct) {
+    public void updateProductAndVariations(String modelOfProduct, ProductCreateRequestDTO productCreateRequestDTO) {
         Optional<ProductEntity> optionalProduct = repositoryProduct.findByModelName(modelOfProduct);
         if(optionalProduct.isEmpty()) {
-            throw new ResourceNotFoundException("Product not found. Cannot Update It");
+            createProductAndVariations(productCreateRequestDTO);
+            return;
         }
 
         ProductEntity thisProductEntity = optionalProduct.get();
+
+        if (!(modelOfProduct.equals(productCreateRequestDTO.getModel()))) {
+            createProductAndVariations(productCreateRequestDTO);
+            repositoryProduct.delete(thisProductEntity);
+            repositoryProduct.flush();
+            return;
+        }
+
         thisProductEntity.setDescription(productCreateRequestDTO.getDescription());
         thisProductEntity.setDimensions(productCreateRequestDTO.getDimensions());
         thisProductEntity.setEnabled(productCreateRequestDTO.getEnable());
@@ -143,10 +153,10 @@ public class CatalogService {
         attributes_X_ProductEntityList.clear();
         List<Product_X_CategoryEntity> product_x_categoryEntityList = thisProductEntity.getProductXCategoryEntityList();
         product_x_categoryEntityList.clear();
-        List<VariationEntity> variationEntityList = thisProductEntity.getVariationEntityList();
 
         repositoryProduct.flush();
 
+        List<VariationEntity> variationEntityList = thisProductEntity.getVariationEntityList();
         List<VariationRequestDTO> variationRequestDTOList = productCreateRequestDTO.getVariations();
 
         // Obtencion De Los Skus Finales de Variation Request, y Eliminacion de Variaciones Provenientes de la
@@ -155,20 +165,24 @@ public class CatalogService {
         for (VariationRequestDTO variationRequestDTO : variationRequestDTOList) {
             if (variationRequestDTO.getSku() != null) {
                 skusFromRequest.add(variationRequestDTO.getSku());
+                System.out.print("-----------------------------------" + (variationRequestDTO.getSku()) + "-----------------------------------");
             }
         }
         Iterator<VariationEntity> iterator = variationEntityList.iterator();
         while (iterator.hasNext()) {
             VariationEntity variationEntityFromDB = iterator.next();
             if (!skusFromRequest.contains(variationEntityFromDB.getSku())) {
+                System.out.println("-----------------------------------" + variationEntityFromDB.getSku() + "-----------------------------------");
                 iterator.remove();
             }
         }
 
+        repositoryProduct.flush();
+
         for(VariationRequestDTO thisVariationRequestDTO : variationRequestDTOList) {
             VariationEntity existVariation = null;
             for (VariationEntity variationFromDB : variationEntityList) {
-                if (variationFromDB.getSku().equals(thisVariationRequestDTO.getSku())) {
+                if (variationFromDB.getSku().trim().equals(thisVariationRequestDTO.getSku().trim())) {
                     existVariation = variationFromDB;
                     break;
                 }
@@ -176,6 +190,11 @@ public class CatalogService {
 
             if(existVariation == null) {
                 VariationEntity thisVariationEntity = new VariationEntity();
+
+                if(repositoryVariation.existsBySku(thisVariationRequestDTO.getSku())) {
+                    throw new IllegalArgumentException("SKU Already Exists in Database linked to a another Product");
+                }
+
                 thisVariationEntity.setSku(thisVariationRequestDTO.getSku());
                 thisVariationEntity.setVariationName(thisVariationRequestDTO.getName());
                 thisVariationEntity.setInstationParameters(thisVariationRequestDTO.getInstance_params());
@@ -232,6 +251,7 @@ public class CatalogService {
 
             } else {
                 VariationEntity thisVariationEntity = existVariation;
+
                 thisVariationEntity.setVariationName(thisVariationRequestDTO.getName());
                 thisVariationEntity.setInstationParameters(thisVariationRequestDTO.getInstance_params());
                 thisVariationEntity.setModel3dPath(thisVariationRequestDTO.getModel_3d());
@@ -245,6 +265,8 @@ public class CatalogService {
                 thumbnailEntityList.clear();
                 List<Attribute_X_VariationEntity> attribute_X_variationEntityList = thisVariationEntity.getAttributeXVariationEntities();
                 attribute_X_variationEntityList.clear();
+
+                repositoryProduct.flush();
 
                 ThumbnailEntity thumbnailEntity = new ThumbnailEntity();
                 thumbnailEntity.setThumbnailPath(thisVariationRequestDTO.getThumbnail());

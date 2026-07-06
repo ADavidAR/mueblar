@@ -34,39 +34,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if(authHeader != null && authHeader.startsWith("Bearer ")){
             String userEmail = jwtService.extractEmail(authHeader);
-
             Map<String, Integer> endpointPatternPermissionMap = jwtService.extractEndpointAndPermission(authHeader.substring(7), urlRequested);
 
-            System.out.println("=== 🔍 DIAGNÓSTICO PROFUNDO ===");
-            System.out.println("1. URL Solicitada: " + urlRequested);
-            System.out.println("2. Mapa extraído del JWT: " + endpointPatternPermissionMap);
-
-            Integer permissions = null;
-            String patternURL = null;
             if (endpointPatternPermissionMap != null) {
                 for (String patternAllowed : endpointPatternPermissionMap.keySet()) {
-                    boolean isMatch = pathMatcher.match(patternAllowed, urlRequested);
-                    System.out.println("   -> Evaluando patrón: [" + patternAllowed + "] contra URL. ¿Coincide?: " + isMatch);
-
-                    if (isMatch) {
-                        permissions = endpointPatternPermissionMap.get(patternAllowed);
-                        patternURL = patternAllowed;
+                    if (pathMatcher.match(patternAllowed, urlRequested)) {
+                        if(endpointPatternPermissionMap.get(patternAllowed) != null){
+                            if(userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                                if (!urlHasEnoughPermissionsAPI(endpointPatternPermissionMap, patternAllowed, httpMethod)) {
+                                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado: No tienes los permisos necesarios para esta acción.");
+                                    return;
+                                }
+                                if (jwtService.validateJWTIntegrity(authHeader.substring(7))) {
+                                    UsernamePasswordAuthenticationToken contextAuthenticationToken = new UsernamePasswordAuthenticationToken(userEmail, null, List.of());
+                                    SecurityContextHolder.getContext().setAuthentication(contextAuthenticationToken);
+                                }
+                            }
+                        }
                         break;
-                    }
-                }
-            }
-
-            System.out.println("3. Permisos finales obtenidos (Bits): " + permissions);
-
-            if(permissions != null){
-                if(userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    if (!urlHasEnoughPermissionsAPI(endpointPatternPermissionMap, patternURL, httpMethod)) {
-                        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado: No tienes los permisos necesarios para esta acción.");
-                        return;
-                    }
-                    if (jwtService.validateJWTIntegrity(authHeader.substring(7))) {
-                        UsernamePasswordAuthenticationToken contextAuthenticationToken = new UsernamePasswordAuthenticationToken(userEmail, null, List.of());
-                        SecurityContextHolder.getContext().setAuthentication(contextAuthenticationToken);
                     }
                 }
             }
