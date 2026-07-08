@@ -330,6 +330,18 @@ public class CatalogService {
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
 
+    @Transactional
+    public void deleteProductCascade(String modelOfProduct) {
+        Optional<ProductEntity> optionalProduct = repositoryProduct.findByModelName(modelOfProduct);
+        if(optionalProduct.isEmpty()){
+            throw new ResourceNotFoundException("Product not found");
+        }
+
+        ProductEntity thisProductEntity = optionalProduct.get();
+        repositoryProduct.delete(thisProductEntity);
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
     public ProductResponseDTO getSpecificProduct(String modelOfProduct, boolean simpleVariation) {
         Optional<ProductEntity> optionalProduct = repositoryProduct.findByModelName(modelOfProduct);
         if (optionalProduct.isEmpty()) {

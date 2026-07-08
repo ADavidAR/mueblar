@@ -33,4 +33,10 @@ public class RestControllerCatalog {
         catalogService.updateProductAndVariations(modelOfProduct, productUpdateDTO);
         return ResponseEntity.status(200).build();
     }
+
+    @DeleteMapping(value = "/{model}")
+    public ResponseEntity<?> deleteProduct(@PathVariable("model") String modelOfProduct){
+        catalogService.deleteProductCascade(modelOfProduct);
+        return ResponseEntity.status(204).build();
+    }
 }
