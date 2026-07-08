@@ -48,6 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (endpointPatternPermissionMap != null) {
                     for (String patternAllowed : endpointPatternPermissionMap.keySet()) {
                         System.out.println(patternAllowed);
+                        System.out.println(urlRequested);
                         if (pathMatcher.match(patternAllowed, urlRequested)) {
                             if (endpointPatternPermissionMap.get(patternAllowed) != null) {
                                 if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {

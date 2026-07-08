@@ -48,9 +48,25 @@ public class CategoryService {
 
         CategoryEntity categoryEntity = new CategoryEntity();
         categoryEntity.setCategoryName(categoryCreateRequestDTO.getName());
-        categoryEntity = repositoryCategory.save(categoryEntity);
+        repositoryCategory.save(categoryEntity);
 
     }
 
     // ------------------------------------------------------------------------------------------------------//
+
+    public void updateCategory(Long categoryID, CategoryCreateRequestDTO categoryCreateRequestDTO) {
+        Optional<CategoryEntity> optionalCategory = repositoryCategory.findByCategoryId(categoryID);
+        if(optionalCategory.isEmpty()) {
+            throw new ResourceNotFoundException("Category not found");
+        }
+
+        CategoryEntity thisCategoryEntity = optionalCategory.get();
+
+        thisCategoryEntity.setCategoryName(categoryCreateRequestDTO.getName());
+        repositoryCategory.save(thisCategoryEntity);
+
+    }
+
+    // ------------------------------------------------------------------------------------------------------//
+
 }
