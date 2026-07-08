@@ -110,7 +110,7 @@ export default function SearchModal({
                         className="flex-row items-center rounded-t-md border dark:bg-earth-light/80 bg-earth-light/10 border-stone-700 px-3 mb-3"
                     >
                         <Pressable 
-                            className="active:opacity-60"
+                            className="active:opacity-60 mr-3"
                             onPress={onSearch}
                         >
                             <SearchIcon color={isDark ? COLORS.stone100 : COLORS.stone900}/>
@@ -119,7 +119,7 @@ export default function SearchModal({
                             onChangeText={handleSearchChange}
                             value={filters.search}
                             autoFocus={true}
-                            className="text-stone-50"
+                            className="text-stone-900 dark:text-stone-50 flex-1"
                         />
                     </View>
                     <Text 
@@ -143,7 +143,7 @@ export default function SearchModal({
                                 return (
                                     <Pressable 
                                         onPress={() => toggleCategory(item.id)}
-                                        className={`py-5 px-4 flex-row justify-between items-center ${isSelected ? "bg-earth-light/80" : ""}`} 
+                                        className={`py-5 px-4 flex-row justify-between items-center ${isSelected ? "bg-earth-light/20 dar:bg-earth-light/80" : ""}`} 
                                     >
                                         <Text 
                                             className={`text-xl ${isSelected ? "text-copper" : "text-stone-900 dark:text-stone-100"}`}
