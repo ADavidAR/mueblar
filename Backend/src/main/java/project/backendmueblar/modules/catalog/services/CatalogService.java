@@ -342,6 +342,42 @@ public class CatalogService {
     }
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
+
+    public VariationResponseDTO getSpecificVariation(String skuOfVariation) {
+        Optional<VariationEntity> optionalVariation = repositoryVariation.findBySku(skuOfVariation);
+        if(optionalVariation.isEmpty()){
+            throw new ResourceNotFoundException("Variation not found");
+        }
+
+        VariationEntity thisVariationEntity = optionalVariation.get();
+
+        VariationResponseDTO variationResponseDTO = new VariationResponseDTO();
+        variationResponseDTO.setSku(thisVariationEntity.getSku());
+        variationResponseDTO.setName(thisVariationEntity.getVariationName());
+        variationResponseDTO.setModel_3d(thisVariationEntity.getModel3dPath());
+
+        List<String> otherThumbnails = new ArrayList<>();
+        for(ThumbnailEntity thisThumbnailEntity : thisVariationEntity.getThumbnailEntities()){
+            if(thisThumbnailEntity.getIsTop()){
+                variationResponseDTO.setThumbnail(thisThumbnailEntity.getThumbnailPath());
+            }
+            otherThumbnails.add(thisThumbnailEntity.getThumbnailPath());
+        }
+        variationResponseDTO.setImgs(otherThumbnails);
+
+        variationResponseDTO.setPrice(thisVariationEntity.getPrice());
+        variationResponseDTO.setTop(thisVariationEntity.getIsTop());
+        variationResponseDTO.setEnabled(thisVariationEntity.getEnabled());
+        variationResponseDTO.setInstance_params(thisVariationEntity.getInstationParameters());
+
+        List<AttributeSummaryResponseDTO> attributeSummaryResponseDTOList = getAttributeSummaryDTOS(thisVariationEntity);
+        variationResponseDTO.setAtribs(attributeSummaryResponseDTOList);
+
+        return variationResponseDTO;
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
+
     public ProductResponseDTO getSpecificProduct(String modelOfProduct, boolean simpleVariation) {
         Optional<ProductEntity> optionalProduct = repositoryProduct.findByModelName(modelOfProduct);
         if (optionalProduct.isEmpty()) {

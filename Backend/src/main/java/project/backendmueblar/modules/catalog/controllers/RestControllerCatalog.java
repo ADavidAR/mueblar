@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.backendmueblar.modules.catalog.dtos.request.ProductCreateRequestDTO;
 import project.backendmueblar.modules.catalog.dtos.response.ProductResponseDTO;
+import project.backendmueblar.modules.catalog.dtos.response.VariationResponseDTO;
 import project.backendmueblar.modules.catalog.services.CatalogService;
 
 @RestController
@@ -38,5 +39,11 @@ public class RestControllerCatalog {
     public ResponseEntity<?> deleteProduct(@PathVariable("model") String modelOfProduct){
         catalogService.deleteProductCascade(modelOfProduct);
         return ResponseEntity.status(204).build();
+    }
+
+    @GetMapping(value = "/{model}/variations/{sku}")
+    public ResponseEntity<?> getVariation(@PathVariable("sku") String skuOfVariation) {
+        VariationResponseDTO variationResponseDTO = catalogService.getSpecificVariation(skuOfVariation);
+        return ResponseEntity.status(200).body(variationResponseDTO);
     }
 }
