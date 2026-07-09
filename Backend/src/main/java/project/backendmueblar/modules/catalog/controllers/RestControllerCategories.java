@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.backendmueblar.modules.catalog.dtos.request.CategoryCreateRequestDTO;
-import project.backendmueblar.modules.catalog.dtos.request.CategoryRequestDTO;
 import project.backendmueblar.modules.catalog.dtos.response.CategoryResponseDTO;
 import project.backendmueblar.modules.catalog.services.CatalogService;
 import project.backendmueblar.modules.catalog.services.CategoryService;
@@ -17,7 +16,6 @@ import java.util.List;
 @RequiredArgsConstructor
 class RestControllerCategories {
     private final CategoryService categoryService;
-    private final CatalogService catalogService;
 
     @GetMapping()
     public ResponseEntity<?> getCategories () {
@@ -35,5 +33,11 @@ class RestControllerCategories {
     public ResponseEntity<?> updateCategory(@PathVariable ("id_categoria") Long categoryID, @Valid @RequestBody CategoryCreateRequestDTO categoryCreateRequestDTO) {
         categoryService.updateCategory(categoryID, categoryCreateRequestDTO);
         return ResponseEntity.status(200).build();
+    }
+
+    @DeleteMapping(value = "/{id_categoria}")
+    public ResponseEntity<?> deleteCategory(@PathVariable ("id_categoria") Long categoryID) {
+        categoryService.deleteCategory(categoryID);
+        return ResponseEntity.status(204).build();
     }
 }

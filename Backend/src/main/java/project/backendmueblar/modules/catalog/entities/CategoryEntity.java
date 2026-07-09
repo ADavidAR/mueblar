@@ -24,7 +24,7 @@ public class CategoryEntity {
     @Column(name = "nombre_categoria", nullable = false)
     private String categoryName;
 
-    @OneToMany(mappedBy = "categoryEntity")
+    @OneToMany(mappedBy = "categoryEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product_X_CategoryEntity> productCategories;
 
 }

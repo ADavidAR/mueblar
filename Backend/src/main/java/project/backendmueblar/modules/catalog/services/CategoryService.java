@@ -1,5 +1,6 @@
 package project.backendmueblar.modules.catalog.services;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import project.backendmueblar.exception.catalog.ResourceAlreadyExistsException;
@@ -40,6 +41,7 @@ public class CategoryService {
 
     // ------------------------------------------------------------------------------------------------------//
 
+    @Transactional
     public void createCategory(CategoryCreateRequestDTO categoryCreateRequestDTO) {
         Optional<CategoryEntity> optionalCategory = repositoryCategory.findByCategoryName(categoryCreateRequestDTO.getName());
         if(optionalCategory.isPresent()) {
@@ -54,6 +56,7 @@ public class CategoryService {
 
     // ------------------------------------------------------------------------------------------------------//
 
+    @Transactional
     public void updateCategory(Long categoryID, CategoryCreateRequestDTO categoryCreateRequestDTO) {
         Optional<CategoryEntity> optionalCategory = repositoryCategory.findByCategoryId(categoryID);
         if(optionalCategory.isEmpty()) {
@@ -64,6 +67,20 @@ public class CategoryService {
 
         thisCategoryEntity.setCategoryName(categoryCreateRequestDTO.getName());
         repositoryCategory.save(thisCategoryEntity);
+
+    }
+
+    // ------------------------------------------------------------------------------------------------------//
+
+    @Transactional
+    public void deleteCategory(Long categoryID) {
+        Optional<CategoryEntity> optionalCategory = repositoryCategory.findByCategoryId(categoryID);
+        if(optionalCategory.isEmpty()) {
+            throw new ResourceNotFoundException("Category not found");
+        }
+
+        CategoryEntity thisCategoryEntity = optionalCategory.get();
+        repositoryCategory.delete(thisCategoryEntity);
 
     }
 
