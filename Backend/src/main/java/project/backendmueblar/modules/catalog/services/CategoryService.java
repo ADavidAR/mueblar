@@ -48,7 +48,7 @@ public class CategoryService {
 
         CategoryEntity categoryEntity = new CategoryEntity();
         categoryEntity.setCategoryName(categoryCreateRequestDTO.getName());
-        categoryEntity = repositoryCategory.save(categoryEntity);
+        repositoryCategory.save(categoryEntity);
 
     }
 
