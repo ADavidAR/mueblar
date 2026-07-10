@@ -1,18 +1,21 @@
 package project.backendmueblar.modules.catalog.services;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import project.backendmueblar.exception.catalog.ResourceAlreadyExistsException;
 import project.backendmueblar.exception.catalog.ResourceNotFoundException;
 import project.backendmueblar.modules.catalog.dtos.request.AttributeCreateRequestDTO;
-import project.backendmueblar.modules.catalog.dtos.request.AttributeSummaryRequestDTO;
 import project.backendmueblar.modules.catalog.entities.AttributeEntity;
 import project.backendmueblar.modules.catalog.entities.AttributeTypeEntity;
+import project.backendmueblar.modules.catalog.entities.Attribute_X_ProductEntity;
+import project.backendmueblar.modules.catalog.entities.Attribute_X_VariationEntity;
 import project.backendmueblar.modules.catalog.repositories.RepositoryAttribute;
 import project.backendmueblar.modules.catalog.repositories.RepositoryAttributeType;
 
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +41,58 @@ public class AttributeService {
         attributeEntity.setAttributeTypeEntity(optionalAttributeType.get());
 
         repositoryAttribute.save(attributeEntity);
+
+    }
+
+    @Transactional
+    public void updateAttribute(String attributeId, AttributeCreateRequestDTO attributeUpdateRequestDTO) {
+        Optional<AttributeEntity> optionalAttribute = repositoryAttribute.findByAttributeId(attributeId);
+        if(optionalAttribute.isEmpty()) {
+            throw new ResourceNotFoundException("Attribute with id " + attributeId + " not found");
+        }
+
+        Optional<AttributeTypeEntity> optionalAttributeType = repositoryAttributeType.findByAttributeTypeId(attributeUpdateRequestDTO.getType());
+        if(optionalAttributeType.isEmpty()) {
+            throw new ResourceNotFoundException("AttributeType with name " + attributeUpdateRequestDTO.getType() + " not found");
+        }
+
+        AttributeEntity oldAttributeEntity = optionalAttribute.get();
+
+        if(attributeId.equals(attributeUpdateRequestDTO.getName())) {
+            oldAttributeEntity.setAttributeTypeEntity(optionalAttributeType.get());
+            repositoryAttribute.save(oldAttributeEntity);
+            return;
+        }
+
+        List<Attribute_X_ProductEntity> attributeXProductEntityList = oldAttributeEntity.getAttributeXProductEntities();
+        List<Attribute_X_VariationEntity> attributeXVariationEntityList = oldAttributeEntity.getAttributeXVariationEntities();
+
+        if(!attributeXProductEntityList.isEmpty() || !attributeXVariationEntityList.isEmpty()) {
+            List<String> products = new ArrayList<>();
+            List<String> variations = new ArrayList<>();
+            Map<String, List<String>> mapForResponsiveError = new HashMap<>();
+
+            for(Attribute_X_ProductEntity attributeXProductEntity : attributeXProductEntityList) {
+                products.add(attributeXProductEntity.getProductEntity().getModelName());
+            }
+
+            for(Attribute_X_VariationEntity attributeXVariationEntity : attributeXVariationEntityList) {
+                variations.add(attributeXVariationEntity.getVariationEntity().getVariationName());
+            }
+
+            mapForResponsiveError.put("products", products);
+            mapForResponsiveError.put("variations", variations);
+
+            throw new ResourceAlreadyExistsException(String.format("The attribute cannot be deleted until it has been removed from all associated products and variations: " + mapForResponsiveError.toString()));
+
+        }
+
+        AttributeEntity newAttributeEntity = new AttributeEntity();
+        newAttributeEntity.setAttributeId(attributeUpdateRequestDTO.getName());
+        newAttributeEntity.setAttributeTypeEntity(optionalAttributeType.get());
+
+        repositoryAttribute.delete(oldAttributeEntity);
+        repositoryAttribute.save(newAttributeEntity);
 
     }
 
