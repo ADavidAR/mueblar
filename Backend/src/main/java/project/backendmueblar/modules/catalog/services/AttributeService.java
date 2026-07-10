@@ -102,4 +102,45 @@ public class AttributeService {
 
     }
 
+    // ------------------------------------------------------------------------------------------------------//
+
+    @Transactional
+    public void deleteAttribute(String attributeId) {
+        Optional<AttributeEntity> optionalAttribute = repositoryAttribute.findByAttributeId(attributeId);
+        if(optionalAttribute.isEmpty()) {
+            throw new ResourceNotFoundException("Attribute with id " + attributeId + " not found");
+        }
+
+        Optional<AttributeTypeEntity> optionalAttributeType = repositoryAttributeType.findByAttributeTypeId(optionalAttribute.get().getAttributeTypeEntity().getAttributeTypeId());
+        if(optionalAttributeType.isEmpty()) {
+            throw new ResourceNotFoundException("AttributeType with name " + optionalAttribute.get().getAttributeTypeEntity().getAttributeTypeId() + " not found");
+        }
+
+        AttributeEntity thisAttributeEntity = optionalAttribute.get();
+        List<Attribute_X_ProductEntity> attributeXProductEntityList = thisAttributeEntity.getAttributeXProductEntities();
+        List<Attribute_X_VariationEntity> attributeXVariationEntityList = thisAttributeEntity.getAttributeXVariationEntities();
+
+        if(!attributeXProductEntityList.isEmpty() || !attributeXVariationEntityList.isEmpty()) {
+            List<String> products = new ArrayList<>();
+            List<String> variations = new ArrayList<>();
+            Map<String, List<String>> mapForResponsiveError = new HashMap<>();
+
+            for(Attribute_X_ProductEntity attributeXProductEntity : attributeXProductEntityList) {
+                products.add(attributeXProductEntity.getProductEntity().getModelName());
+            }
+
+            for(Attribute_X_VariationEntity attributeXVariationEntity : attributeXVariationEntityList) {
+                variations.add(attributeXVariationEntity.getVariationEntity().getVariationName());
+            }
+
+            mapForResponsiveError.put("products", products);
+            mapForResponsiveError.put("variations", variations);
+
+            throw new ResourceAlreadyExistsException(String.format("The attribute cannot be deleted until it has been removed from all associated products and variations: " + mapForResponsiveError));
+        }
+
+        repositoryAttribute.delete(thisAttributeEntity);
+
+    }
+
 }

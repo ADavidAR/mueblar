@@ -26,4 +26,10 @@ public class RestControllerAttributes {
         return ResponseEntity.status(200).build();
     }
 
+    @DeleteMapping(value = "/attributes/{id_atributo}")
+    public ResponseEntity<?> deleteAttribute(@PathVariable ("id_atributo") String attributeId){
+        attributeService.deleteAttribute(attributeId);
+        return ResponseEntity.status(204).build();
+    }
+
 }
