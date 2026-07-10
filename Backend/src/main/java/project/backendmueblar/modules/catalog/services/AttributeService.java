@@ -1,10 +1,8 @@
 package project.backendmueblar.modules.catalog.services;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import project.backendmueblar.exception.catalog.ResourceAlreadyExistsException;
 import project.backendmueblar.exception.catalog.ResourceNotFoundException;
 import project.backendmueblar.modules.catalog.dtos.request.AttributeCreateRequestDTO;
@@ -43,6 +41,8 @@ public class AttributeService {
         repositoryAttribute.save(attributeEntity);
 
     }
+
+    // ------------------------------------------------------------------------------------------------------//
 
     @Transactional
     public void updateAttribute(String attributeId, AttributeCreateRequestDTO attributeUpdateRequestDTO) {
@@ -83,8 +83,14 @@ public class AttributeService {
             mapForResponsiveError.put("products", products);
             mapForResponsiveError.put("variations", variations);
 
-            throw new ResourceAlreadyExistsException(String.format("The attribute cannot be deleted until it has been removed from all associated products and variations: " + mapForResponsiveError.toString()));
+            throw new ResourceAlreadyExistsException(String.format("The attribute cannot be deleted until it has been removed from all associated products and variations: " + mapForResponsiveError));
 
+        }
+
+
+        Optional<AttributeEntity> optionalAttributeExists = repositoryAttribute.findByAttributeId(attributeUpdateRequestDTO.getName());
+        if(optionalAttributeExists.isPresent()) {
+            throw new ResourceAlreadyExistsException("Attribute with name " + attributeUpdateRequestDTO.getName() + " already exists");
         }
 
         AttributeEntity newAttributeEntity = new AttributeEntity();
