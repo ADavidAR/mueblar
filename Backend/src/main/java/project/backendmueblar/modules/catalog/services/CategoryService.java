@@ -1,5 +1,6 @@
 package project.backendmueblar.modules.catalog.services;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import project.backendmueblar.exception.catalog.ResourceAlreadyExistsException;
@@ -40,6 +41,7 @@ public class CategoryService {
 
     // ------------------------------------------------------------------------------------------------------//
 
+    @Transactional
     public void createCategory(CategoryCreateRequestDTO categoryCreateRequestDTO) {
         Optional<CategoryEntity> optionalCategory = repositoryCategory.findByCategoryName(categoryCreateRequestDTO.getName());
         if(optionalCategory.isPresent()) {
