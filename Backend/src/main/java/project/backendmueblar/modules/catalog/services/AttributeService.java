@@ -87,9 +87,8 @@ public class AttributeService {
 
         }
 
-
         Optional<AttributeEntity> optionalAttributeExists = repositoryAttribute.findByAttributeId(attributeUpdateRequestDTO.getName());
-        if(optionalAttributeExists.isPresent()) {
+        if(!(optionalAttributeExists.isEmpty())) {
             throw new ResourceAlreadyExistsException("Attribute with name " + attributeUpdateRequestDTO.getName() + " already exists");
         }
 
