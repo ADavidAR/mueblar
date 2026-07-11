@@ -11,13 +11,13 @@ import project.backendmueblar.modules.catalog.dtos.request.AttributeCreateReques
 import project.backendmueblar.modules.catalog.services.AttributeService;
 
 @RestController
-@RequestMapping("/api/attributes")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class RestControllerAttributes {
 
     private final AttributeService attributeService;
 
-    @PostMapping(consumes = "application/json")
+    @PostMapping(value = "/attribute", consumes = "application/json")
     public ResponseEntity<?> createAttribute(@Valid @RequestBody AttributeCreateRequestDTO attributeCreateRequestDTO) {
         attributeService.createAttribute(attributeCreateRequestDTO);
         return ResponseEntity.status(201).build();
