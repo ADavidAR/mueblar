@@ -5,6 +5,7 @@ import { AnimatedProductCard } from "../ui/ProductCard"
 import { PRODUCTS_FETCHING } from "../../constants/products"
 import { COLORS } from "../../constants/theme"
 import { useFilters } from "../../hooks/useFilters"
+import SerifText from "../ui/SerifText"
 
 export default function ProductsList({ shouldReload, stopReloading }) {
     const { getFilteredProduucts } = useFilters()
@@ -93,14 +94,15 @@ export default function ProductsList({ shouldReload, stopReloading }) {
     }
 
     return (
-        <View className="z-0 bg-stone-50 dark:bg-surface">
-            
+        <View className="z-0 flex-1 bg-sand dark:bg-surface">
+
             <FlatList
                 ref={flatListRef}
                 onEndReachedThreshold={0.5}
                 onEndReached={loadMoreItems}
+                showsVerticalScrollIndicator={false}
                 refreshControl={
-                    <RefreshControl 
+                    <RefreshControl
                         refreshing={refreshing}
                         onRefresh={handleRefresh}
                         colors={["#b5745a"]}
@@ -110,9 +112,11 @@ export default function ProductsList({ shouldReload, stopReloading }) {
                 }
 
                 ListHeaderComponent={() => (
-                    <View className="z-0 bg-stone-50 dark:bg-surface items-center">
-                        <Text className="color-surface dark:color-slate-50 my-5" >Catalogo</Text>
-                        <Text className="color-surface dark:color-slate-50 my-5">
+                    <View className="bg-sand dark:bg-surface pt-4 pb-6">
+                        <SerifText className="text-6xl font-bold text-stone-900 dark:text-stone-50">
+                            Catálogo
+                        </SerifText>
+                        <Text className="mt-3 text-base leading-6 text-stone-500 dark:text-stone-400">
                             Siluetas escultóricas y materiales orgánicos
                             para el santuario moderno. Experimenta el
                             diseño en tu espacio.
@@ -125,7 +129,7 @@ export default function ProductsList({ shouldReload, stopReloading }) {
                 keyExtractor={(item) => item.model}
                 numColumns={2}
                 columnWrapperStyle={{ justifyContent: 'space-between' }}
-                contentContainerStyle={{ gap: 16 }}
+                contentContainerStyle={{ gap: 20, paddingBottom: 110 }}
                 renderItem={({ item, index }) => {
                     const topVariation = item.variations.find(v => v.top)
                     return (

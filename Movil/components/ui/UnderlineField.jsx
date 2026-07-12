@@ -8,11 +8,12 @@ export default function UnderlineField({
   error,
   className = '',
   inputClassName = '',
+  labelClassName = '',
   ...inputProps
 }) {
   return (
     <View className={`w-full ${className}`}>
-      {label ? <FieldLabel>{label}</FieldLabel> : null}
+      {label ? <FieldLabel className={labelClassName}>{label}</FieldLabel> : null}
       <TextInput
         placeholderTextColor={COLORS.placeholder}
         className={`border-b border-stone-300 pb-2 text-base text-stone-900 dark:border-stone-700 dark:text-stone-100 ${inputClassName}`}
