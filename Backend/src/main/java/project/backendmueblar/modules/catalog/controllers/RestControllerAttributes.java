@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import project.backendmueblar.modules.catalog.dtos.request.AttributeCreateRequestDTO;
 import project.backendmueblar.modules.catalog.services.AttributeService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -30,6 +32,12 @@ public class RestControllerAttributes {
     public ResponseEntity<?> deleteAttribute(@PathVariable ("id_atributo") String attributeId){
         attributeService.deleteAttribute(attributeId);
         return ResponseEntity.status(204).build();
+    }
+
+    @GetMapping(value = "/attributes", produces = "application/json")
+    public ResponseEntity<?> getAttributesByQuery(@RequestParam(defaultValue = "10") Integer limit, @RequestParam(defaultValue = "0") Integer offset) {
+        List<AttributeCreateRequestDTO> attributeResponseDTOList = attributeService.getAttributes(limit, offset);
+        return ResponseEntity.status(200).body(attributeResponseDTOList);
     }
 
 }
