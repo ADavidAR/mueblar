@@ -32,7 +32,7 @@ public class AttributeService {
             throw new ResourceAlreadyExistsException("Attribute with name " + attributeCreateRequestDTO.getName() + " already exists");
         }
 
-        Optional<AttributeTypeEntity> optionalAttributeType = repositoryAttributeType.findByAttributeTypeId(attributeCreateRequestDTO.getType());
+        Optional<AttributeTypeEntity> optionalAttributeType = repositoryAttributeType.findByAttributeTypeId(attributeCreateRequestDTO.getAtribType().getId());
         if(optionalAttributeType.isEmpty()) {
             throw new ResourceNotFoundException("AttributeType with name " + attributeCreateRequestDTO.getName() + " not found");
         }
@@ -54,9 +54,9 @@ public class AttributeService {
             throw new ResourceNotFoundException("Attribute with id " + attributeId + " not found");
         }
 
-        Optional<AttributeTypeEntity> optionalAttributeType = repositoryAttributeType.findByAttributeTypeId(attributeUpdateRequestDTO.getType());
+        Optional<AttributeTypeEntity> optionalAttributeType = repositoryAttributeType.findByAttributeTypeId(attributeUpdateRequestDTO.getAtribType().getId());
         if(optionalAttributeType.isEmpty()) {
-            throw new ResourceNotFoundException("AttributeType with name " + attributeUpdateRequestDTO.getType() + " not found");
+            throw new ResourceNotFoundException("AttributeType with name " + attributeUpdateRequestDTO.getAtribType().getId() + " not found");
         }
 
         AttributeEntity oldAttributeEntity = optionalAttribute.get();
@@ -64,6 +64,7 @@ public class AttributeService {
         if(attributeId.equals(attributeUpdateRequestDTO.getName())) {
             oldAttributeEntity.setAttributeTypeEntity(optionalAttributeType.get());
             repositoryAttribute.save(oldAttributeEntity);
+            System.out.println("Actualizacion con mismo Nombre");
             return;
         }
 
@@ -91,7 +92,7 @@ public class AttributeService {
         }
 
         Optional<AttributeEntity> optionalAttributeExists = repositoryAttribute.findByAttributeId(attributeUpdateRequestDTO.getName());
-        if(!(optionalAttributeExists.isEmpty())) {
+        if(optionalAttributeExists.isPresent()) {
             throw new ResourceAlreadyExistsException("Attribute with name " + attributeUpdateRequestDTO.getName() + " already exists");
         }
 
