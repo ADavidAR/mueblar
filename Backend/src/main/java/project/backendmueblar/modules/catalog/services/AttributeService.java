@@ -28,7 +28,7 @@ public class AttributeService {
             throw new ResourceAlreadyExistsException("Attribute with name " + attributeCreateRequestDTO.getName() + " already exists");
         }
 
-        Optional<AttributeTypeEntity> optionalAttributeType = repositoryAttributeType.findByAttributeTypeId(attributeCreateRequestDTO.getType());
+        Optional<AttributeTypeEntity> optionalAttributeType = repositoryAttributeType.findByAttributeTypeId(attributeCreateRequestDTO.getAtribType().getId());
         if(optionalAttributeType.isEmpty()) {
             throw new ResourceNotFoundException("AttributeType with name " + attributeCreateRequestDTO.getName() + " not found");
         }
