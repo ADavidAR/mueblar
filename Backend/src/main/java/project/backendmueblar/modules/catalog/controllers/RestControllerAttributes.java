@@ -5,9 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.backendmueblar.modules.catalog.dtos.request.AttributeCreateRequestDTO;
+import project.backendmueblar.modules.catalog.dtos.response.Attribute_X_VariationSummaryResponseDTO;
 import project.backendmueblar.modules.catalog.services.AttributeService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -35,9 +37,9 @@ public class RestControllerAttributes {
     }
 
     @GetMapping(value = "/attributes", produces = "application/json")
-    public ResponseEntity<?> getAttributesByQuery(@RequestParam(defaultValue = "10") Integer limit, @RequestParam(defaultValue = "0") Integer offset) {
-        List<AttributeCreateRequestDTO> attributeResponseDTOList = attributeService.getAttributes(limit, offset);
-        return ResponseEntity.status(200).body(attributeResponseDTOList);
+    public ResponseEntity<?> getAttributesByQuery(@RequestParam(defaultValue = "10") Integer limit, @RequestParam(defaultValue = "0") Integer page) {
+        Map<String, List<Attribute_X_VariationSummaryResponseDTO>> mapOfAttribute_X_Variation = attributeService.getAllAttributes(limit, page);
+        return ResponseEntity.status(200).body(mapOfAttribute_X_Variation);
     }
 
 }

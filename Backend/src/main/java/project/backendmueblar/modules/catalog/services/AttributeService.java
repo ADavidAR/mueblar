@@ -9,6 +9,8 @@ import project.backendmueblar.exception.catalog.InternalServerException;
 import project.backendmueblar.exception.catalog.ResourceAlreadyExistsException;
 import project.backendmueblar.exception.catalog.ResourceNotFoundException;
 import project.backendmueblar.modules.catalog.dtos.request.AttributeCreateRequestDTO;
+import project.backendmueblar.modules.catalog.dtos.response.AttributeSummaryResponseDTO;
+import project.backendmueblar.modules.catalog.dtos.response.Attribute_X_VariationSummaryResponseDTO;
 import project.backendmueblar.modules.catalog.entities.AttributeEntity;
 import project.backendmueblar.modules.catalog.entities.AttributeTypeEntity;
 import project.backendmueblar.modules.catalog.entities.Attribute_X_ProductEntity;
@@ -148,27 +150,38 @@ public class AttributeService {
 
     // ------------------------------------------------------------------------------------------------------//
 
-    public List<AttributeCreateRequestDTO> getAttributes(Integer limit, Integer offset) {
+    public Map<String, List<Attribute_X_VariationSummaryResponseDTO>> getAllAttributes(Integer limit, Integer page) {
         if(limit == 0) {
             throw new InternalServerException("Cannot throw zero Attributes");
         }
 
-        Pageable pageableQueryAttributes = PageRequest.of(offset/limit, limit);
+        Pageable pageableQueryAttributes = PageRequest.of(page, limit);
 
         List<AttributeEntity> attributeEntityList = repositoryAttribute.findAll(pageableQueryAttributes).getContent();
         if(attributeEntityList.isEmpty()) {
             throw new ResourceNotFoundException("Not Exists Any Attribute");
         }
 
-        List<AttributeCreateRequestDTO> attributeResponseDTOList = new ArrayList<>();
+        Map<String, List<Attribute_X_VariationSummaryResponseDTO>> attributeXVariationSummaryResponseMap = new HashMap<>();
+
         for(AttributeEntity thisAttributeEntity : attributeEntityList) {
-            AttributeCreateRequestDTO attributeResponseDTO = new AttributeCreateRequestDTO();
-            attributeResponseDTO.setName(thisAttributeEntity.getAttributeId());
-            attributeResponseDTO.setType(thisAttributeEntity.getAttributeTypeEntity().getAttributeTypeId());
-            attributeResponseDTOList.add(attributeResponseDTO);
+            String attributeId = thisAttributeEntity.getAttributeId();
+
+            List<Attribute_X_VariationEntity> attributeXVariationEntityList = thisAttributeEntity.getAttributeXVariationEntities();
+            List<Attribute_X_VariationSummaryResponseDTO> attributeXVariationSummaryResponseDTOList = new ArrayList<>();
+
+            for(Attribute_X_VariationEntity thisAttribute_X_VariationEntity : attributeXVariationEntityList) {
+                Attribute_X_VariationSummaryResponseDTO thisAttribute_X_VariationSummary = new Attribute_X_VariationSummaryResponseDTO();
+                thisAttribute_X_VariationSummary.setSku(thisAttribute_X_VariationEntity.getVariationEntity().getSku());
+                thisAttribute_X_VariationSummary.setValue(thisAttribute_X_VariationEntity.getAttributeValue());
+                attributeXVariationSummaryResponseDTOList.add(thisAttribute_X_VariationSummary);
+            }
+
+            attributeXVariationSummaryResponseMap.put(attributeId, attributeXVariationSummaryResponseDTOList);
+
         }
 
-        return attributeResponseDTOList;
+        return attributeXVariationSummaryResponseMap;
 
     }
 
