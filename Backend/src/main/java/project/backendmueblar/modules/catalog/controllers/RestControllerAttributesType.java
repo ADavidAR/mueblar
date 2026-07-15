@@ -33,4 +33,9 @@ public class RestControllerAttributesType {
         return ResponseEntity.status(204).build();
     }
 
+    @PutMapping(value = "/{id_tipo_atributo}", consumes = "application/json")
+    public ResponseEntity<?> updateAttributeType(@PathVariable("id_tipo_atributo") String attributeTypeId, @Valid @RequestBody AttributeTypeCreateRequestDTO attributeTypeUpdateDTO) {
+        attributeTypeService.updateAttributeType(attributeTypeId, attributeTypeUpdateDTO);
+        return ResponseEntity.status(200).build();
+    }
 }

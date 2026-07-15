@@ -32,6 +32,8 @@ public class AttributeTypeService {
         return attributeTypeResponseDTO;
     }
 
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
+
     @Transactional
     public void createAttributeType(AttributeTypeCreateRequestDTO attributeTypeCreateRequestDTO) {
 
@@ -45,6 +47,8 @@ public class AttributeTypeService {
         attributeTypeEntity.setAttributeTypeId(attributeTypeCreateRequestDTO.getId());
         repositoryAttributeType.save(attributeTypeEntity);
     }
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
 
     @Transactional
     public void deleteAttributeType(String attributeTypeId) {
@@ -61,6 +65,41 @@ public class AttributeTypeService {
 
         repositoryAttributeType.delete(thisAttributeTypeEntity);
 
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
+
+    @Transactional
+    public void updateAttributeType(String attributeTypeId, AttributeTypeCreateRequestDTO attributeTypeUpdateRequestDTO) {
+        Optional<AttributeTypeEntity> optionalAttributeType = repositoryAttributeType.findByAttributeTypeId(attributeTypeId);
+        if(optionalAttributeType.isEmpty()) {
+            throw new ResourceNotFoundException("AttributeType not found");
+        }
+
+        AttributeTypeEntity thisAttributeTypeEntity = optionalAttributeType.get();
+
+        if(attributeTypeUpdateRequestDTO.getId().equals(thisAttributeTypeEntity.getAttributeTypeId())) {
+            thisAttributeTypeEntity.setDescription(attributeTypeUpdateRequestDTO.getDescription());
+            repositoryAttributeType.save(thisAttributeTypeEntity);
+            return;
+        }
+
+        Optional<AttributeTypeEntity> optionalAttributeTypeRequest = repositoryAttributeType.findByAttributeTypeId(attributeTypeUpdateRequestDTO.getId());
+        if(optionalAttributeTypeRequest.isPresent()) {
+            throw new ResourceAlreadyExistsException("Already exists at Attribute Type with this Name");
+        }
+
+        List<AttributeEntity> thisAttributeEntityList = thisAttributeTypeEntity.getAttributeEntities();
+        if(!(thisAttributeEntityList.isEmpty())) {
+            throw new ResourceAlreadyExistsException("Exists at least one (1) Attribute to this Attribute Type");
+        }
+
+        AttributeTypeEntity attributeTypeEntity = new AttributeTypeEntity();
+        attributeTypeEntity.setDescription(attributeTypeUpdateRequestDTO.getDescription());
+        attributeTypeEntity.setAttributeTypeId(attributeTypeUpdateRequestDTO.getId());
+
+        repositoryAttributeType.delete(thisAttributeTypeEntity);
+        repositoryAttributeType.save(attributeTypeEntity);
     }
 
 }
