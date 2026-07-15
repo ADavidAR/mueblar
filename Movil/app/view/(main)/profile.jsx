@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router"
 
 import MainScreen from "../../../components/main/MainScreen"
-import ProfileForm from "../../../components/main/Profile.Form"
+import ProfileForm from "../../../components/main/ProfileForm"
 
 
 

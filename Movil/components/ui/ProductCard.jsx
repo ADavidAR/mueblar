@@ -82,16 +82,13 @@ export function ProductCard ({ item, topVariation }) {
     )
 }
 
-export function AnimatedProductCard ({item, topVariation, index, shouldReset, stopReset}) {
+export function AnimatedProductCard ({item, topVariation, index, resetKey}) {
     const [fadeAnim] = useState(() => new Animated.Value(0))
     const [slideAnim] = useState(() => new Animated.Value(20))
 
     useEffect(() => {
-        if (shouldReset) {
-            fadeAnim.setValue(0)
-            slideAnim.setValue(20)
-            stopReset()
-        }
+        fadeAnim.setValue(0)
+        slideAnim.setValue(20)
 
         Animated.parallel([
             Animated.timing(fadeAnim, {
@@ -106,11 +103,8 @@ export function AnimatedProductCard ({item, topVariation, index, shouldReset, st
                 delay: index * 120,
                 useNativeDriver: true,
             })
-        ]).start();
-        // fadeAnim/slideAnim son estables (nunca se reasignan), no hace falta
-        // incluirlos como dependencias: incluirlos fue lo que causaba el loop original.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [shouldReset])
+        ]).start()
+    }, [resetKey, fadeAnim, slideAnim, index])
 
     return (
         <Animated.View

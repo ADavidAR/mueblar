@@ -8,12 +8,16 @@ import { Controller } from "react-hook-form";
 import { VALIDATION } from "../../constants/authErrors";
 import PasswordField from "../ui/PasswordField";
 import PrimaryButton from "../ui/PrimaryButton";
-import CustomColorButton from "../ui/DangerButton";
+import CustomColorButton from "../ui/CustomColorButton";
+import { logoutUser } from "../../services/authService";
+import { useRouter } from "expo-router";
 
 const LABEL_CLASS = "text-copper dark:text-copper-light"
 
 export default function ProfileForm () {
-    // Campos de edición (estado local presentacional).
+
+    const router = useRouter()
+    // Campos de edición.
     const [ currentProfileData, setCurrentProfileData ] = useState({
         name: "",
         lastName: "",
@@ -51,6 +55,11 @@ export default function ProfileForm () {
             }
             return true
         })
+    }
+
+    const handleLogout = () => {
+        logoutUser()
+        router.navigate("/view/login")
     }
 
     return (
@@ -174,7 +183,15 @@ export default function ProfileForm () {
                     />
                     </>
                 )
-                :null }
+                : (
+                    <CustomColorButton
+                        label={"Cerrar Sesión"}
+                        onPress={handleLogout}
+                        className={"mt-10"}
+                        color={"terracotta"}
+                    />
+                ) }
+                
             </View>
 
             <View className="flex-1" />

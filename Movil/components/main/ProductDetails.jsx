@@ -10,6 +10,7 @@ import PrimaryButton from "../ui/PrimaryButton"
 import VariantsModal from "./VariantsModal"
 import "../../assets/img_placeholder.jpeg"
 import { CubeIcon, FilledHeartIcon, EmptyHeartIcon } from "../Icons"
+import { fetchSingleProduct } from "../../services/inventoryService"
 
 /** Construye la vista de datos derivada de una variación concreta. */
 function buildProductData(prod, variation) {
@@ -44,7 +45,7 @@ export default function ProductDetails ({ model }) {
     })
 
     useEffect(() => {
-        const loadProduct = () => {
+        const loadProduct = async () => {
             const newProd = data.filter(p => p.model === model)[0] //await fetchSingleProduct(model)
             const newVariation = newProd.variations.filter(v => v.top)[0]
             setProduct(newProd)

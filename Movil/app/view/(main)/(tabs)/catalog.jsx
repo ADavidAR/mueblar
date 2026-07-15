@@ -7,7 +7,7 @@ import { FiltersProvider } from "../../../../context/FiltersContext"
 
 export default function Catalog() {
     const [ showSearchModal, toggleSearchModal ] = useState(false)
-    const [ shouldLoad, toggleShouldLoad ] = useState(true)
+    const [ loadKey, setLoadKey ] = useState(0)
     
     return (
         <FiltersProvider>
@@ -15,7 +15,7 @@ export default function Catalog() {
                 visible={showSearchModal}
                 onHide={() => toggleSearchModal(false)}
                 onSearch={() => {
-                    toggleShouldLoad(true)
+                    setLoadKey(prev => prev + 1)
                     toggleSearchModal(false)
                 }}
             />
@@ -27,8 +27,7 @@ export default function Catalog() {
                 scrollEnabled={false}
             >
                 <ProductsList 
-                    shouldReload={shouldLoad}
-                    stopReloading={() => toggleShouldLoad(false)}
+                    loadKey={loadKey}
                 />
             </MainScreen>
         </FiltersProvider>

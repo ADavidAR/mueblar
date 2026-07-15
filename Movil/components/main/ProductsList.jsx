@@ -7,14 +7,15 @@ import { COLORS } from "../../constants/theme"
 import { useFilters } from "../../hooks/useFilters"
 import SerifText from "../ui/SerifText"
 
-export default function ProductsList({ shouldReload, stopReloading }) {
+export default function ProductsList({ loadKey }) {
     const { getFilteredProduucts } = useFilters()
     const [products, setProducts] = useState([])
     const [page, setPage] = useState(1)
     const [loading, setLoading] = useState(false)
     const [hasMore, setHasMore] = useState(true)
     const [refreshing, setRefreshing] = useState(false)
-    const [shouldReset, setShouldReset] = useState(false)
+    //const [shouldReset, setShouldReset] = useState(false)
+    const [ resetKey, setResetKey ] = useState(0)
     const flatListRef = useRef(null)
     
     const loadMoreItems = useCallback(  async () => {
@@ -36,10 +37,9 @@ export default function ProductsList({ shouldReload, stopReloading }) {
     }, [hasMore, loading, page, getFilteredProduucts])
 
     const handleRefresh = useCallback( async () => {
-        setShouldReset(true)
+        setResetKey(prev => prev + 1)
         setRefreshing(true)
         setHasMore(true)
-        
         try {
             const freshItems = await getFilteredProduucts(0)
             if (freshItems.length === 0) {
@@ -53,36 +53,33 @@ export default function ProductsList({ shouldReload, stopReloading }) {
             setRefreshing(false)
             setPage(1)
         }
-    }, [getFilteredProduucts])
+    }, [getFilteredProduucts, resetKey, loadKey])
 
     useEffect(() => {
-        if(shouldReload) {
-            const initialLoad = async () => {
-                flatListRef.current?.scrollToOffset({
-                    offset: 0,
-                    animated: true,
+        const initialLoad = async () => {
+            flatListRef.current?.scrollToOffset({
+                offset: 0,
+                animated: true,
 
-                })
-                setShouldReset(true)
-                setHasMore(true)
-                try {
-                    const newItems = await getFilteredProduucts(0)
-                    if (newItems.length === 0) {
-                        setHasMore(false)
-                    } else {
-                        setProducts(newItems)
-                    }
-                } catch (error) {
-                    console.error("Error fetching data:", error)
-                } finally {
-                    setPage(1)
-                    setLoading(false)
-                    stopReloading()
+            })
+            setResetKey(prev => prev + 1)
+            setHasMore(true)
+            try {
+                const newItems = await getFilteredProduucts(0)
+                if (newItems.length === 0) {
+                    setHasMore(false)
+                } else {
+                    setProducts(newItems)
                 }
+            } catch (error) {
+                console.error("Error fetching data:", error)
+            } finally {
+                setLoading(false)
+                setPage(1)
             }
-            initialLoad()
         }
-    },[shouldReload, stopReloading, getFilteredProduucts]) 
+        initialLoad()
+    },[loadKey, getFilteredProduucts]) 
 
     const renderFooter = () => {
         if (!loading) return null
@@ -135,8 +132,7 @@ export default function ProductsList({ shouldReload, stopReloading }) {
                     return (
                         <AnimatedProductCard 
                             index={index % 10}
-                            shouldReset={shouldReset}
-                            stopReset={() => setShouldReset(false)}
+                            resetKey={resetKey}
                             item={item}
                             topVariation={topVariation}
                         />
