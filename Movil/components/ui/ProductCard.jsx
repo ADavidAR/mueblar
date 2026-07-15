@@ -1,6 +1,6 @@
 import { Link } from "expo-router"
 import { Image, Pressable, Text, View, Animated } from "react-native"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import { EmptyHeartIcon, FilledHeartIcon } from "../Icons"
 import { numberSeparatorFormatter } from "../../utils/formatters"
@@ -41,7 +41,7 @@ function FavoriteButton() {
     )
 }
 
-export function ProductCard ({ item, topVariation }) {
+export function ProductCard ({ item, topVariation, onImageLoad }) {
     const [scale] = useState(() => new Animated.Value(1))
 
     const animateTo = (toValue) =>
@@ -65,6 +65,7 @@ export function ProductCard ({ item, topVariation }) {
                             source={{ uri: topVariation.thumbnail }}
                             style={{ height: 200, width: '100%' }}
                             resizeMode="cover"
+                            onLoadEnd={onImageLoad}
                         />
                         <FavoriteButton />
                     </View>
@@ -85,11 +86,9 @@ export function ProductCard ({ item, topVariation }) {
 export function AnimatedProductCard ({item, topVariation, index, resetKey}) {
     const [fadeAnim] = useState(() => new Animated.Value(0))
     const [slideAnim] = useState(() => new Animated.Value(20))
+    const imageLoadedRef = useRef(false)
 
-    useEffect(() => {
-        fadeAnim.setValue(0)
-        slideAnim.setValue(20)
-
+    const runAnimation = useCallback(() => {
         Animated.parallel([
             Animated.timing(fadeAnim, {
                 toValue: 1,
@@ -104,7 +103,24 @@ export function AnimatedProductCard ({item, topVariation, index, resetKey}) {
                 useNativeDriver: true,
             })
         ]).start()
-    }, [resetKey, fadeAnim, slideAnim, index])
+    }, [fadeAnim, slideAnim, index])
+
+    const handleImageLoad = useCallback(() => {
+        imageLoadedRef.current = true
+        runAnimation()
+    }, [runAnimation])
+
+    // Al cambiar resetKey se reinician los valores. Si la imagen ya estaba
+    // cargada (cache, ej. refresh con los mismos productos) el <Image> no
+    // vuelve a disparar onLoadEnd, así que la animación se relanza acá mismo.
+
+    useEffect(() => {
+        fadeAnim.setValue(0)
+        slideAnim.setValue(20)
+        if (imageLoadedRef.current) {
+            runAnimation()
+        }
+    }, [resetKey, fadeAnim, slideAnim, runAnimation])
 
     return (
         <Animated.View
@@ -115,7 +131,7 @@ export function AnimatedProductCard ({item, topVariation, index, resetKey}) {
             }}
 
         >
-            <ProductCard item={item} topVariation={topVariation} />
+            <ProductCard item={item} topVariation={topVariation} onImageLoad={handleImageLoad} />
         </Animated.View>
     )
 }

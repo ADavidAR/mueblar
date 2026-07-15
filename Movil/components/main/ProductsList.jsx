@@ -53,7 +53,7 @@ export default function ProductsList({ loadKey }) {
             setRefreshing(false)
             setPage(1)
         }
-    }, [getFilteredProduucts, resetKey, loadKey])
+    }, [getFilteredProduucts])
 
     useEffect(() => {
         const initialLoad = async () => {
