@@ -7,9 +7,11 @@ import project.backendmueblar.exception.catalog.ResourceAlreadyExistsException;
 import project.backendmueblar.exception.catalog.ResourceNotFoundException;
 import project.backendmueblar.modules.catalog.dtos.request.AttributeTypeCreateRequestDTO;
 import project.backendmueblar.modules.catalog.dtos.response.AttributeTypeResponseDTO;
+import project.backendmueblar.modules.catalog.entities.AttributeEntity;
 import project.backendmueblar.modules.catalog.entities.AttributeTypeEntity;
 import project.backendmueblar.modules.catalog.repositories.RepositoryAttributeType;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -42,6 +44,23 @@ public class AttributeTypeService {
         attributeTypeEntity.setDescription(attributeTypeCreateRequestDTO.getDescription());
         attributeTypeEntity.setAttributeTypeId(attributeTypeCreateRequestDTO.getId());
         repositoryAttributeType.save(attributeTypeEntity);
+    }
+
+    @Transactional
+    public void deleteAttributeType(String attributeTypeId) {
+        Optional<AttributeTypeEntity> optionalAttributeType = repositoryAttributeType.findByAttributeTypeId(attributeTypeId);
+        if(optionalAttributeType.isEmpty()) {
+            throw new ResourceNotFoundException("AttributeType not found");
+        }
+
+        AttributeTypeEntity thisAttributeTypeEntity = optionalAttributeType.get();
+        List<AttributeEntity> thisAttributeEntityList = thisAttributeTypeEntity.getAttributeEntities();
+        if(!(thisAttributeEntityList.isEmpty())) {
+            throw new ResourceAlreadyExistsException("Exists at least one (1) Attribute to this Attribute Type");
+        }
+
+        repositoryAttributeType.delete(thisAttributeTypeEntity);
+
     }
 
 }
