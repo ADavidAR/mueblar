@@ -1,8 +1,11 @@
 package project.backendmueblar.modules.catalog.services;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import project.backendmueblar.exception.catalog.ResourceAlreadyExistsException;
 import project.backendmueblar.exception.catalog.ResourceNotFoundException;
+import project.backendmueblar.modules.catalog.dtos.request.AttributeTypeCreateRequestDTO;
 import project.backendmueblar.modules.catalog.dtos.response.AttributeTypeResponseDTO;
 import project.backendmueblar.modules.catalog.entities.AttributeTypeEntity;
 import project.backendmueblar.modules.catalog.repositories.RepositoryAttributeType;
@@ -25,6 +28,20 @@ public class AttributeTypeService {
         attributeTypeResponseDTO.setDescription(optionalAttributeType.get().getDescription());
 
         return attributeTypeResponseDTO;
+    }
+
+    @Transactional
+    public void createAttributeType(AttributeTypeCreateRequestDTO attributeTypeCreateRequestDTO) {
+
+        Optional<AttributeTypeEntity> optionalAttributeType = repositoryAttributeType.findByAttributeTypeId(attributeTypeCreateRequestDTO.getId());
+        if(optionalAttributeType.isPresent()) {
+            throw new ResourceAlreadyExistsException("Attribute Type already exists");
+        }
+
+        AttributeTypeEntity attributeTypeEntity = new AttributeTypeEntity();
+        attributeTypeEntity.setDescription(attributeTypeCreateRequestDTO.getDescription());
+        attributeTypeEntity.setAttributeTypeId(attributeTypeCreateRequestDTO.getId());
+        repositoryAttributeType.save(attributeTypeEntity);
     }
 
 }
