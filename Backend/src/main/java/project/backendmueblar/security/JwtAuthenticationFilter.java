@@ -14,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import project.backendmueblar.modules.auth.services.JwtService;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,10 +34,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String urlRequested =  request.getRequestURI();
         String httpMethod = request.getMethod().toUpperCase();
 
+        // Arreglo donde se encuentran todas las APIS que hacen uso del Token, pero no son propias del Role en cuestion //
+        List<String> apisWithBearerForAllRoles = new ArrayList<>();
+        apisWithBearerForAllRoles.add("/api/auth/permits");
+        apisWithBearerForAllRoles.add("/api/collections");
+
         if(authHeader != null && authHeader.startsWith("Bearer ")) {
             String userEmail = jwtService.extractEmail(authHeader);
 
-            if (urlRequested.equals("/api/auth/permits")) {
+            if (apisWithBearerForAllRoles.contains(urlRequested)) {
                 if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     if (jwtService.validateJWTIntegrity(authHeader.substring(7))) {
                         UsernamePasswordAuthenticationToken contextAuthenticationToken = new UsernamePasswordAuthenticationToken(userEmail, null, List.of());

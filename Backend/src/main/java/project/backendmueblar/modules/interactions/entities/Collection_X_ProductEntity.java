@@ -1,4 +1,4 @@
-package project.backendmueblar.modules.interactions;
+package project.backendmueblar.modules.interactions.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import project.backendmueblar.modules.catalog.entities.ProductEntity;
-import project.backendmueblar.modules.interactions.idClass.CollectionProductId;
+import project.backendmueblar.modules.interactions.entities.idClass.CollectionProductId;
 
 @Getter
 @Setter

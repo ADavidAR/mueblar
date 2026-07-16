@@ -1,4 +1,4 @@
-package project.backendmueblar.modules.interactions.idClass;
+package project.backendmueblar.modules.interactions.entities.idClass;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

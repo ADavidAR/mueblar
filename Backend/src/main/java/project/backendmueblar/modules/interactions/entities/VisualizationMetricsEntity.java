@@ -1,4 +1,4 @@
-package project.backendmueblar.modules.interactions;
+package project.backendmueblar.modules.interactions.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

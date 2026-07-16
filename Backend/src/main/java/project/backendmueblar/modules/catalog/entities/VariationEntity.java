@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import project.backendmueblar.modules.interactions.VisualizationMetricsEntity;
+import project.backendmueblar.modules.interactions.entities.VisualizationMetricsEntity;
 
 import java.util.List;
 import java.util.Map;
