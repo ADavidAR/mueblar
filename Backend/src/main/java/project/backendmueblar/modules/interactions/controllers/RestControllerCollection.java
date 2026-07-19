@@ -20,4 +20,12 @@ public class RestControllerCollection {
         return ResponseEntity.status(201).build();
     }
 
+    @PutMapping(value = "/{id_collections}", consumes = "application/json")
+    public ResponseEntity<?> updateCollectionName(@RequestHeader("Authorization") String authHeader,
+                                                  @PathVariable ("id_collections") Long collectionId,
+                                                  @Valid @RequestBody CollectionCreateRequestDTO collectionUpdateRequestDTO
+    ) {
+        collectionService.updateCollectionName(collectionId, collectionUpdateRequestDTO, authHeader);
+        return ResponseEntity.status(200).build();
+    }
 }

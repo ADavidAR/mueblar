@@ -3,8 +3,10 @@ package project.backendmueblar.modules.interactions.services;
 import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestHeader;
 import project.backendmueblar.exception.auth.EmailNotFoundException;
 import project.backendmueblar.exception.auth.UserIDNotMatchException;
+import project.backendmueblar.exception.catalog.ResourceNotFoundException;
 import project.backendmueblar.modules.auth.services.JwtService;
 import project.backendmueblar.modules.interactions.dtos.request.CollectionCreateRequestDTO;
 import project.backendmueblar.modules.interactions.entities.CollectionEntity;
@@ -22,14 +24,17 @@ public class CollectionService {
     private final RepositoryUser userRepository;
     private final RepositoryCollection collectionRepository;
 
-    public void createCollection(CollectionCreateRequestDTO collectionCreateRequestDTO, String authHeader) {
+    private Optional<UserEntity> existsUserWithToken(String authHeader) {
         String uniqueEmailForUser = jwtService.extractEmail(authHeader);
         Optional<UserEntity> optionalUser = userRepository.findByEmail(uniqueEmailForUser);
         if (optionalUser.isEmpty()) {
             throw new UserIDNotMatchException("User not Found, Cannot create or access to Collection");
         }
+        return optionalUser;
+    }
 
-        UserEntity thisUserEntity =  optionalUser.get();
+    public void createCollection(CollectionCreateRequestDTO collectionCreateRequestDTO, String authHeader) {
+        UserEntity thisUserEntity =  existsUserWithToken(authHeader).get();
 
         CollectionEntity collectionEntity = new CollectionEntity();
         collectionEntity.setTitle(collectionCreateRequestDTO.getTitle());
@@ -37,4 +42,23 @@ public class CollectionService {
         collectionEntity.setUserEntity(thisUserEntity);
         collectionRepository.save(collectionEntity);
     }
+
+    public void updateCollectionName(Long collectionId, CollectionCreateRequestDTO collectionUpdateRequestDTO, String authHeader) {
+        UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
+
+        Optional<CollectionEntity> optionalCollection = collectionRepository.findByCollectionId(collectionId);
+        if (optionalCollection.isEmpty()) {
+            throw new ResourceNotFoundException("Collection not found, cannot update collection");
+        }
+
+        CollectionEntity thisCollectionEntity = optionalCollection.get();
+
+        if(!(optionalCollection.get().getUserEntity().equals(thisUserEntity))) {
+            throw new UserIDNotMatchException("User not Match, Cannot update collection");
+        }
+
+        thisCollectionEntity.setTitle(collectionUpdateRequestDTO.getTitle());
+        collectionRepository.save(thisCollectionEntity);
+    }
+
 }

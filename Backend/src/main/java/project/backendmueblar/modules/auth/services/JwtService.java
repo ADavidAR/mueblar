@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import org.springframework.util.AntPathMatcher;
+import project.backendmueblar.exception.auth.EmailNotFoundException;
 import project.backendmueblar.exception.auth.NotPatternURLFoundTokenException;
 import project.backendmueblar.exception.auth.ViolatedJWTIntegrity;
 import project.backendmueblar.modules.users.entities.UserEntity;
@@ -53,7 +54,13 @@ public class JwtService {
     public String extractEmail(String authHeader) {
         String token = authHeader.substring(7);
         Claims claims = Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token).getPayload();
+
+        if(claims.getSubject() == null) {
+            throw new EmailNotFoundException("User with Specified Email not Exists");
+        }
+
         return claims.getSubject();
+
     }
 
     private String extractPatternEndpointAndPermission(String token, String endpointURI) {
