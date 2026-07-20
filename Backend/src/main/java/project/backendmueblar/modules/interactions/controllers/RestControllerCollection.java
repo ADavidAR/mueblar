@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import project.backendmueblar.modules.catalog.dtos.ProductSummaryDTO;
 import project.backendmueblar.modules.interactions.dtos.request.CollectionCreateRequestDTO;
 import project.backendmueblar.modules.interactions.services.CollectionService;
 
@@ -35,5 +36,14 @@ public class RestControllerCollection {
     ) {
         collectionService.deleteCollectionAndLogs(collectionId, authHeader);
         return ResponseEntity.status(204).build();
+    }
+
+    @PostMapping(value = "/{id_collections}")
+    public ResponseEntity<?> addProductsToCollection(@RequestHeader("Authorization") String authHeader,
+                                                     @PathVariable("id_collections") Long collectionId,
+                                                     @Valid @RequestBody ProductSummaryDTO productSummaryDTO
+    ){
+        collectionService.addProductToCollection(collectionId, authHeader, productSummaryDTO);
+        return ResponseEntity.status(201).build();
     }
 }
