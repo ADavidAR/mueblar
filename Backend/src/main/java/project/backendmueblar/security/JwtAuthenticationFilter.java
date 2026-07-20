@@ -39,6 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         apisWithBearerForAllRoles.add("/api/auth/permits");
         apisWithBearerForAllRoles.add("/api/collections");
         apisWithBearerForAllRoles.add("/api/collections/{id_collections}");
+        apisWithBearerForAllRoles.add("/api/collections/{id_collections}/products/{model}");
 
         if(authHeader != null && authHeader.startsWith("Bearer ")) {
             String userEmail = jwtService.extractEmail(authHeader);

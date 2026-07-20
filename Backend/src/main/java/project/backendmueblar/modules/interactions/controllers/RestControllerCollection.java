@@ -46,4 +46,13 @@ public class RestControllerCollection {
         collectionService.addProductToCollection(collectionId, authHeader, productSummaryDTO);
         return ResponseEntity.status(201).build();
     }
+
+    @DeleteMapping(value = "/{id_collections}/products/{model}")
+    public ResponseEntity<?> deleteProductFromCollection(@RequestHeader("Authorization") String authHeader,
+                                                         @PathVariable("id_collections") Long collectionId,
+                                                         @PathVariable("model") String modelOfProduct
+    ){
+        collectionService.deleteProductFromCollection(authHeader, collectionId, modelOfProduct);
+        return ResponseEntity.status(204).build();
+    }
 }

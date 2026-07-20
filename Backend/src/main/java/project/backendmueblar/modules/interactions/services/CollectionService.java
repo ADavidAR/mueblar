@@ -50,6 +50,7 @@ public class CollectionService {
         if (optionalCollection.isPresent()) {
             throw new ResourceAlreadyExistsException("The Collection already exists");
         }
+
         CollectionEntity collectionEntity = new CollectionEntity();
         collectionEntity.setTitle(collectionCreateRequestDTO.getTitle());
         collectionEntity.setErasable(true);
@@ -69,7 +70,7 @@ public class CollectionService {
 
         CollectionEntity thisCollectionEntity = optionalCollection.get();
 
-        if(!(optionalCollection.get().getUserEntity().getUserId().equals(thisUserEntity.getUserId()))) {
+        if(!(thisCollectionEntity.getUserEntity().getUserId().equals(thisUserEntity.getUserId()))) {
             throw new UserIDNotMatchException("The Collection does not belong to this user");
         }
 
@@ -89,7 +90,7 @@ public class CollectionService {
 
         CollectionEntity thisCollectionEntity = optionalCollection.get();
 
-        if(!(optionalCollection.get().getUserEntity().getUserId().equals(thisUserEntity.getUserId()))) {
+        if(!(thisCollectionEntity.getUserEntity().getUserId().equals(thisUserEntity.getUserId()))) {
             throw new UserIDNotMatchException("The Collection does not belong to this user");
         }
 
@@ -129,4 +130,38 @@ public class CollectionService {
         collection_X_ProductEntity.setProductEntity(thisProduct);
         repositoryCollectionXProduct.save(collection_X_ProductEntity);
     }
+
+    // --------------------------------------------------------------------------------------------------------- //
+
+    public void deleteProductFromCollection(String authHeader, Long collectionId, String modelOfProduct){
+        UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
+
+        Optional<CollectionEntity> optionalCollection = collectionRepository.findByCollectionId(collectionId);
+        if (optionalCollection.isEmpty()) {
+            throw new ResourceNotFoundException("Collection not found");
+        }
+
+        CollectionEntity thisCollectionEntity = optionalCollection.get();
+
+        if(!(thisCollectionEntity.getUserEntity().getUserId().equals(thisUserEntity.getUserId()))) {
+            throw new UserIDNotMatchException("The Collection does not belong to this user");
+        }
+
+        Optional<ProductEntity> optionalProduct = repositoryProduct.findByModelName(modelOfProduct);
+        if (optionalProduct.isEmpty()) {
+            throw new ResourceNotFoundException("Product not found");
+        }
+
+        ProductEntity thisProduct = optionalProduct.get();
+
+        Optional<Collection_X_ProductEntity> optionalCollectionXProductEntity = repositoryCollectionXProduct.findByProductEntityAndCollectionEntity(thisProduct, thisCollectionEntity);
+        if (optionalCollectionXProductEntity.isEmpty()) {
+            throw new ResourceNotFoundException("The Product is not related to the Collection");
+        }
+
+        Collection_X_ProductEntity thisCollection_X_ProductEntity = optionalCollectionXProductEntity.get();
+        repositoryCollectionXProduct.delete(thisCollection_X_ProductEntity);
+
+    }
+
 }

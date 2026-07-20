@@ -32,8 +32,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/mobile/login","/api/auth/recovery-email", "/api/auth/reset-password", "/api/auth/token-verification/{token}", "/api/auth/permits").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/{model}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories").permitAll()
-                        .requestMatchers("/api/collections").permitAll()
-                        .requestMatchers("/api/collections/{id_collections}").permitAll()
                         .anyRequest().authenticated()
                 ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
