@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestHeader;
 import project.backendmueblar.exception.auth.EmailNotFoundException;
 import project.backendmueblar.exception.auth.UserIDNotMatchException;
+import project.backendmueblar.exception.catalog.ResourceAlreadyExistsException;
 import project.backendmueblar.exception.catalog.ResourceNotFoundException;
 import project.backendmueblar.modules.auth.services.JwtService;
 import project.backendmueblar.modules.interactions.dtos.request.CollectionCreateRequestDTO;
@@ -36,6 +37,10 @@ public class CollectionService {
     public void createCollection(CollectionCreateRequestDTO collectionCreateRequestDTO, String authHeader) {
         UserEntity thisUserEntity =  existsUserWithToken(authHeader).get();
 
+        Optional<CollectionEntity> optionalCollection = collectionRepository.findByTitle(collectionCreateRequestDTO.getTitle());
+        if (optionalCollection.isPresent()) {
+            throw new ResourceAlreadyExistsException("The Collection already exists");
+        }
         CollectionEntity collectionEntity = new CollectionEntity();
         collectionEntity.setTitle(collectionCreateRequestDTO.getTitle());
         collectionEntity.setErasable(true);
@@ -53,12 +58,30 @@ public class CollectionService {
 
         CollectionEntity thisCollectionEntity = optionalCollection.get();
 
-        if(!(optionalCollection.get().getUserEntity().equals(thisUserEntity))) {
-            throw new UserIDNotMatchException("User not Match, Cannot update collection");
+        if(!(optionalCollection.get().getUserEntity().getUserId().equals(thisUserEntity.getUserId()))) {
+            throw new UserIDNotMatchException("The Collection does not belong to this user");
         }
 
         thisCollectionEntity.setTitle(collectionUpdateRequestDTO.getTitle());
         collectionRepository.save(thisCollectionEntity);
+    }
+
+    public void deleteCollectionAndLogs(Long collectionId, String authHeader){
+        UserEntity thisUserEntity =  existsUserWithToken(authHeader).get();
+
+        Optional<CollectionEntity> optionalCollection = collectionRepository.findByCollectionId(collectionId);
+        if (optionalCollection.isEmpty()) {
+            throw new ResourceNotFoundException("Collection not found, cannot update collection");
+        }
+
+        CollectionEntity thisCollectionEntity = optionalCollection.get();
+
+        if(!(optionalCollection.get().getUserEntity().getUserId().equals(thisUserEntity.getUserId()))) {
+            throw new UserIDNotMatchException("The Collection does not belong to this user");
+        }
+
+        collectionRepository.delete(thisCollectionEntity);
+
     }
 
 }

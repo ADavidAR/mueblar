@@ -28,4 +28,12 @@ public class RestControllerCollection {
         collectionService.updateCollectionName(collectionId, collectionUpdateRequestDTO, authHeader);
         return ResponseEntity.status(200).build();
     }
+
+    @DeleteMapping(value = "/{id_collections}")
+    public ResponseEntity<?> deleteCollectionAndLogs(@RequestHeader("Authorization") String authHeader,
+                                                     @PathVariable ("id_collections") Long collectionId
+    ) {
+        collectionService.deleteCollectionAndLogs(collectionId, authHeader);
+        return ResponseEntity.status(204).build();
+    }
 }
