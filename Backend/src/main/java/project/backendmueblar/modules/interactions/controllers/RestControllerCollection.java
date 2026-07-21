@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import project.backendmueblar.modules.catalog.dtos.ProductSummaryDTO;
 import project.backendmueblar.modules.catalog.dtos.response.ProductResponseDTO;
 import project.backendmueblar.modules.interactions.dtos.request.CollectionCreateRequestDTO;
+import project.backendmueblar.modules.interactions.dtos.response.CollectionResponseDTO;
 import project.backendmueblar.modules.interactions.services.CollectionService;
 
 import java.util.List;
@@ -68,4 +69,14 @@ public class RestControllerCollection {
         List<ProductResponseDTO> productResponseDTOList = collectionService.getProductsFromCollectionFilter(authHeader, collectionId, limit, page);
         return ResponseEntity.status(200).body(productResponseDTOList);
     }
+
+    @GetMapping(produces = "application/json")
+    public ResponseEntity<List<CollectionResponseDTO>> getCollectionsFromUserFilter(@RequestHeader("Authorization") String authHeader,
+                                                                                 @RequestParam(defaultValue = "10") Integer limit,
+                                                                                 @RequestParam(defaultValue = "0") Integer page
+    ) {
+        List<CollectionResponseDTO> collectionResponseDTOList = collectionService.getCollectionsFromUserFilter(authHeader, limit, page);
+        return ResponseEntity.status(200).body(collectionResponseDTOList);
+    }
+
 }

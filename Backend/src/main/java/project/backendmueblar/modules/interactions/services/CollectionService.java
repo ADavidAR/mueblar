@@ -11,11 +11,15 @@ import project.backendmueblar.exception.catalog.ResourceAlreadyExistsException;
 import project.backendmueblar.exception.catalog.ResourceNotFoundException;
 import project.backendmueblar.modules.auth.services.JwtService;
 import project.backendmueblar.modules.catalog.dtos.ProductSummaryDTO;
+import project.backendmueblar.modules.catalog.dtos.VariationSummaryDTO;
 import project.backendmueblar.modules.catalog.dtos.response.ProductResponseDTO;
 import project.backendmueblar.modules.catalog.entities.ProductEntity;
+import project.backendmueblar.modules.catalog.entities.ThumbnailEntity;
+import project.backendmueblar.modules.catalog.entities.VariationEntity;
 import project.backendmueblar.modules.catalog.repositories.RepositoryProduct;
 import project.backendmueblar.modules.catalog.services.CatalogService;
 import project.backendmueblar.modules.interactions.dtos.request.CollectionCreateRequestDTO;
+import project.backendmueblar.modules.interactions.dtos.response.CollectionResponseDTO;
 import project.backendmueblar.modules.interactions.entities.CollectionEntity;
 import project.backendmueblar.modules.interactions.entities.Collection_X_ProductEntity;
 import project.backendmueblar.modules.interactions.repositories.RepositoryCollection;
@@ -191,9 +195,9 @@ public class CollectionService {
             throw new InternalServerException("Cannot throw zero Products");
         }
 
-        Pageable pageableQueryAttributes = PageRequest.of(page, limit);
+        Pageable pageable = PageRequest.of(page, limit);
 
-        List<ProductEntity> productEntityList = repositoryProduct.findAll(pageableQueryAttributes).getContent();
+        List<ProductEntity> productEntityList = repositoryProduct.findAll(pageable).getContent();
         if(productEntityList.isEmpty()) {
             throw new ResourceNotFoundException("Not Exists Any Product");
         }
@@ -206,6 +210,54 @@ public class CollectionService {
         }
 
         return productResponseDTOList;
+    }
+
+    public List<CollectionResponseDTO> getCollectionsFromUserFilter(String authHeader, Integer limit, Integer page) {
+        UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
+
+        Pageable pageable = PageRequest.of(page, limit);
+
+        List<CollectionEntity> collectionEntityList = collectionRepository.findAllByUserEntity(thisUserEntity, pageable);
+        List<CollectionResponseDTO> collectionResponseDTOList = new ArrayList<>();
+
+        for(CollectionEntity thisCollectionEntity : collectionEntityList) {
+            CollectionResponseDTO collectionResponseDTO = new  CollectionResponseDTO();
+            collectionResponseDTO.setId(thisCollectionEntity.getCollectionId());
+            collectionResponseDTO.setTitle(thisCollectionEntity.getTitle());
+
+            List<Collection_X_ProductEntity> collectionXProductEntityList = thisCollectionEntity.getCollectionXProductEntityList();
+            List<ProductSummaryDTO> productSummaryDTOList = new ArrayList<>();
+            for(Collection_X_ProductEntity thisCollection_X_ProductEntity : collectionXProductEntityList) {
+                ProductEntity thisProductEntity = thisCollection_X_ProductEntity.getProductEntity();
+
+                ProductSummaryDTO thisProductSummaryDTO = new ProductSummaryDTO();
+                thisProductSummaryDTO.setModel(thisProductEntity.getModelName());
+
+                List<VariationEntity> variationEntityList = thisProductEntity.getVariationEntityList();
+                List<VariationSummaryDTO> variationSummaryDTOList = new ArrayList<>();
+                for(VariationEntity thisVariationEntity : variationEntityList) {
+                    VariationSummaryDTO thisVariationSummaryDTO = new VariationSummaryDTO();
+                    thisVariationSummaryDTO.setName(thisVariationEntity.getVariationName());
+
+                    List<ThumbnailEntity> thumbnailEntityList = thisVariationEntity.getThumbnailEntities();
+                    for(ThumbnailEntity thisThumbnailEntity : thumbnailEntityList) {
+                        if(thisThumbnailEntity.getIsTop() == true) {
+                            thisVariationSummaryDTO.setThumbnail(thisThumbnailEntity.getThumbnailPath());
+                        }
+                    }
+
+                    thisVariationSummaryDTO.setSku(thisVariationEntity.getSku());
+                    thisVariationSummaryDTO.setPrice(thisVariationEntity.getPrice());
+                    variationSummaryDTOList.add(thisVariationSummaryDTO);
+                }
+
+                thisProductSummaryDTO.setVariations(variationSummaryDTOList);
+                productSummaryDTOList.add(thisProductSummaryDTO);
+            }
+            collectionResponseDTO.setProducts(productSummaryDTOList);
+            collectionResponseDTOList.add(collectionResponseDTO);
+        }
+        return collectionResponseDTOList;
     }
 
 }
