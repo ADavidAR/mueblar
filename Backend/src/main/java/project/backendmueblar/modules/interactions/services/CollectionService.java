@@ -1,17 +1,20 @@
 package project.backendmueblar.modules.interactions.services;
 
-import jakarta.validation.constraints.Email;
+
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestHeader;
-import project.backendmueblar.exception.auth.EmailNotFoundException;
 import project.backendmueblar.exception.auth.UserIDNotMatchException;
+import project.backendmueblar.exception.catalog.InternalServerException;
 import project.backendmueblar.exception.catalog.ResourceAlreadyExistsException;
 import project.backendmueblar.exception.catalog.ResourceNotFoundException;
 import project.backendmueblar.modules.auth.services.JwtService;
 import project.backendmueblar.modules.catalog.dtos.ProductSummaryDTO;
+import project.backendmueblar.modules.catalog.dtos.response.ProductResponseDTO;
 import project.backendmueblar.modules.catalog.entities.ProductEntity;
 import project.backendmueblar.modules.catalog.repositories.RepositoryProduct;
+import project.backendmueblar.modules.catalog.services.CatalogService;
 import project.backendmueblar.modules.interactions.dtos.request.CollectionCreateRequestDTO;
 import project.backendmueblar.modules.interactions.entities.CollectionEntity;
 import project.backendmueblar.modules.interactions.entities.Collection_X_ProductEntity;
@@ -20,6 +23,8 @@ import project.backendmueblar.modules.interactions.repositories.RepositoryCollec
 import project.backendmueblar.modules.users.entities.UserEntity;
 import project.backendmueblar.modules.users.repositories.RepositoryUser;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -31,6 +36,8 @@ public class CollectionService {
     private final RepositoryCollection collectionRepository;
     private final RepositoryProduct repositoryProduct;
     private final RepositoryCollection_X_Product repositoryCollectionXProduct;
+
+    private final CatalogService catalogService;
 
     private Optional<UserEntity> existsUserWithToken(String authHeader) {
         String uniqueEmailForUser = jwtService.extractEmail(authHeader);
@@ -162,6 +169,43 @@ public class CollectionService {
         Collection_X_ProductEntity thisCollection_X_ProductEntity = optionalCollectionXProductEntity.get();
         repositoryCollectionXProduct.delete(thisCollection_X_ProductEntity);
 
+    }
+
+    // --------------------------------------------------------------------------------------------------------- //
+
+    public List<ProductResponseDTO> getProductsFromCollectionFilter(String authHeader, Long collectionId, Integer limit, Integer page) {
+        UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
+
+        Optional<CollectionEntity> optionalCollection = collectionRepository.findByCollectionId(collectionId);
+        if (optionalCollection.isEmpty()) {
+            throw new ResourceNotFoundException("Collection not found");
+        }
+
+        CollectionEntity thisCollectionEntity = optionalCollection.get();
+
+        if(!(thisCollectionEntity.getUserEntity().getUserId().equals(thisUserEntity.getUserId()))) {
+            throw new UserIDNotMatchException("The Collection does not belong to this user");
+        }
+
+        if(limit == 0) {
+            throw new InternalServerException("Cannot throw zero Products");
+        }
+
+        Pageable pageableQueryAttributes = PageRequest.of(page, limit);
+
+        List<ProductEntity> productEntityList = repositoryProduct.findAll(pageableQueryAttributes).getContent();
+        if(productEntityList.isEmpty()) {
+            throw new ResourceNotFoundException("Not Exists Any Product");
+        }
+
+        List<ProductResponseDTO> productResponseDTOList = new ArrayList<>();
+
+        for (ProductEntity productEntity : productEntityList) {
+            ProductResponseDTO thisProductResponseDTO = catalogService.getSpecificProduct(productEntity.getModelName(), true);
+            productResponseDTOList.add(thisProductResponseDTO);
+        }
+
+        return productResponseDTOList;
     }
 
 }

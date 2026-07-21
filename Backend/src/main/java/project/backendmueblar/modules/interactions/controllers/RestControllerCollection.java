@@ -6,8 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.backendmueblar.modules.catalog.dtos.ProductSummaryDTO;
+import project.backendmueblar.modules.catalog.dtos.response.ProductResponseDTO;
 import project.backendmueblar.modules.interactions.dtos.request.CollectionCreateRequestDTO;
 import project.backendmueblar.modules.interactions.services.CollectionService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/collections")
@@ -54,5 +57,15 @@ public class RestControllerCollection {
     ){
         collectionService.deleteProductFromCollection(authHeader, collectionId, modelOfProduct);
         return ResponseEntity.status(204).build();
+    }
+
+    @GetMapping(value = "/{id_collections}", produces = "application/json")
+    public ResponseEntity<List<ProductResponseDTO>> getProductsFromCollectionFilter(@RequestHeader("Authorization") String authHeader,
+                                                                                    @PathVariable("id_collections") Long  collectionId,
+                                                                                    @RequestParam(defaultValue = "10") Integer limit,
+                                                                                    @RequestParam(defaultValue = "0") Integer page
+    ) {
+        List<ProductResponseDTO> productResponseDTOList = collectionService.getProductsFromCollectionFilter(authHeader, collectionId, limit, page);
+        return ResponseEntity.status(200).body(productResponseDTOList);
     }
 }

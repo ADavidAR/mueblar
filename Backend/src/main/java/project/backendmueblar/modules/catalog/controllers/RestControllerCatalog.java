@@ -23,8 +23,7 @@ public class RestControllerCatalog {
     }
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<?> createProduct(
-            @Valid @RequestBody ProductCreateRequestDTO productCreateDTO) {
+    public ResponseEntity<?> createProduct(@Valid @RequestBody ProductCreateRequestDTO productCreateDTO) {
         catalogService.createProductAndVariations(productCreateDTO);
         return ResponseEntity.status(201).build();
     }
