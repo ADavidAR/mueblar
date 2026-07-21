@@ -72,10 +72,11 @@ public class RestControllerCollection {
 
     @GetMapping(produces = "application/json")
     public ResponseEntity<List<CollectionResponseDTO>> getCollectionsFromUserFilter(@RequestHeader("Authorization") String authHeader,
-                                                                                 @RequestParam(defaultValue = "10") Integer limit,
-                                                                                 @RequestParam(defaultValue = "0") Integer page
+                                                                                    @RequestParam(defaultValue = "10") Integer limit,
+                                                                                    @RequestParam(defaultValue = "0") Integer page,
+                                                                                    @RequestParam(required = false) String search
     ) {
-        List<CollectionResponseDTO> collectionResponseDTOList = collectionService.getCollectionsFromUserFilter(authHeader, limit, page);
+        List<CollectionResponseDTO> collectionResponseDTOList = collectionService.getCollectionsFromUserFilter(authHeader, limit, page, search);
         return ResponseEntity.status(200).body(collectionResponseDTOList);
     }
 

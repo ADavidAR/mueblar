@@ -212,14 +212,27 @@ public class CollectionService {
         return productResponseDTOList;
     }
 
-    public List<CollectionResponseDTO> getCollectionsFromUserFilter(String authHeader, Integer limit, Integer page) {
+    public List<CollectionResponseDTO> getCollectionsFromUserFilter(String authHeader, Integer limit, Integer page, String search) {
         UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
 
         Pageable pageable = PageRequest.of(page, limit);
 
-        List<CollectionEntity> collectionEntityList = collectionRepository.findAllByUserEntity(thisUserEntity, pageable);
+        List<CollectionEntity> collectionEntityList;
         List<CollectionResponseDTO> collectionResponseDTOList = new ArrayList<>();
 
+        if(search == null || search.trim().isEmpty()) {
+            collectionEntityList = collectionRepository.findAllByUserEntity(thisUserEntity, pageable);
+
+            convertCollectionEntityToResponseDTO(collectionEntityList, collectionResponseDTOList);
+        } else {
+            collectionEntityList = collectionRepository.findByUserEntityAndTitleContainingIgnoreCase(thisUserEntity, search, pageable);
+
+            convertCollectionEntityToResponseDTO(collectionEntityList, collectionResponseDTOList);
+        }
+        return collectionResponseDTOList;
+    }
+
+    private void convertCollectionEntityToResponseDTO(List<CollectionEntity> collectionEntityList, List<CollectionResponseDTO> collectionResponseDTOList) {
         for(CollectionEntity thisCollectionEntity : collectionEntityList) {
             CollectionResponseDTO collectionResponseDTO = new  CollectionResponseDTO();
             collectionResponseDTO.setId(thisCollectionEntity.getCollectionId());
@@ -257,7 +270,6 @@ public class CollectionService {
             collectionResponseDTO.setProducts(productSummaryDTOList);
             collectionResponseDTOList.add(collectionResponseDTO);
         }
-        return collectionResponseDTOList;
     }
 
 }

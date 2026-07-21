@@ -12,4 +12,5 @@ public interface RepositoryCollection extends JpaRepository<CollectionEntity, Lo
     Optional<CollectionEntity> findByCollectionId(Long collectionId);
     Optional<CollectionEntity> findByTitle(String title);
     List<CollectionEntity> findAllByUserEntity(UserEntity userEntity, Pageable pageable);
+    List<CollectionEntity> findByUserEntityAndTitleContainingIgnoreCase(UserEntity userEntity, String search, Pageable pageable);
 }
