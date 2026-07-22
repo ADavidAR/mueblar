@@ -8,6 +8,8 @@ import project.backendmueblar.modules.catalog.dtos.request.AttributeTypeCreateRe
 import project.backendmueblar.modules.catalog.dtos.response.AttributeTypeResponseDTO;
 import project.backendmueblar.modules.catalog.services.AttributeTypeService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/attribute-types")
 @RequiredArgsConstructor
@@ -37,5 +39,13 @@ public class RestControllerAttributesType {
     public ResponseEntity<?> updateAttributeType(@PathVariable("id_tipo_atributo") String attributeTypeId, @Valid @RequestBody AttributeTypeCreateRequestDTO attributeTypeUpdateDTO) {
         attributeTypeService.updateAttributeType(attributeTypeId, attributeTypeUpdateDTO);
         return ResponseEntity.status(200).build();
+    }
+
+    @GetMapping(produces = "application/json")
+    public ResponseEntity<List<AttributeTypeResponseDTO>> getAllAttributeTypes(@RequestParam(defaultValue = "10") Integer limit,
+                                                                               @RequestParam(defaultValue = "0") Integer page
+    ){
+        List<AttributeTypeResponseDTO> attributeTypeResponseDTOList = attributeTypeService.getAllAttributesTypes(limit, page);
+        return ResponseEntity.status(200).body(attributeTypeResponseDTOList);
     }
 }

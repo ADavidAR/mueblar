@@ -2,6 +2,8 @@ package project.backendmueblar.modules.catalog.services;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.backendmueblar.exception.catalog.ResourceAlreadyExistsException;
 import project.backendmueblar.exception.catalog.ResourceNotFoundException;
@@ -11,6 +13,7 @@ import project.backendmueblar.modules.catalog.entities.AttributeEntity;
 import project.backendmueblar.modules.catalog.entities.AttributeTypeEntity;
 import project.backendmueblar.modules.catalog.repositories.RepositoryAttributeType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -100,6 +103,22 @@ public class AttributeTypeService {
 
         repositoryAttributeType.delete(thisAttributeTypeEntity);
         repositoryAttributeType.save(attributeTypeEntity);
+    }
+
+    public List<AttributeTypeResponseDTO> getAllAttributesTypes(Integer limit, Integer page){
+        Pageable pageable = PageRequest.of(page, limit);
+
+        List<AttributeTypeResponseDTO> attributeTypeResponseDTOList = new ArrayList<>();
+
+        List<AttributeTypeEntity> attributeTypeEntityList = repositoryAttributeType.findAll(pageable).getContent();
+        for(AttributeTypeEntity attributeTypeEntity : attributeTypeEntityList) {
+            AttributeTypeResponseDTO thisAttributeTypeResponseDTO = new AttributeTypeResponseDTO();
+            thisAttributeTypeResponseDTO.setId(attributeTypeEntity.getAttributeTypeId());
+            thisAttributeTypeResponseDTO.setDescription(attributeTypeEntity.getDescription());
+            attributeTypeResponseDTOList.add(thisAttributeTypeResponseDTO);
+        }
+
+        return attributeTypeResponseDTOList;
     }
 
 }
