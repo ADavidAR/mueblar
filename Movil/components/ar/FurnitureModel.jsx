@@ -1,8 +1,7 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Viro3DObject, ViroNode } from '@reactvision/react-viro'
 
-import { AR_MODELS } from '../../mocks/arModels'
-import { isObstructed } from './collision'
+import { isObstructed } from '../../utils/collision'
 
 // Estados de gesto de Viro (onRotate): 1 = inicio, 2 = en curso, 3 = fin
 const GESTURE_BEGIN = 1
@@ -20,118 +19,124 @@ const CLICK_TAP = 3
  *   pasa por React en cada frame). Cada evento se valida contra la lógica de
  *   colisiones AABB: si el punto está libre se registra en `lastValid`; si
  *   está ocupado, el nodo se re-fija con setNativeProps a la última
- *   transformación libre — el mueble no puede atravesar otro modelo ni una
- *   pared detectada.
+ *   transformación libre.
  * - Al soltar (CLICK_UP tras drag, o fin del gesto de rotación) se confirma
  *   `lastValid` al estado del padre, que lo persiste.
  *
  * Traslación: dragType="FixedToPlane" restringe el arrastre al plano del
  * suelo detectado (planeNormal Y), cumpliendo "trasladar sobre el plano
- * horizontal". Rotación: gesto de dos dedos (twist) sobre el eje Y propio.
- *
- * Escala: fija en la del modelo (metros reales). No se implementa onPinch a
- * propósito — escalar rompería la promesa 1:1 del catálogo.
+ * horizontal". Solo activo en modo "move": en modo "rotate" el giro se
+ * maneja fuera de este componente (swipe de pantalla en ARFurnitureView, que
+ * escribe `object.rotation` directo) para no depender del raycast de Viro.
+ * Rotación con las manos sobre el objeto: gesto de dos dedos (twist) sobre
+ * el eje Y propio, disponible en cualquier modo.
  */
 export default function FurnitureModel({
-  object,
-  selected,
-  floorY,
-  objectsRef,
-  anchorsRef,
-  onSelect,
-  onCommit,
-  onObstruction,
+    object,
+    selected,
+    floorY,
+    mode,
+    getModel,
+    objectsRef,
+    anchorsRef,
+    onSelect,
+    onCommit,
+    onObstruction,
 }) {
-  const nodeRef = useRef(null)
-  // Última transformación libre de colisiones; a ella se revierte el nodo
-  const lastValid = useRef({
-    position: object.position,
-    rotationY: object.rotation[1],
-  })
-  // Rotación Y confirmada al iniciar el gesto de twist en curso
-  const gestureBaseY = useRef(0)
-
-  const model = AR_MODELS[object.productId]
-  if (!model) return null
-
-  const obstructed = (position, rotationY) =>
-    isObstructed({
-      position,
-      rotationY,
-      objectId: object.id,
-      modelId: object.productId,
-      objects: objectsRef.current,
-      anchors: anchorsRef.current,
+    const nodeRef = useRef(null)
+    // Última transformación libre de colisiones; a ella se revierte el nodo
+    const lastValid = useRef({
+        position: object.position,
+        rotationY: object.rotation[1],
     })
+    // Rotación Y confirmada al iniciar el gesto de twist en curso
+    const gestureBaseY = useRef(0)
+    // El giro por swipe de pantalla (modo "rotate") escribe object.rotation
+    // desde afuera, sin pasar por commit(); hay que mantener lastValid al día
+    // o un gesto posterior (mover, o incluso soltar el tap) lo pisaría.
+    useEffect(() => {
+        lastValid.current = { position: object.position, rotationY: object.rotation[1] }
+    }, [object.position, object.rotation])
+    const model = getModel(object.sku)
+    if (!model) return null
 
-  const commit = () => {
-    nodeRef.current?.setNativeProps({
-      position: lastValid.current.position,
-      rotation: [0, lastValid.current.rotationY, 0],
-    })
-    onCommit(object.id, {
-      position: lastValid.current.position,
-      rotation: [0, lastValid.current.rotationY, 0],
-    })
-  }
+    const obstructed = (position, rotationY) =>
+        isObstructed({
+            position,
+            rotationY,
+            objectId: object.id,
+            collisionBox: model.collisionBox,
+            objects: objectsRef.current,
+            anchors: anchorsRef.current,
+            getCollisionBox: (sku) => getModel(sku)?.collisionBox,
+        })
 
-  const handleClickState = (state) => {
-    if (state === CLICK_TAP) onSelect(object.id)
-    // Fin de cualquier interacción táctil sobre el objeto seleccionado:
-    // confirmar la última transformación válida
-    if (state === CLICK_UP && selected) commit()
-  }
-
-  const handleDrag = (dragToPos) => {
-    if (obstructed(dragToPos, lastValid.current.rotationY)) {
-      nodeRef.current?.setNativeProps({ position: lastValid.current.position })
-      onObstruction()
-    } else {
-      lastValid.current.position = dragToPos
+    const commit = () => {
+        nodeRef.current?.setNativeProps({
+            position: lastValid.current.position,
+            rotation: [0, lastValid.current.rotationY, 0],
+        })
+        onCommit(object.id, {
+            position: lastValid.current.position,
+            rotation: [0, lastValid.current.rotationY, 0],
+        })
     }
-  }
 
-  const handleRotate = (rotateState, rotationFactor) => {
-    if (rotateState === GESTURE_BEGIN) {
-      gestureBaseY.current = lastValid.current.rotationY
-      return
+    const handleClickState = (state) => {
+        if (state === CLICK_TAP) onSelect(object.id)
+        // Fin de cualquier interacción táctil sobre el objeto seleccionado:
+        // confirmar la última transformación válida
+        if (state === CLICK_UP && selected) commit()
     }
-    if (rotateState === GESTURE_END) {
-      commit()
-      return
-    }
-    // El twist no rota el nodo por sí solo: se aplica manualmente si el
-    // volumen rotado no invade otro objeto
-    const candidateY = gestureBaseY.current - rotationFactor
-    if (obstructed(lastValid.current.position, candidateY)) {
-      onObstruction()
-    } else {
-      lastValid.current.rotationY = candidateY
-      nodeRef.current?.setNativeProps({ rotation: [0, candidateY, 0] })
-    }
-  }
 
-  return (
-    <ViroNode
-      ref={nodeRef}
-      position={object.position}
-      rotation={object.rotation}
-      onClickState={handleClickState}
-      onDrag={selected ? handleDrag : undefined}
-      dragType="FixedToPlane"
-      dragPlane={{
-        planePoint: [0, floorY, 0],
-        planeNormal: [0, 1, 0],
-        maxDistance: 8,
-      }}
-      onRotate={selected ? handleRotate : undefined}
-    >
-      <Viro3DObject
-        source={model.source}
-        type="GLB"
-        scale={model.scale}
-        opacity={selected ? 0.85 : 1}
-      />
-    </ViroNode>
-  )
+    const handleDrag = (dragToPos) => {
+        if (obstructed(dragToPos, lastValid.current.rotationY)) {
+            nodeRef.current?.setNativeProps({ position: lastValid.current.position })
+            onObstruction()
+        } else {
+            lastValid.current.position = dragToPos
+        }
+    }
+
+    const handleRotate = (rotateState, rotationFactor) => {
+        if (rotateState === GESTURE_BEGIN) {
+            gestureBaseY.current = lastValid.current.rotationY
+            return
+        }
+        if (rotateState === GESTURE_END) {
+            commit()
+            return
+        }
+        const candidateY = gestureBaseY.current + rotationFactor
+        if (obstructed(lastValid.current.position, candidateY)) {
+            onObstruction()
+        } else {
+            lastValid.current.rotationY = candidateY
+            nodeRef.current?.setNativeProps({ rotation: [0, candidateY, 0] })
+        }
+    }
+
+    return (
+        <ViroNode
+            ref={nodeRef}
+            position={object.position}
+            rotation={object.rotation}
+            onClickState={handleClickState}
+            onDrag={selected && mode === 'move' ? handleDrag : undefined}
+            dragType="FixedToPlane"
+            dragPlane={{
+                planePoint: [0, floorY, 0],
+                planeNormal: [0, 1, 0],
+                maxDistance: 8,
+            }}
+            onRotate={selected ? handleRotate : undefined}
+        >
+            <Viro3DObject
+                source={model.source}
+                type="GLB"
+                scale={model.scale}
+                opacity={selected ? 0.85 : 1}
+            />
+        </ViroNode>
+    )
 }

@@ -2,10 +2,13 @@ import { useEffect, useState } from "react"
 import { Text, View, ScrollView } from "react-native"
 import Modal from "react-native-modal"
 
-import SerifText from "../ui/SerifText"
-import PrimaryButton from "../ui/PrimaryButton"
+import SerifText from "./SerifText"
+import PrimaryButton from "./PrimaryButton"
 import { numberSeparatorFormatter } from "../../utils/formatters"
-import VariationCard from "../ui/VariationCard"
+import VariationCard from "./VariationCard"
+import { fetchSingleProduct } from "../../services/inventoryService"
+
+import products from "../../mocks/products.json"
 
 /**
  * Selector de variantes del producto (modal).
@@ -13,20 +16,30 @@ import VariationCard from "../ui/VariationCard"
  * Trabaja sobre `product.variations` (datos ya existentes) y devuelve la
  * variante elegida vía `onSelect`, sin tocar la lógica de la pantalla.
  */
-export default function VariantsModal({ visible, product, selected, onSelect, onClose }) {
-    const variations = product?.variations ?? []
+export default function VariantsModal({ visible, product, selected, onSelect, onClose, shouldLoadVariants = false }) {
+    const [ variations, setVariations ] =  useState( product?.variations ?? [])
     const [draft, setDraft] = useState(selected)
 
     // Sincroniza la selección temporal cada vez que se abre el modal.
     useEffect(() => {
+        
         if (visible) {
+            if(shouldLoadVariants) {
+                const loadVariations = async () => {
+                    const { variations: newVariations } = products.find( (p) => p.model === product.model ) //await fetchSingleProduct(product.model, false)
+                    setVariations(newVariations)
+                }
+                loadVariations()
+            }
+
+            console.log(variations)
             const initDraftSelection = async () => {
                 setDraft(selected)
             }
 
             initDraftSelection()
         }
-    }, [visible, selected])
+    }, [visible, selected, product.model, shouldLoadVariants])
 
     const active = draft ?? selected
 

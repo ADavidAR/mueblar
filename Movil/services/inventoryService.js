@@ -28,6 +28,12 @@ export const fetchSingleProduct = async (model, simpleVariation = true) =>
         method: 'GET'
     })
 
+export const fetchSingleVariation = async (model, sku) =>
+    await request(`/api/products/${encodeURIComponent(model)}/variations/${encodeURIComponent(sku)}`, {
+        skipAuth: true,
+        method: 'GET'
+    })
+
 export const fetchCategories = async () => 
     await request("/api/categories", {
         skipAuth: true,

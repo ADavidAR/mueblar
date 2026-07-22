@@ -174,6 +174,10 @@ export const XIcon = ({ size = 18, color = '#ffffff', ...props }) => (
     <FontAwesome6 name="xmark" size={size} color={color} {...props} />
 )
 
+export const MenuIcon = ({ size = 18, color = '#ffffff', ...props }) => (
+    <FontAwesome6 name="bars" size={size} color={color} {...props} />
+)
+
 // --- Radios (sección Estilos) ---
 export const CircleIcon = ({ size = 18, color = COLORS.iconMuted, ...props }) => (
     <FontAwesome6 name="circle" size={size} color={color} {...props} />

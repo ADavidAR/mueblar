@@ -7,7 +7,7 @@ import { numberSeparatorFormatter, parseAttributes } from "../../utils/formatter
 import SpecificationTable from "../ui/SpecificationTable"
 import SerifText from "../ui/SerifText"
 import PrimaryButton from "../ui/PrimaryButton"
-import VariantsModal from "./VariantsModal"
+import VariantsModal from "../ui/VariantsModal"
 import "../../assets/img_placeholder.jpeg"
 import { CubeIcon, FilledHeartIcon, EmptyHeartIcon } from "../Icons"
 import { fetchSingleProduct } from "../../services/inventoryService"
@@ -28,7 +28,7 @@ function buildProductData(prod, variation) {
     }
 }
 
-export default function ProductDetails ({ model }) {
+export default function ProductDetails ({ model, sku }) {
     const router = useRouter()
     
     const [ product, setProduct ] = useState({})
@@ -47,17 +47,19 @@ export default function ProductDetails ({ model }) {
     useEffect(() => {
         const loadProduct = async () => {
             const newProd = data.filter(p => p.model === model)[0] //await fetchSingleProduct(model)
-            const newVariation = newProd.variations.filter(v => v.top)[0]
+            const newVariation = newProd.variations.find( v => sku ? sku === v.sku : v.top )
             setProduct(newProd)
             setSelectedVariation(newVariation)
             setSelectedImg(newVariation.thumbnail)
             setProductData(buildProductData(newProd, newVariation))
+            console.log(newProd)
+            
         }
 
         loadProduct()
-    }, [model])
+    }, [model, sku])
 
-    // Selección de una variación desde el modal (reutiliza los mismos setters).
+    // Selección de una variación desde el modal
     const handleSelectVariation = (variation) => {
         setSelectedVariation(variation)
         setSelectedImg(variation.thumbnail)
@@ -145,7 +147,7 @@ export default function ProductDetails ({ model }) {
                 icon={<CubeIcon size={18} />}
                 onPress={() => router.push({
                     pathname:"/view/ar",
-                    params: { sku: selectedVariation.sku}
+                    params: { sku: selectedVariation.sku, model }
                 })}
             />
         </ScrollView>

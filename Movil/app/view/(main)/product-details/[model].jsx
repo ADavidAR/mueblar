@@ -4,11 +4,11 @@ import ProductDetails from "../../../../components/main/ProductDetails"
 
 
 export default function ProductDetailsView () {
-    const { model } = useLocalSearchParams()
+    const { model, sku } = useLocalSearchParams()
 
     return (
         <MainScreen showBack showBrand>
-            <ProductDetails model={model}/>
+            <ProductDetails model={model} sku={sku} />
         </MainScreen>
     )
 }

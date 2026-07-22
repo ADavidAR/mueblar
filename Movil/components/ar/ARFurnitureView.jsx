@@ -1,19 +1,22 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { View, Text, Pressable, PermissionsAndroid, Platform } from 'react-native'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { View, Text, Pressable, PanResponder, PermissionsAndroid, Platform } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ViroARSceneNavigator } from '@reactvision/react-viro'
 
-import { PRODUCTS } from '../../mocks/catalogData'
-import { AR_MODELS, SPAWN_DISTANCE } from '../../mocks/arModels'
+import { SPAWN_DISTANCE } from '../../mocks/arModels'
 import { useARObjects } from '../../hooks/useARObjects'
-import { findFreeSpot } from './collision'
+import { useModelCatalog } from '../../hooks/useModelCatalog'
+import { findFreeSpot, isObstructed } from '../../utils/collision'
 import ARFurnitureScene from './ARFurnitureScene'
 import ARActionButton from './ARActionButton'
 import Brand from '../ui/Brand'
-import { XIcon } from '../Icons'
+import { MenuIcon, MoveIcon, RotateIcon, XIcon } from '../Icons'
+import SceneObjectsModal from './SceneObjectsModal'
 
 const HIT_EXISTING_PLANE = 'ExistingPlaneUsingExtent'
 const OBSTRUCTION_BANNER_MS = 1200
+// Grados de rotación por píxel de arrastre horizontal en modo "Girar"
+const ROTATE_PX_TO_DEG = 0.4
 
 /**
  * Módulo AR de MueblAR. Ciclo de vida:
@@ -29,19 +32,21 @@ const OBSTRUCTION_BANNER_MS = 1200
  *    SPAWN_DISTANCE frente a la cámara como respaldo), desplazado al hueco
  *    libre más cercano si el punto está ocupado por otro modelo.
  *
- * Los muebles ya colocados conservan sus coordenadas absolutas de mundo en
- * `useARObjects` (array {id, productId, position [x,y,z], rotation}) y solo
- * el seleccionado acepta gestos.
+ * `sku`/`model`: props de entrada, la variación concreta que el usuario
+ * tocó en "Ver en tu espacio" (ver ProductDetails.jsx → ar.jsx).
  */
-export default function ARFurnitureView({ productId }) {
+export default function ARFurnitureView({ sku, model }) {
     const insets = useSafeAreaInsets()
     const scene = useARObjects()
+
+    const [ showObjectsModal, setShowObjectsModal ] = useState(false)
 
     const [arActive, setArActive] = useState(false)
     const [permissionDenied, setPermissionDenied] = useState(false)
     const [tracking, setTracking] = useState(false)
     const [floorY, setFloorY] = useState(null) // null = sin suelo detectado aún
     const [obstruction, setObstruction] = useState(false)
+    const [mode, setMode] = useState('move') // 'move' | 'rotate' — qué hace el arrastre de un dedo
 
     const arSceneRef = useRef(null)
     // Planos detectados por ARCore, compartidos con la lógica de colisiones
@@ -55,11 +60,40 @@ export default function ARFurnitureView({ productId }) {
         objectsRef.current = scene.objects
     }, [scene.objects])
 
-    const product =
-        PRODUCTS.find((p) => p.id === productId && AR_MODELS[p.id]) ||
-        PRODUCTS.find((p) => AR_MODELS[p.id])
+    // Modelos 3D en uso: los ya colocados y la variación que se va a
+    // colocar. Se resuelven por sku
+    // contra la API y se cachean en memoria
+    const catalogSkus = useMemo(() => {
+        const list = scene.objects.map((o) => ({ model: o.productId, sku: o.sku }))
+        if (sku && model) list.push({ model, sku })
+        return list
+    }, [scene.objects, sku, model])
+    const getObjectData = useModelCatalog(catalogSkus)
+    const currentModel = sku ? getObjectData(sku) : null
+
     const selectedObject = scene.objects.find((o) => o.id === scene.selectedId)
-    const ready = tracking && floorY !== null
+    const ready = tracking && floorY !== null && !!currentModel
+
+    // Leídos dentro del PanResponder de rotación, que se crea una sola vez
+    const selectedObjectRef = useRef(selectedObject)
+    useEffect(() => {
+        selectedObjectRef.current = selectedObject
+    }, [selectedObject])
+    const getModelRef = useRef(getObjectData)
+    useEffect(() => {
+        getModelRef.current = getObjectData
+    }, [getObjectData])
+    // Rotación Y confirmada al iniciar el gesto de swipe en curso
+    const rotateBaseY = useRef(0)
+
+    // Cada nueva selección arranca en modo "mover"
+    useEffect(() => {
+        const inittMove = () => {
+            setMode('move')
+        }
+
+        inittMove()
+    }, [scene.selectedId])
 
     const flagObstruction = useCallback(() => {
         setObstruction(true)
@@ -68,17 +102,53 @@ export default function ARFurnitureView({ productId }) {
     }, [])
 
     const handleFloorFound = useCallback((y) => {
-        // El plano horizontal más bajo de la habitación es el suelo
-        setFloorY((prev) => (prev === null || y < prev ? y : prev))
+        setFloorY(y)
+    }, [])
+
+    // Modo "rotate": deslizar un dedo en cualquier parte de la pantalla gira
+    // el mueble seleccionado. Trabaja directo sobre deltas de píxeles de RN
+    // (sin pasar por el raycast de Viro), así que responde al instante.
+
+    const [rotateHandlers, setRotateHandlers] = useState(null)
+    useEffect(() => {
+        const responder = PanResponder.create({
+            onStartShouldSetPanResponder: () => true,
+            onMoveShouldSetPanResponder: () => true,
+            onPanResponderGrant: () => {
+                rotateBaseY.current = selectedObjectRef.current?.rotation[1] ?? 0
+            },
+            onPanResponderMove: (_, gestureState) => {
+                const obj = selectedObjectRef.current
+                if (!obj) return
+                const candidateY = rotateBaseY.current + gestureState.dx * ROTATE_PX_TO_DEG
+                const objModel = getModelRef.current(obj.sku)
+                if (
+                    isObstructed({
+                        position: obj.position,
+                        rotationY: candidateY,
+                        objectId: obj.id,
+                        collisionBox: objModel?.collisionBox,
+                        objects: objectsRef.current,
+                        anchors: anchorsRef.current,
+                        getCollisionBox: (s) => getModelRef.current(s)?.collisionBox,
+                    })
+                ) {
+                    flagObstruction()
+                    return
+                }
+                scene.updateTransform(obj.id, { rotation: [0, candidateY, 0] })
+            },
+        })
+        setRotateHandlers(responder.panHandlers)
     }, [])
 
     const requestCameraPermission = async () => {
         if (Platform.OS !== 'android') return true
         const result = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA, {
-        title: 'Cámara para Realidad Aumentada',
-        message: 'MueblAR usa la cámara para mostrar los muebles en tu habitación.',
-        buttonPositive: 'Permitir',
-        buttonNegative: 'Ahora no',
+            title: 'Cámara para Realidad Aumentada',
+            message: 'MueblAR usa la cámara para mostrar los muebles en tu habitación.',
+            buttonPositive: 'Permitir',
+            buttonNegative: 'Ahora no',
         })
         return result === PermissionsAndroid.RESULTS.GRANTED
     }
@@ -91,7 +161,7 @@ export default function ARFurnitureView({ productId }) {
             if (granted) setArActive(true)
             return
         }
-        if (!arSceneRef.current || !ready || !product) return
+        if (!arSceneRef.current || !ready || !currentModel) return
 
         // Anclaje por hit test: rayo desde la cámara hacia adelante contra los
         // planos reales detectados
@@ -104,23 +174,24 @@ export default function ARFurnitureView({ productId }) {
             camera.position[0] + camera.forward[0] * SPAWN_DISTANCE,
             floorY,
             camera.position[2] + camera.forward[2] * SPAWN_DISTANCE,
-            ]
+        ]
 
         const spot = findFreeSpot({
             position: [base[0], floorY, base[2]],
-            modelId: product.id,
+            collisionBox: currentModel.collisionBox,
             objects: objectsRef.current,
             anchors: anchorsRef.current,
+            getCollisionBox: (s) => getObjectData(s)?.collisionBox,
         })
+
         if (!spot) {
             flagObstruction()
             return
         }
-        scene.addObject(product.id, spot)
+        scene.addObject(model, sku, spot)
     }
 
-    // Fase 1: AR sin inicializar — la cámara no se solicita hasta que el
-    // usuario lo pide explícitamente
+    //AR sin inicializar la cámara no se solicita hasta que el usuario lo pide explícitamente
     if (!arActive) {
         return (
             <View
@@ -129,8 +200,8 @@ export default function ARFurnitureView({ productId }) {
             >
                 <Brand className="text-white" />
                 <Text className="mt-6 text-center text-sm text-white/70">
-                El visor AR usa la cámara para escanear tu habitación y colocar los muebles a escala
-                real.
+                    El visor AR usa la cámara para escanear tu habitación y colocar los muebles a escala
+                    real.
                 </Text>
                 {permissionDenied && (
                 <Text className="mt-3 text-center text-xs text-red-300">
@@ -151,6 +222,7 @@ export default function ARFurnitureView({ productId }) {
     }
 
     return (
+        <>
         <View className="flex-1 bg-black">
             <ViroARSceneNavigator
                 autofocus
@@ -159,6 +231,8 @@ export default function ARFurnitureView({ productId }) {
                     objects: scene.objects,
                     selectedId: scene.selectedId,
                     floorY: floorY ?? -1,
+                    mode,
+                    getModel: getObjectData,
                     objectsRef,
                     anchorsRef,
                     registerSceneRef: (ref) => {
@@ -173,72 +247,116 @@ export default function ARFurnitureView({ productId }) {
                 style={{ flex: 1 }}
             />
 
-        {/* Overlay de UI sobre la cámara */}
-        <View
-            pointerEvents="box-none"
-            className="absolute inset-0"
-            style={{ paddingTop: insets.top + 8, paddingBottom: insets.bottom + 8 }}
-        >
-            <View className="px-6">
-            <Brand className="text-white" />
-            <View className="mt-4 rounded-2xl bg-black/45 px-4 py-3">
-                <Text className="text-sm text-white/90">
-                    {!tracking
-                        ? 'Mueve el teléfono lentamente para iniciar el seguimiento...'
-                        : floorY === null
-                        ? 'Apunta al suelo hasta que aparezca la malla de detección...'
-                        : selectedObject
-                            ? 'Arrastra para trasladar · gira con dos dedos · toca fuera para soltar'
-                            : 'Suelo detectado: toca un mueble para manipularlo'}
-                </Text>
-            </View>
-            {obstruction && (
-                <View className="mt-2 rounded-2xl bg-red-900/70 px-4 py-3">
-                <Text className="text-sm font-semibold text-white">
-                    Obstrucción: no hay espacio libre en ese punto
-                </Text>
-                </View>
-            )}
-            </View>
-
-            <View className="flex-1" pointerEvents="none" />
-
-            <View className="px-6 mb-16">
-            <View className="rounded-2xl bg-black/45 p-4">
-                <Text className="text-[10px] uppercase tracking-[2px] text-copper">
-                    {selectedObject ? 'Manipulando' : 'Pieza a colocar'}
-                </Text>
-                <Text className="mt-1 text-lg font-semibold text-white">
-                    {selectedObject
-                        ? PRODUCTS.find((p) => p.id === selectedObject.productId)?.name
-                        : product?.name}
-                </Text>
-                <Text className="text-xs text-white/60">
-                    {scene.objects.length} objeto(s) en escena
-                </Text>
-            </View>
-
-            {selectedObject && (
-                <View className="mt-4 flex-row justify-center">
-                <ARActionButton
-                    icon={<XIcon />}
-                    label="Eliminar"
-                    onPress={() => scene.removeObject(selectedObject.id)}
-                />
-                </View>
-            )}
-
-            <Pressable
-                disabled={!ready || !product}
-                onPress={handlePlacePress}
-                className="mt-4 items-center rounded-full bg-copper py-4 active:opacity-80 disabled:opacity-40"
+            {/* Overlay de UI sobre la cámara */}
+            <View
+                pointerEvents="box-none"
+                className="absolute inset-0"
+                style={{ paddingTop: insets.top + 8, paddingBottom: insets.bottom + 76 }}
             >
-                <Text className="text-sm font-semibold uppercase tracking-[2px] text-white">
-                    Colocar objeto
-                </Text>
-            </Pressable>
+                <View className="px-6">
+                    <View
+                        className="flex-row items-center justify-between"
+                    >
+                        <Pressable
+                            onPress={() => setShowObjectsModal(true)}
+                            hitSlop={10}
+                            className="h-9 w-9 items-center justify-center rounded-full active:bg-stone-200/60 dark:active:bg-white/5"
+                        >
+                            <MenuIcon />
+                        </Pressable>
+                        <Brand className="text-white flex-end" />
+
+                    </View>
+                    <View className="mt-4 rounded-2xl bg-black/45 px-4 py-3">
+                        <Text className="text-sm text-white/90">
+                            {!tracking
+                                ? 'Mueve el teléfono lentamente para iniciar el seguimiento...'
+                                : floorY === null
+                                ? 'Apunta al suelo hasta que aparezca la malla de detección...'
+                                : selectedObject
+                                    ? mode === 'rotate'
+                                        ? 'Desliza un dedo para girar · toca fuera para soltar'
+                                        : 'Arrastra para trasladar · toca fuera para soltar'
+                                    : 'Suelo detectado: toca un mueble para manipularlo'}
+                        </Text>
+                    </View>
+                    {obstruction && (
+                        <View className="mt-2 rounded-2xl bg-red-900/70 px-4 py-3">
+                        <Text className="text-sm font-semibold text-white">
+                            Obstrucción: no hay espacio libre en ese punto
+                        </Text>
+                        </View>
+                    )}
+                </View>
+
+                <View
+                    className="flex-1"
+                    pointerEvents={mode === 'rotate' && selectedObject ? 'auto' : 'none'}
+                    {...(mode === 'rotate' && selectedObject && rotateHandlers ? rotateHandlers : {})}
+                />
+
+                <View className="px-6 mb-4">
+                    { selectedObject ? (
+
+                    <View className="rounded-2xl bg-black/45 p-4">
+                        <Text className="text-[10px] uppercase tracking-[2px] text-copper">
+                            {selectedObject ? 'Manipulando' : 'Pieza a colocar'}
+                        </Text>
+                        <Text className="mt-1 text-lg font-semibold text-white">
+                            {selectedObject ? getObjectData(selectedObject.sku)?.name : currentModel?.name}
+                        </Text>
+                        <Text className="text-xs text-white/60">
+                            {scene.objects.length} objeto(s) en escena
+                        </Text>
+                    </View>
+                    ) 
+                    : (
+                        <View className="rounded-2xl bg-black/45 p-4">
+                            <Text className="text-sm text-white/60">
+                                Selecciona un objeto en escena o agregalo desde el catalogo
+                            </Text>
+                        </View>
+                    )}
+
+                    {selectedObject && (
+                        <View className="mt-4 flex-row justify-center gap-6">
+                            <ARActionButton
+                                icon={<MoveIcon />}
+                                label="Mover"
+                                active={mode === 'move'}
+                                onPress={() => setMode('move')}
+                            />
+                            <ARActionButton
+                                icon={<RotateIcon />}
+                                label="Girar"
+                                active={mode === 'rotate'}
+                                onPress={() => setMode('rotate')}
+                            />
+                            <ARActionButton
+                                icon={<XIcon />}
+                                label="Eliminar"
+                                onPress={() => scene.removeObject(selectedObject.id)}
+                            />
+                        </View>
+                    )}
+
+                    <Pressable
+                        disabled={!ready || !currentModel}
+                        onPress={handlePlacePress}
+                        className="mt-4 items-center rounded-full bg-copper py-4 active:opacity-80 disabled:opacity-40"
+                    >
+                        <Text className="text-sm font-semibold uppercase tracking-[2px] text-white">
+                            Colocar objeto
+                        </Text>
+                    </Pressable>
+                </View>
             </View>
         </View>
-        </View>
+        <SceneObjectsModal
+            visible={showObjectsModal}
+            onHide={() => setShowObjectsModal(false)}
+        />
+        
+        </>
     )
 }
