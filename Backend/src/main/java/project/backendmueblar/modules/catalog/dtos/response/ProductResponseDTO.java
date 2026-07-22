@@ -15,4 +15,5 @@ public class ProductResponseDTO {
     private Boolean enable;
     private String model;
     private List<VariationResponseDTO> variations;
+    private Boolean isInCollection;
 }

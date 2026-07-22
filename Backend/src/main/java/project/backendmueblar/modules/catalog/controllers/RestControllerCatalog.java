@@ -9,6 +9,8 @@ import project.backendmueblar.modules.catalog.dtos.response.ProductResponseDTO;
 import project.backendmueblar.modules.catalog.dtos.response.VariationResponseDTO;
 import project.backendmueblar.modules.catalog.services.CatalogService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
@@ -40,9 +42,19 @@ public class RestControllerCatalog {
         return ResponseEntity.status(204).build();
     }
 
-    @GetMapping(value = "/{model}/variations/{sku}")
-    public ResponseEntity<?> getVariation(@PathVariable("sku") String skuOfVariation) {
+    @GetMapping(value = "/{model}/variations/{sku}", produces = "application/json")
+    public ResponseEntity<VariationResponseDTO> getVariation(@PathVariable("sku") String skuOfVariation) {
         VariationResponseDTO variationResponseDTO = catalogService.getSpecificVariation(skuOfVariation);
         return ResponseEntity.status(200).body(variationResponseDTO);
+    }
+
+    @GetMapping(produces = "application/json")
+    public ResponseEntity<List<ProductResponseDTO>> getAllProductsSimple(@RequestParam(defaultValue = "10") Integer limit,
+                                                                   @RequestParam(defaultValue = "0") Integer page,
+                                                                   @RequestParam(required = false) String category,
+                                                                   @RequestParam(required = false) String search
+    ){
+        List<ProductResponseDTO> productResponseDTOList = catalogService.getAllProductsSimple(limit, page, category, search);
+        return ResponseEntity.status(200).body(productResponseDTOList);
     }
 }

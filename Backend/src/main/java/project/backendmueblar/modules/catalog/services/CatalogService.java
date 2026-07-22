@@ -3,7 +3,10 @@ package project.backendmueblar.modules.catalog.services;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import project.backendmueblar.exception.catalog.InternalServerException;
 import project.backendmueblar.exception.catalog.NotExistentResourceException;
 import project.backendmueblar.exception.catalog.ProductAlreadyExistException;
 import project.backendmueblar.exception.catalog.ResourceNotFoundException;
@@ -403,6 +406,43 @@ public class CatalogService {
 
         return productResponseDTO;
     }
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
+
+    public List<ProductResponseDTO> getAllProductsSimple(Integer limit, Integer page, String category, String search) {
+        if(limit == 0) {
+            throw new InternalServerException("Cannot throw zero Products");
+        }
+
+        Pageable pageable = PageRequest.of(page, limit);
+        List<ProductEntity> productEntityList = new ArrayList<>();
+
+        boolean hasSearch = (search != null && !search.trim().isEmpty());
+        boolean hasCategory = (category != null && !category.trim().isEmpty());
+
+        if (!hasSearch && !hasCategory) {
+            productEntityList = repositoryProduct.findAll(pageable).getContent();
+        }
+        else if (hasSearch && hasCategory) {
+            productEntityList = repositoryProduct.findByModelNameContainingIgnoreCaseAndProductXCategoryEntityList_CategoryEntity_CategoryName(search, category, pageable);
+        }
+        else if (hasSearch) {
+            productEntityList = repositoryProduct.findByModelNameContainingIgnoreCase(search, pageable);
+        }
+        else if (hasCategory) {
+            productEntityList = repositoryProduct.findByProductXCategoryEntityList_CategoryEntity_CategoryName(category, pageable);
+        }
+
+        List<ProductResponseDTO> productResponseDTOList = new ArrayList<>();
+        for(ProductEntity thisProductEntity : productEntityList){
+            ProductResponseDTO productResponseDTO = getSpecificProduct(thisProductEntity.getModelName(), true);
+            productResponseDTOList.add(productResponseDTO);
+        }
+        return productResponseDTOList;
+
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
 
     private List<CategoryResponseDTO> getCategoryResponseDTOS(ProductEntity product) {
         List<Product_X_CategoryEntity> productXCategoryEntityList = product.getProductXCategoryEntityList();
