@@ -79,10 +79,12 @@ export default function ARFurnitureView({ sku, model }) {
     useEffect(() => {
         selectedObjectRef.current = selectedObject
     }, [selectedObject])
+
     const getModelRef = useRef(getObjectData)
     useEffect(() => {
         getModelRef.current = getObjectData
     }, [getObjectData])
+
     // Rotación Y confirmada al iniciar el gesto de swipe en curso
     const rotateBaseY = useRef(0)
 
@@ -296,7 +298,7 @@ export default function ARFurnitureView({ sku, model }) {
                 />
 
                 <View className="px-6 mb-4">
-                    { selectedObject ? (
+                    { selectedObject || (sku && model) ? (
 
                     <View className="rounded-2xl bg-black/45 p-4">
                         <Text className="text-[10px] uppercase tracking-[2px] text-copper">
@@ -355,6 +357,7 @@ export default function ARFurnitureView({ sku, model }) {
         <SceneObjectsModal
             visible={showObjectsModal}
             onHide={() => setShowObjectsModal(false)}
+            scene={scene}
         />
         
         </>

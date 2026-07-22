@@ -5,7 +5,6 @@ import Modal from "react-native-modal"
 import SerifText from "../ui/SerifText"
 import { useRouter } from "expo-router"
 import VariantsModal from "../ui/VariantsModal"
-import { useARObjects } from "../../hooks/useARObjects"
 import { useModelCatalog } from "../../hooks/useModelCatalog"
 
 /**
@@ -13,17 +12,22 @@ import { useModelCatalog } from "../../hooks/useModelCatalog"
  *
  * Trabaja sobre `product.variations` (datos ya existentes) y devuelve la
  * variante elegida vía `onSelect`, sin tocar la lógica de la pantalla.
+ *
+ * `scene`: la MISMA instancia de useARObjects que usa ARFurnitureView, pasada
+ * por prop en vez de llamar useARObjects() acá — cada llamada al hook tiene
+ * su propio estado interno, así que una instancia aparte nunca se enteraría
+ * de los cambios (ni al revés).
  */
-export default function OptionsModal({ visible, onClose, objectId ,productId, sku }) {
-    const scene = useARObjects()
-    const getObjectData = useModelCatalog(scene.objects)
-    const [ showVariantsModal, setShowVariantsModal] = useState(false)
+export default function OptionsModal({ visible, onClose, objectId, productId, sku, scene }) {
+    const getObjectData = useModelCatalog([])
+    const [ showVariantsModal, setShowVariantsModal ] = useState(false)
     const router = useRouter()
 
     // Selección de una variación desde el modal
     const handleSelectVariation = (variation) => {
         scene.updateTransform(objectId, {sku: variation.sku})
         setShowVariantsModal(false)
+        onClose()
     }
     return (
         <>
@@ -80,7 +84,7 @@ export default function OptionsModal({ visible, onClose, objectId ,productId, sk
             onSelect={handleSelectVariation}
             visible={showVariantsModal}
             shouldLoadVariants
-            selected={getObjectData(sku)}
+            selected={{...getObjectData(sku), sku}}
             
         />
         </>

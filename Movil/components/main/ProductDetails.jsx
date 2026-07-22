@@ -52,7 +52,6 @@ export default function ProductDetails ({ model, sku }) {
             setSelectedVariation(newVariation)
             setSelectedImg(newVariation.thumbnail)
             setProductData(buildProductData(newProd, newVariation))
-            console.log(newProd)
             
         }
 
@@ -148,7 +147,8 @@ export default function ProductDetails ({ model, sku }) {
                 onPress={() => router.push({
                     pathname:"/view/ar",
                     params: { sku: selectedVariation.sku, model }
-                })}
+                })
+            }
             />
         </ScrollView>
 

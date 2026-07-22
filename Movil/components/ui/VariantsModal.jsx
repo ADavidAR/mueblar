@@ -17,7 +17,8 @@ import products from "../../mocks/products.json"
  * variante elegida vía `onSelect`, sin tocar la lógica de la pantalla.
  */
 export default function VariantsModal({ visible, product, selected, onSelect, onClose, shouldLoadVariants = false }) {
-    const [ variations, setVariations ] =  useState( product?.variations ?? [])
+    const [ fetchedVariations, setFetchedVariations ] = useState(null)
+    const variations = fetchedVariations ?? product?.variations ?? []
     const [draft, setDraft] = useState(selected)
 
     // Sincroniza la selección temporal cada vez que se abre el modal.
@@ -27,12 +28,10 @@ export default function VariantsModal({ visible, product, selected, onSelect, on
             if(shouldLoadVariants) {
                 const loadVariations = async () => {
                     const { variations: newVariations } = products.find( (p) => p.model === product.model ) //await fetchSingleProduct(product.model, false)
-                    setVariations(newVariations)
+                    setFetchedVariations(newVariations)
                 }
                 loadVariations()
             }
-
-            console.log(variations)
             const initDraftSelection = async () => {
                 setDraft(selected)
             }

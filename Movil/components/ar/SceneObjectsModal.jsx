@@ -13,15 +13,15 @@ import {
 import { COLORS } from "../../constants/theme"
 import { useTheme } from "../../context/ThemeContext"
 import SerifText from "../ui/SerifText"
-import { useARObjects } from "../../hooks/useARObjects"
 import { SceneObjectCard } from "../ui/ProductCard"
 import { fetchSingleVariation } from "../../services/inventoryService"
 import OptionsModal from "./OptionsModal"
 import { useModelCatalog } from "../../hooks/useModelCatalog"
 
-export default function SceneObjectsModal({ visible, onHide, onSearch }) {
-    const { objects, clearScene } = useARObjects()
-    const getObjectData = useModelCatalog(objects)
+// `scene`: la MISMA instancia de useARObjects que ARFurnitureView, pasada
+// por prop — ver la nota en OptionsModal.jsx.
+export default function SceneObjectsModal({ visible, onHide, onSearch, scene }) {
+    const getObjectData = useModelCatalog([])
     const insets = useSafeAreaInsets()
     const { isDark } = useTheme()
     const [ isAtEnd, setIsAtEnd ] = useState(false)
@@ -59,7 +59,7 @@ export default function SceneObjectsModal({ visible, onHide, onSearch }) {
             'Se van a eliminar todos los muebles colocados. Esta acción no se puede deshacer.',
             [
                 { text: 'Cancelar', style: 'cancel' },
-                { text: 'Vaciar', style: 'destructive', onPress: clearScene },
+                { text: 'Vaciar', style: 'destructive', onPress: scene.clearScene },
             ],
         )
     }
@@ -119,7 +119,7 @@ export default function SceneObjectsModal({ visible, onHide, onSearch }) {
                                 Objetos
                             </Text>
                         </View>
-                        {objects.length > 0 && (
+                        {scene.objects.length > 0 && (
                             <Pressable
                                 onPress={handleClearScene}
                                 hitSlop={10}
@@ -131,18 +131,18 @@ export default function SceneObjectsModal({ visible, onHide, onSearch }) {
                         )}
                     </View>
 
-                    { objects.length ? (
+                    { scene.objects.length ? (
                         <>
                         <View className="items-center h-4">
                             {isAtEnd ? <ChevronUpIcon color={arrowColor} size={14} /> : null}
                         </View>
-                        <View className="h-[26%] border-y border-stone-300 dark:border-white/10 py-2">
+                        <View className="h-[46%] border-y  border-stone-300 dark:border-white/10 py-2">
                             <FlatList
-                                data={objects}
-                                keyExtractor={(o) => o.id}
+                                data={scene.objects}
                                 onScroll={(e) => handleScroll(e)}
                                 scrollEventThrottle={16}
                                 showsVerticalScrollIndicator={false}
+                                keyExtractor={(o) => o.id}
                                 numColumns={2}
                                 columnWrapperStyle={{ justifyContent: "space-between" }}
                                 contentContainerStyle={{ gap: 10 }}
@@ -150,7 +150,7 @@ export default function SceneObjectsModal({ visible, onHide, onSearch }) {
                                     return (
                                         <SceneObjectCard
                                             item={getObjectData(item.sku)}
-                                            onPress={() => handlePress(item.objectId, item.productId, item.sku)}
+                                            onPress={() => handlePress(item.id, item.productId, item.sku)}
                                         />
                                     )
                                 }}
@@ -176,11 +176,13 @@ export default function SceneObjectsModal({ visible, onHide, onSearch }) {
                 </View>
             </View>
         </Modal>
-        <OptionsModal 
+        <OptionsModal
             visible={showOptionsModal}
             onClose={() => setShowOptionsModal(false)}
+            objectId={selectedIds.objectId}
             productId={selectedIds.productId}
             sku={selectedIds.sku}
+            scene={scene}
         />
         </>
     )

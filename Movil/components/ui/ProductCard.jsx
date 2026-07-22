@@ -99,16 +99,15 @@ export function SceneObjectCard ({ item, onPress }) {
             onPress={onPress}
                 onPressIn={() => animateTo(0.96)}
                 onPressOut={() => animateTo(1)}
-                className="w-full"
+                className="w-[48%]"
             >
                 <Animated.View style={{ transform: [{ scale }] }}>
-                    <View className="rounded-2xl overflow-hidden bg-white dark:bg-card shadow-sm shadow-black/20">
+                    <View className="rounded-2xl w-full overflow-hidden bg-white dark:bg-card shadow-sm shadow-black/20">
                         <Image
                             source={{ uri: item.thumbnail }}
                             style={{ height: 200, width: '100%' }}
                             resizeMode="cover"
                         />
-                        <FavoriteButton />
                     </View>
 
                     <SerifText className="mt-3 text-lg font-semibold text-stone-900 dark:text-stone-50">
