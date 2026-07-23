@@ -83,6 +83,41 @@ export function ProductCard ({ item, topVariation, onImageLoad }) {
     )
 }
 
+export function SceneObjectCard ({ item, onPress }) {
+    const [scale] = useState(() => new Animated.Value(1))
+
+    const animateTo = (toValue) =>
+        Animated.spring(scale, {
+            toValue,
+            useNativeDriver: true,
+            speed: 50,
+            bounciness: 0,
+        }).start()
+
+    return (
+            <Pressable
+            onPress={onPress}
+                onPressIn={() => animateTo(0.96)}
+                onPressOut={() => animateTo(1)}
+                className="w-[48%]"
+            >
+                <Animated.View style={{ transform: [{ scale }] }}>
+                    <View className="rounded-2xl w-full overflow-hidden bg-white dark:bg-card shadow-sm shadow-black/20">
+                        <Image
+                            source={{ uri: item.thumbnail }}
+                            style={{ height: 200, width: '100%' }}
+                            resizeMode="cover"
+                        />
+                    </View>
+
+                    <SerifText className="mt-3 text-lg font-semibold text-stone-900 dark:text-stone-50">
+                        {item.model}
+                    </SerifText>
+                </Animated.View>
+            </Pressable>
+    )
+}
+
 export function AnimatedProductCard ({item, topVariation, index, resetKey}) {
     const [fadeAnim] = useState(() => new Animated.Value(0))
     const [slideAnim] = useState(() => new Animated.Value(20))

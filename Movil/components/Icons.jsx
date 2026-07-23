@@ -154,6 +154,30 @@ export const SlidersIcon = ({ size = 18, color = COLORS.copper, ...props }) => (
     <FontAwesome6 name="sliders" size={size} color={color} {...props} />
 )
 
+export const PlusIcon = ({ size = 16, color = COLORS.copper, ...props }) => (
+    <FontAwesome6 name="plus" size={size} color={color} {...props} />
+)
+
+export const TrashIcon = ({ size = 16, color = '#ef4444', ...props }) => (
+    <FontAwesome6 name="trash-can" size={size} color={color} {...props} />
+)
+
+export const RotateIcon = ({ size = 18, color = '#ffffff', ...props }) => (
+    <FontAwesome6 name="arrows-rotate" size={size} color={color} {...props} />
+)
+
+export const MoveIcon = ({ size = 18, color = '#ffffff', ...props }) => (
+    <FontAwesome6 name="up-down-left-right" size={size} color={color} {...props} />
+)
+
+export const XIcon = ({ size = 18, color = '#ffffff', ...props }) => (
+    <FontAwesome6 name="xmark" size={size} color={color} {...props} />
+)
+
+export const MenuIcon = ({ size = 18, color = '#ffffff', ...props }) => (
+    <FontAwesome6 name="bars" size={size} color={color} {...props} />
+)
+
 // --- Radios (sección Estilos) ---
 export const CircleIcon = ({ size = 18, color = COLORS.iconMuted, ...props }) => (
     <FontAwesome6 name="circle" size={size} color={color} {...props} />

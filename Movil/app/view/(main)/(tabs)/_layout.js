@@ -2,9 +2,11 @@ import { Tabs } from "expo-router";
 import { COLORS } from "../../../../constants/theme";
 import { ArIcon, CatalogIcon, EmptyHeartIcon } from "../../../../components/Icons";
 import { useTheme } from "../../../../context/ThemeContext";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabsLayout () {
     const { isDark } = useTheme()
+    const insets = useSafeAreaInsets()
 
     return (
         <Tabs
@@ -33,7 +35,7 @@ export default function TabsLayout () {
                     shadowRadius: 12,
                     elevation: 8,
                     position: 'absolute',
-                    bottom: 16,
+                    bottom: insets.bottom,
                     left: 20,
                     right: 20,
                     height: 74,

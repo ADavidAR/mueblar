@@ -15,8 +15,7 @@ export function useFilters() {
             // const res =   await fetchProducts(
             //     filters.search,
             //     limit,
-            //     page * limit,
-            //     PRODUCTS_FETCHING.select,
+            //     page,
             //     filters.categories,
             //     filters.materials
             // )

@@ -12,6 +12,8 @@
         "sku": "SOF-NOR-001-GR",
         "price": 649.99,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [2.1, 0.85, 0.9] },
         "imgs": [
           "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80",
           "https://images.unsplash.com/photo-1484101403633-562f891dc89a?auto=format&fit=crop&w=1200&q=80"
@@ -28,6 +30,8 @@
         "sku": "SOF-NOR-001-AZ",
         "price": 669.99,
         "top": false,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [2.1, 0.85, 0.9] },
         "imgs": [
           "https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -52,6 +56,8 @@
         "sku": "MES-WAL-002-NAT",
         "price": 899.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [1.8, 0.76, 1] },
         "imgs": [
           "https://images.unsplash.com/photo-1615066390971-03e4e1c36ddf?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -75,6 +81,8 @@
         "sku": "SIL-ERG-003-NE",
         "price": 249.50,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [0.65, 1.2, 0.65] },
         "imgs": [
           "https://images.unsplash.com/photo-1505797149-43b0069ec26b?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -90,6 +98,8 @@
         "sku": "SIL-ERG-003-BL",
         "price": 259.50,
         "top": false,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [0.65, 1.2, 0.65] },
         "imgs": [
           "https://images.unsplash.com/photo-1580481072645-022f9a6dbf27?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -114,6 +124,8 @@
         "sku": "CAM-VEL-004-GR",
         "price": 420.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [1.6, 1.15, 2.1] },
         "imgs": [
           "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -128,6 +140,8 @@
         "sku": "CAM-VEL-004-RO",
         "price": 420.00,
         "top": false,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [1.6, 1.15, 2.1] },
         "imgs": [
           "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -151,6 +165,8 @@
         "sku": "MCE-LUX-005-OR",
         "price": 310.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [0.8, 0.42, 0.8] },
         "imgs": [
           "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -175,6 +191,8 @@
         "sku": "ARM-SPA-006-BL",
         "price": 549.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [1.5, 2.2, 0.62] },
         "imgs": [
           "https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -199,6 +217,8 @@
         "sku": "SIL-VIN-007-MON",
         "price": 189.99,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [0.8, 1.02, 0.85] },
         "imgs": [
           "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -223,6 +243,8 @@
         "sku": "PAC-EAM-008-BL",
         "price": 120.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [0.46, 0.82, 0.53] },
         "imgs": [
           "https://images.unsplash.com/photo-1562184560-a11b7cf7c169?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -238,6 +260,8 @@
         "sku": "PAC-EAM-008-NE",
         "price": 120.00,
         "top": false,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [0.46, 0.82, 0.53] },
         "imgs": [
           "https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -262,6 +286,8 @@
         "sku": "ESC-SMA-009-RO",
         "price": 399.99,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [1.4, 1.15, 0.7] },
         "imgs": [
           "https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -286,6 +312,8 @@
         "sku": "TVM-IRO-010-ENV",
         "price": 285.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [1.6, 0.55, 0.4] },
         "imgs": [
           "https://images.unsplash.com/photo-1593085260707-5377ba34f9a8?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -310,6 +338,8 @@
         "sku": "GAR-IBZ-011-BR",
         "price": 499.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [1.3, 0.8, 0.75] },
         "imgs": [
           "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -334,6 +364,8 @@
         "sku": "MSN-FLO-012-BL",
         "price": 79.99,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [0.45, 0.2, 0.35] },
         "imgs": [
           "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -357,6 +389,8 @@
         "sku": "EST-ZIG-013-RO",
         "price": 145.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [0.9, 1.8, 0.28] },
         "imgs": [
           "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -380,6 +414,8 @@
         "sku": "TAB-BAR-014-CA",
         "price": 85.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [0.42, 0.95, 0.42] },
         "imgs": [
           "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -404,6 +440,8 @@
         "sku": "CON-GLA-015-TR",
         "price": 199.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [1, 0.75, 0.3] },
         "imgs": [
           "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -427,6 +465,8 @@
         "sku": "COM-NOR-016-MB",
         "price": 279.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [1.2, 0.8, 0.45] },
         "imgs": [
           "https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -450,6 +490,8 @@
         "sku": "CHL-COM-017-GM",
         "price": 799.99,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [2.4, 0.9, 1.5] },
         "imgs": [
           "https://images.unsplash.com/photo-1549488344-1f9b8d2bd1f3?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -474,6 +516,8 @@
         "sku": "CAM-KID-018-AZ",
         "price": 340.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [1.95, 0.65, 0.98] },
         "imgs": [
           "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -497,6 +541,8 @@
         "sku": "MAU-RUS-019-PIN",
         "price": 135.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [0.6, 0.45, 0.6] },
         "imgs": [
           "https://images.unsplash.com/photo-1604014237800-1c9102c219da?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -520,6 +566,8 @@
         "sku": "CAJ-ROL-020-GR",
         "price": 95.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [0.4, 0.6, 0.5] },
         "imgs": [
           "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -544,6 +592,8 @@
         "sku": "RE-POW-021-CH",
         "price": 450.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [0.85, 1.05, 0.9] },
         "imgs": [
           "https://images.unsplash.com/photo-1592078615290-033ee584e267?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -568,6 +618,8 @@
         "sku": "TUM-SOL-022-BE",
         "price": 160.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [0.65, 0.35, 1.9] },
         "imgs": [
           "https://images.unsplash.com/photo-1560185007-c5ca9d2c014d?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -592,6 +644,8 @@
         "sku": "VIT-GLA-023-NE",
         "price": 520.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [0.8, 1.9, 0.42] },
         "imgs": [
           "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -616,6 +670,8 @@
         "sku": "ZAP-SLI-024-BM",
         "price": 110.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [0.7, 1.15, 0.22] },
         "imgs": [
           "https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -639,6 +695,8 @@
         "sku": "ESC-GRO-025-VE",
         "price": 175.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [0.9, 0.75, 0.55] },
         "imgs": [
           "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -663,6 +721,8 @@
         "sku": "PUF-REL-026-MO",
         "price": 65.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [0.8, 1.1, 0.8] },
         "imgs": [
           "https://images.unsplash.com/photo-1581428982868-e410dd047a90?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -687,6 +747,8 @@
         "sku": "BAN-AQU-027-GC",
         "price": 349.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [0.8, 0.56, 0.46] },
         "imgs": [
           "https://images.unsplash.com/photo-1620626011160-9928f1b2b634?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -711,6 +773,8 @@
         "sku": "TOC-HOL-028-BL",
         "price": 229.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [0.9, 1.4, 0.4] },
         "imgs": [
           "https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -735,6 +799,8 @@
         "sku": "ISL-CHE-029-BI",
         "price": 189.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [0.85, 0.85, 0.5] },
         "imgs": [
           "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80"
         ],
@@ -759,6 +825,8 @@
         "sku": "MSAL-INT-030-GR",
         "price": 599.00,
         "top": true,
+        "model_3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SheenChair/glTF-Binary/SheenChair.glb",
+        "instance_params": { "scale": [1, 1, 1], "collisionBox": [2.2, 1.6, 0.42] },
         "imgs": [
           "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1200&q=80"
         ],

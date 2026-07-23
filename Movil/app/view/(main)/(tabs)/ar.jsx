@@ -1,25 +1,32 @@
-import { Text, View } from "react-native"
+import { NativeModules } from 'react-native'
+import { useLocalSearchParams } from 'expo-router'
 
-import MainScreen from "../../../../components/main/MainScreen"
-import SerifText from "../../../../components/ui/SerifText"
-import { ArIcon } from "../../../../components/Icons"
-import { COLORS } from "../../../../constants/theme"
+import { ModelCatalogProvider } from '../../../../context/ModelCatalogContext'
 
-export default function AR() {
+/**
+ * Pestaña AR.
+ */
+let ARView
+try {
+    ARView =
+    NativeModules.VRTMaterialManager != null
+        ? require('../../../../components/ar/ARFurnitureView').default
+        : require("../../../../components/ar/ARSimulatedView").default
+} catch {
+    ARView = require('../../../../components/ar/ARSimulatedView').default
+}
 
+export default function ARScreen() {
+    // sku/model: la variación concreta que el usuario tocó en "Ver en tu
+    // espacio" (ver ProductDetails.jsx). Sin esto ARFurnitureView no sabe
+    // qué modelo 3D mostrar.
+    const { sku, model } = useLocalSearchParams()
     return (
-        <MainScreen showBrand showProfile>
-            <View className="flex-1 items-center justify-center gap-y-4 pb-24">
-                <View className="h-16 w-16 items-center justify-center rounded-full bg-copper/15 border border-copper/30">
-                    <ArIcon size={26} color={COLORS.copper} />
-                </View>
-                <SerifText className="text-3xl font-bold text-stone-900 dark:text-stone-50">
-                    {"Vista Ar"}
-                </SerifText>
-                <Text className="text-center text-base text-stone-500 dark:text-stone-400">
-                    Apunta tu cámara a la habitación{"\n"}y coloca el mueble en tu espacio real.
-                </Text>
-            </View>
-        </MainScreen>
+        // Un solo cache de modelos 3D compartido entre ARFurnitureView,
+        // SceneObjectsModal y OptionsModal (todos montados bajo esta
+        // pantalla) — ver ModelCatalogContext.jsx.
+        <ModelCatalogProvider>
+            <ARView sku={sku} model={model} />
+        </ModelCatalogProvider>
     )
 }

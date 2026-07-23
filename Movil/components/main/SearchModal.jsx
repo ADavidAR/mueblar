@@ -93,7 +93,7 @@ export default function SearchModal({ visible, onHide, onSearch }) {
             onSwipeComplete={onHide}
             useNativeDriverForBackdrop
             style={{ margin: 0 }}
-            backdropTransitionOutTiming={0}
+            backdropTransitionOutTiming={200}
             backdropOpacity={0.5}
         >
             <View
