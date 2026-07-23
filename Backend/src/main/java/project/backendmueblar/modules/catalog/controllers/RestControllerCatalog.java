@@ -54,7 +54,18 @@ public class RestControllerCatalog {
                                                                    @RequestParam(required = false) String category,
                                                                    @RequestParam(required = false) String search
     ){
-        List<ProductResponseDTO> productResponseDTOList = catalogService.getAllProductsSimple(limit, page, category, search);
+        List<ProductResponseDTO> productResponseDTOList = catalogService.getAllProducts(limit, page, category, search);
         return ResponseEntity.status(200).body(productResponseDTOList);
+    }
+
+    @GetMapping(value = "/token", produces = "application/json")
+    public ResponseEntity<List<ProductResponseDTO>> getAllProductsToken(@RequestHeader("Authorization") String authHeader,
+                                                                        @RequestParam(defaultValue = "10") Integer limit,
+                                                                        @RequestParam(defaultValue = "0") Integer page,
+                                                                        @RequestParam(required = false) String category,
+                                                                        @RequestParam(required = false) String search
+    ){
+        List<ProductResponseDTO> productResponseList = catalogService.getAllProducts(authHeader, limit, page, category, search);
+        return ResponseEntity.status(200).body(productResponseList);
     }
 }

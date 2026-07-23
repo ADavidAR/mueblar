@@ -6,10 +6,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import project.backendmueblar.exception.auth.UserIDNotMatchException;
 import project.backendmueblar.exception.catalog.InternalServerException;
 import project.backendmueblar.exception.catalog.NotExistentResourceException;
 import project.backendmueblar.exception.catalog.ProductAlreadyExistException;
 import project.backendmueblar.exception.catalog.ResourceNotFoundException;
+import project.backendmueblar.modules.auth.services.JwtService;
 import project.backendmueblar.modules.catalog.dtos.request.AttributeSummaryRequestDTO;
 import project.backendmueblar.modules.catalog.dtos.request.CategoryRequestDTO;
 import project.backendmueblar.modules.catalog.dtos.request.ProductCreateRequestDTO;
@@ -20,6 +22,12 @@ import project.backendmueblar.modules.catalog.dtos.response.ProductResponseDTO;
 import project.backendmueblar.modules.catalog.dtos.response.VariationResponseDTO;
 import project.backendmueblar.modules.catalog.entities.*;
 import project.backendmueblar.modules.catalog.repositories.*;
+import project.backendmueblar.modules.interactions.entities.CollectionEntity;
+import project.backendmueblar.modules.interactions.entities.Collection_X_ProductEntity;
+import project.backendmueblar.modules.interactions.repositories.RepositoryCollection;
+import project.backendmueblar.modules.interactions.repositories.RepositoryCollection_X_Product;
+import project.backendmueblar.modules.users.entities.UserEntity;
+import project.backendmueblar.modules.users.repositories.RepositoryUser;
 
 import java.util.*;
 
@@ -31,6 +39,11 @@ public class CatalogService {
     private final RepositoryCategory repositoryCategory;
     private final RepositoryAttribute repositoryAttribute;
     private final RepositoryVariation repositoryVariation;
+    private final RepositoryUser repositoryUser;
+    private final RepositoryCollection repositoryCollection;
+    private final RepositoryCollection_X_Product repositoryCollection_X_Product;
+
+    private final JwtService jwtService;
 
     @Transactional
     public void createProductAndVariations(ProductCreateRequestDTO productCreateRequestDTO) {
@@ -408,8 +421,8 @@ public class CatalogService {
     }
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
-
-    public List<ProductResponseDTO> getAllProductsSimple(Integer limit, Integer page, String category, String search) {
+    // 1 //
+    public List<ProductResponseDTO> getAllProducts(Integer limit, Integer page, String category, String search) {
         if(limit == 0) {
             throw new InternalServerException("Cannot throw zero Products");
         }
@@ -440,6 +453,68 @@ public class CatalogService {
         }
         return productResponseDTOList;
 
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
+    // 2 //
+    public List<ProductResponseDTO> getAllProducts(String authHeader, Integer limit, Integer page, String category, String search) {
+        UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
+        if(limit == 0) {
+            throw new InternalServerException("Cannot throw zero Products");
+        }
+
+        Pageable pageable = PageRequest.of(page, limit);
+        List<ProductEntity> productEntityList = new ArrayList<>();
+
+        boolean hasSearch = (search != null && !search.trim().isEmpty());
+        boolean hasCategory = (category != null && !category.trim().isEmpty());
+
+        if (!hasSearch && !hasCategory) {
+            productEntityList = repositoryProduct.findAll(pageable).getContent();
+        }
+        else if (hasSearch && hasCategory) {
+            productEntityList = repositoryProduct.findByModelNameContainingIgnoreCaseAndProductXCategoryEntityList_CategoryEntity_CategoryName(search, category, pageable);
+        }
+        else if (hasSearch) {
+            productEntityList = repositoryProduct.findByModelNameContainingIgnoreCase(search, pageable);
+        }
+        else if (hasCategory) {
+            productEntityList = repositoryProduct.findByProductXCategoryEntityList_CategoryEntity_CategoryName(category, pageable);
+        }
+
+        List<ProductResponseDTO> productResponseDTOList = new ArrayList<>();
+
+        List<CollectionEntity> collectionEntityList = repositoryCollection.findAllByUserEntity(thisUserEntity);
+
+        for(ProductEntity thisProductEntity : productEntityList){
+            ProductResponseDTO productResponseDTO = getSpecificProduct(thisProductEntity.getModelName(), true);
+
+            for(CollectionEntity collectionEntity : collectionEntityList) {
+                Optional<Collection_X_ProductEntity> optionalCollectionXProduct = repositoryCollection_X_Product.findByProductEntityAndCollectionEntity(thisProductEntity, collectionEntity);
+                if(optionalCollectionXProduct.isPresent()) {
+                    productResponseDTO.setIsInCollection(true);
+                    break;
+                }
+            }
+
+            if (productResponseDTO.getIsInCollection() == null){
+                productResponseDTO.setIsInCollection(false);
+            }
+            productResponseDTOList.add(productResponseDTO);
+        }
+        return productResponseDTOList;
+
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
+
+    private Optional<UserEntity> existsUserWithToken(String authHeader) {
+        String uniqueEmailForUser = jwtService.extractEmail(authHeader);
+        Optional<UserEntity> optionalUser = repositoryUser.findByEmail(uniqueEmailForUser);
+        if (optionalUser.isEmpty()) {
+            throw new UserIDNotMatchException("User not Found, Cannot create or access to Collection");
+        }
+        return optionalUser;
     }
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//

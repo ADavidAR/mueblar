@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface RepositoryCollection extends JpaRepository<CollectionEntity, Long> {
     Optional<CollectionEntity> findByCollectionId(Long collectionId);
     Optional<CollectionEntity> findByTitle(String title);
+    List<CollectionEntity> findAllByUserEntity(UserEntity userEntity);
     List<CollectionEntity> findAllByUserEntity(UserEntity userEntity, Pageable pageable);
     List<CollectionEntity> findByUserEntityAndTitleContainingIgnoreCase(UserEntity userEntity, String search, Pageable pageable);
 }

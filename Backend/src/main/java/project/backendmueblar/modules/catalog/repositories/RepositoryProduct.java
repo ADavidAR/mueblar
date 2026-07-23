@@ -17,5 +17,4 @@ public interface RepositoryProduct extends JpaRepository<ProductEntity, String> 
     List<ProductEntity> findByModelNameContainingIgnoreCase(String search, Pageable pageable);
     List<ProductEntity> findByProductXCategoryEntityList_CategoryEntity_CategoryName(String category, Pageable pageable);
     List<ProductEntity> findByModelNameContainingIgnoreCaseAndProductXCategoryEntityList_CategoryEntity_CategoryName(String search, String category, Pageable pageable);
-
 }
