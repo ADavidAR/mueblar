@@ -10,8 +10,11 @@ import project.backendmueblar.exception.auth.*;
 import project.backendmueblar.modules.auth.dtos.*;
 import project.backendmueblar.modules.auth.repositories.RepositoryRecoveryToken;
 import project.backendmueblar.modules.auth.entities.RecoveryTokenEntity;
+import project.backendmueblar.modules.users.entities.ModuleEntity;
+import project.backendmueblar.modules.users.entities.Module_X_RoleEntity;
 import project.backendmueblar.modules.users.entities.RoleEntity;
 import project.backendmueblar.modules.users.entities.UserEntity;
+import project.backendmueblar.modules.users.repositories.RepositoryModule;
 import project.backendmueblar.modules.users.repositories.RepositoryPermission_X_Role;
 import project.backendmueblar.modules.users.repositories.RepositoryRole;
 import project.backendmueblar.modules.users.repositories.RepositoryUser;
@@ -27,8 +30,8 @@ public class AuthService {
     private final RepositoryUser repositoryUser;
     private final RepositoryRole repositoryRole;
     private final PasswordEncoder passwordEncoder;
-    private final RepositoryPermission_X_Role repositoryPermission_X_Role;
     private final RepositoryRecoveryToken repositoryRecoveryToken;
+    private final RepositoryModule repositoryModule;
 
     private final JwtService jwtService;
     private final EmailService emailService;
@@ -78,7 +81,7 @@ public class AuthService {
         // Good Response
         UserEntity user = optionalUser.get();
 
-        List<Object[]> listOfEndpointsAndPermissions = repositoryPermission_X_Role.findEndpointsAndPermission(user);
+//        List<Module_X_RoleEntityy> listOfEndpointsAndPermissions = repositoryModule.findBy(user);
 
         if(listOfEndpointsAndPermissions.isEmpty()){
             throw new NoRelatedPermissionsException("No permissions");
