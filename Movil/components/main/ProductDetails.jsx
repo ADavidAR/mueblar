@@ -46,7 +46,7 @@ export default function ProductDetails ({ model, sku }) {
 
     useEffect(() => {
         const loadProduct = async () => {
-            const newProd = data.filter(p => p.model === model)[0] //await fetchSingleProduct(model)
+            const newProd = data.filter(p => p.model === model)[0] //await fetchSingleProduct(model, false)
             const newVariation = newProd.variations.find( v => sku ? sku === v.sku : v.top )
             setProduct(newProd)
             setSelectedVariation(newVariation)

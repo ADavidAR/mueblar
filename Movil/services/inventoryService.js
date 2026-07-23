@@ -3,20 +3,18 @@ import {request} from './authService'
 export const fetchProducts = async (
     search = "",
     limit = undefined, 
-    offset = 0,
-    select = [],
+    page = 0,
     categories = [],
     materials = []
 ) => {
     const queryParams = []
     if (search)             queryParams.push(`search=${encodeURIComponent(search)}`) 
     if (limit)              queryParams.push(`limit=${limit}`) 
-    if (offset)             queryParams.push(`offset=${offset}`) 
-    if (select.length)      queryParams.push(`select=${select.join(",")}`) 
+    if (page)               queryParams.push(`page=${page}`) 
     if (categories.length)  queryParams.push(`categories=${categories.map(c => encodeURIComponent(c)).join(",")}`) 
     if (materials.length)   queryParams.push(`materials=${materials.join(",")}`)  
 
-    return await request(`/api/products/search?${queryParams.join("&")}`, {
+    return await request(`/api/products/token?${queryParams.join("&")}`, {
         skipAuth: true,
         method: 'GET'
     })
