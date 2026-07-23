@@ -422,7 +422,7 @@ public class CatalogService {
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
     // 1 //
-    public List<ProductResponseDTO> getAllProducts(Integer limit, Integer page, String category, String search) {
+    public List<ProductResponseDTO> getAllProducts(Integer limit, Integer page, List<String> categories, String search, List<String> materials) {
         if(limit == 0) {
             throw new InternalServerException("Cannot throw zero Products");
         }
@@ -431,19 +431,50 @@ public class CatalogService {
         List<ProductEntity> productEntityList = new ArrayList<>();
 
         boolean hasSearch = (search != null && !search.trim().isEmpty());
-        boolean hasCategory = (category != null && !category.trim().isEmpty());
+        boolean hasCategories = (categories != null && !categories.isEmpty());
+        boolean hasMaterials = (materials != null && !materials.isEmpty());
 
-        if (!hasSearch && !hasCategory) {
-            productEntityList = repositoryProduct.findAll(pageable).getContent();
+        if(hasMaterials) {
+            for (String material : materials) {
+                Optional<AttributeEntity> optionalAttribute = repositoryAttribute.findByAttributeId(material);
+                if(optionalAttribute.isEmpty() || !optionalAttribute.get().getAttributeTypeEntity().getAttributeTypeId().equals("MATERIAL")){
+                    throw new NotExistentResourceException(String.format("Attribute %s not found as a MATERIAL Attribute Type", material));
+                }
+            }
         }
-        else if (hasSearch && hasCategory) {
-            productEntityList = repositoryProduct.findByModelNameContainingIgnoreCaseAndProductXCategoryEntityList_CategoryEntity_CategoryName(search, category, pageable);
+
+        if(hasCategories) {
+            for (String category : categories) {
+                Optional<CategoryEntity> optionalCategory = repositoryCategory.findByCategoryName(category);
+                if(optionalCategory.isEmpty()) {
+                    throw new NotExistentResourceException(String.format("Category %s not found", category));
+                }
+            }
+        }
+
+        if (hasSearch && hasCategories && hasMaterials) {
+            productEntityList = repositoryProduct.findByModelNameContainingIgnoreCaseAndProductXCategoryEntityList_CategoryEntity_CategoryNameInAndVariationEntityList_AttributeXVariationEntities_AttributeEntity_AttributeIdIn(search, categories, materials, pageable);
+        }
+        else if (hasSearch && hasCategories) {
+            productEntityList = repositoryProduct.findByModelNameContainingIgnoreCaseAndProductXCategoryEntityList_CategoryEntity_CategoryNameIn(search, categories, pageable);
+        }
+        else if (hasSearch && hasMaterials) {
+            productEntityList = repositoryProduct.findByModelNameContainingIgnoreCaseAndVariationEntityList_AttributeXVariationEntities_AttributeEntity_AttributeIdIn(search, materials, pageable);
+        }
+        else if (hasCategories && hasMaterials) {
+            productEntityList = repositoryProduct.findByProductXCategoryEntityList_CategoryEntity_CategoryNameInAndVariationEntityList_AttributeXVariationEntities_AttributeEntity_AttributeIdIn(categories, materials, pageable);
         }
         else if (hasSearch) {
             productEntityList = repositoryProduct.findByModelNameContainingIgnoreCase(search, pageable);
         }
-        else if (hasCategory) {
-            productEntityList = repositoryProduct.findByProductXCategoryEntityList_CategoryEntity_CategoryName(category, pageable);
+        else if (hasCategories) {
+            productEntityList = repositoryProduct.findByProductXCategoryEntityList_CategoryEntity_CategoryNameIn(categories, pageable);
+        }
+        else if (hasMaterials) {
+            productEntityList = repositoryProduct.findByVariationEntityList_AttributeXVariationEntities_AttributeEntity_AttributeIdIn(materials, pageable);
+        }
+        else {
+            productEntityList = repositoryProduct.findAll(pageable).getContent();
         }
 
         List<ProductResponseDTO> productResponseDTOList = new ArrayList<>();
@@ -457,7 +488,7 @@ public class CatalogService {
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
     // 2 //
-    public List<ProductResponseDTO> getAllProducts(String authHeader, Integer limit, Integer page, String category, String search) {
+    public List<ProductResponseDTO> getAllProducts(String authHeader, Integer limit, Integer page, List<String> categories, String search, List<String> materials) {
         UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
         if(limit == 0) {
             throw new InternalServerException("Cannot throw zero Products");
@@ -467,23 +498,53 @@ public class CatalogService {
         List<ProductEntity> productEntityList = new ArrayList<>();
 
         boolean hasSearch = (search != null && !search.trim().isEmpty());
-        boolean hasCategory = (category != null && !category.trim().isEmpty());
+        boolean hasCategories = (categories != null && !categories.isEmpty());
+        boolean hasMaterials = (materials != null && !materials.isEmpty());
 
-        if (!hasSearch && !hasCategory) {
-            productEntityList = repositoryProduct.findAll(pageable).getContent();
+        if(hasMaterials) {
+            for (String material : materials) {
+                Optional<AttributeEntity> optionalAttribute = repositoryAttribute.findByAttributeId(material);
+                if(optionalAttribute.isEmpty() || !optionalAttribute.get().getAttributeTypeEntity().getAttributeTypeId().equals("MATERIAL")){
+                    throw new NotExistentResourceException(String.format("Attribute %s not found as a MATERIAL Attribute Type", material));
+                }
+            }
         }
-        else if (hasSearch && hasCategory) {
-            productEntityList = repositoryProduct.findByModelNameContainingIgnoreCaseAndProductXCategoryEntityList_CategoryEntity_CategoryName(search, category, pageable);
+
+        if(hasCategories) {
+            for (String category : categories) {
+                Optional<CategoryEntity> optionalCategory = repositoryCategory.findByCategoryName(category);
+                if(optionalCategory.isEmpty()) {
+                    throw new NotExistentResourceException(String.format("Category %s not found", category));
+                }
+            }
+        }
+
+        if (hasSearch && hasCategories && hasMaterials) {
+            productEntityList = repositoryProduct.findByModelNameContainingIgnoreCaseAndProductXCategoryEntityList_CategoryEntity_CategoryNameInAndVariationEntityList_AttributeXVariationEntities_AttributeEntity_AttributeIdIn(search, categories, materials, pageable);
+        }
+        else if (hasSearch && hasCategories) {
+            productEntityList = repositoryProduct.findByModelNameContainingIgnoreCaseAndProductXCategoryEntityList_CategoryEntity_CategoryNameIn(search, categories, pageable);
+        }
+        else if (hasSearch && hasMaterials) {
+            productEntityList = repositoryProduct.findByModelNameContainingIgnoreCaseAndVariationEntityList_AttributeXVariationEntities_AttributeEntity_AttributeIdIn(search, materials, pageable);
+        }
+        else if (hasCategories && hasMaterials) {
+            productEntityList = repositoryProduct.findByProductXCategoryEntityList_CategoryEntity_CategoryNameInAndVariationEntityList_AttributeXVariationEntities_AttributeEntity_AttributeIdIn(categories, materials, pageable);
         }
         else if (hasSearch) {
             productEntityList = repositoryProduct.findByModelNameContainingIgnoreCase(search, pageable);
         }
-        else if (hasCategory) {
-            productEntityList = repositoryProduct.findByProductXCategoryEntityList_CategoryEntity_CategoryName(category, pageable);
+        else if (hasCategories) {
+            productEntityList = repositoryProduct.findByProductXCategoryEntityList_CategoryEntity_CategoryNameIn(categories, pageable);
+        }
+        else if (hasMaterials) {
+            productEntityList = repositoryProduct.findByVariationEntityList_AttributeXVariationEntities_AttributeEntity_AttributeIdIn(materials, pageable);
+        }
+        else {
+            productEntityList = repositoryProduct.findAll(pageable).getContent();
         }
 
         List<ProductResponseDTO> productResponseDTOList = new ArrayList<>();
-
         List<CollectionEntity> collectionEntityList = repositoryCollection.findAllByUserEntity(thisUserEntity);
 
         for(ProductEntity thisProductEntity : productEntityList){

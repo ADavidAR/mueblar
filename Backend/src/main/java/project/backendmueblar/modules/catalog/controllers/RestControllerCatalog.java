@@ -50,11 +50,12 @@ public class RestControllerCatalog {
 
     @GetMapping(produces = "application/json")
     public ResponseEntity<List<ProductResponseDTO>> getAllProductsSimple(@RequestParam(defaultValue = "10") Integer limit,
-                                                                   @RequestParam(defaultValue = "0") Integer page,
-                                                                   @RequestParam(required = false) String category,
-                                                                   @RequestParam(required = false) String search
+                                                                         @RequestParam(defaultValue = "0") Integer page,
+                                                                         @RequestParam(required = false) List<String> categories,
+                                                                         @RequestParam(required = false) String search,
+                                                                         @RequestParam(required = false) List<String> materials
     ){
-        List<ProductResponseDTO> productResponseDTOList = catalogService.getAllProducts(limit, page, category, search);
+        List<ProductResponseDTO> productResponseDTOList = catalogService.getAllProducts(limit, page, categories, search, materials);
         return ResponseEntity.status(200).body(productResponseDTOList);
     }
 
@@ -62,10 +63,11 @@ public class RestControllerCatalog {
     public ResponseEntity<List<ProductResponseDTO>> getAllProductsToken(@RequestHeader("Authorization") String authHeader,
                                                                         @RequestParam(defaultValue = "10") Integer limit,
                                                                         @RequestParam(defaultValue = "0") Integer page,
-                                                                        @RequestParam(required = false) String category,
-                                                                        @RequestParam(required = false) String search
+                                                                        @RequestParam(required = false) List<String> categories,
+                                                                        @RequestParam(required = false) String search,
+                                                                        @RequestParam(required = false) List<String> materials
     ){
-        List<ProductResponseDTO> productResponseList = catalogService.getAllProducts(authHeader, limit, page, category, search);
+        List<ProductResponseDTO> productResponseList = catalogService.getAllProducts(authHeader, limit, page, categories, search, materials);
         return ResponseEntity.status(200).body(productResponseList);
     }
 }
