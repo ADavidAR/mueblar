@@ -5,7 +5,7 @@ import GenericButton from './GenericButton'
  *  - "solid"   → relleno cobre (acción primaria, ej. REGISTRARSE).
  *  - "outline" → solo borde (acción secundaria, ej. CANCELAR).
  */
-export default function PrimaryButton({
+export default function CustomColorButton({
     label,
     onPress,
     loading = false,
@@ -13,10 +13,11 @@ export default function PrimaryButton({
     variant = 'solid',
     icon = null,
     className = '',
+    color = "copper"
 }) {
     const isSolid = variant === 'solid'
     const containerBase = isSolid
-        ? 'bg-copper shadow-lg shadow-copper/40'
+        ? `bg-${color} shadow-lg shadow-${color}/40`
         : 'border border-stone-300 dark:border-stone-700'
     const textColor = isSolid ? 'text-white' : 'text-stone-500 dark:text-stone-300'
 

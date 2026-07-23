@@ -1,5 +1,5 @@
-import AuthScreen from '../../components/auth/AuthScreen'
-import LoginForm from '../../components/auth/LoginForm'
+import AuthScreen from '../../../components/auth/AuthScreen'
+import LoginForm from '../../../components/auth/LoginForm'
 
 export default function Login() {
   return (

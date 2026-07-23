@@ -1,0 +1,773 @@
+[
+  {
+    "categories": [{ "name": "Salón" }, { "name": "Sofás" }],
+    "description": "Sofá de tres plazas tapizado en lino transpirable con patas de madera de roble. Ideal para ambientes nórdicos.",
+    "dimensions": { "depth": 90, "height": 85, "width": 210 },
+    "enable": true,
+    "model": "Nordic Comfort XL",
+    "variations": [
+      {
+        "name": "Gris Claro",
+        "thumbnail": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=300&q=80",
+        "sku": "SOF-NOR-001-GR",
+        "price": 649.99,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80",
+          "https://images.unsplash.com/photo-1484101403633-562f891dc89a?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Gris Claro" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Lino" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Roble" }
+        ]
+      },
+      {
+        "name": "Azul Marino",
+        "thumbnail": "https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=300&q=80",
+        "sku": "SOF-NOR-001-AZ",
+        "price": 669.99,
+        "top": false,
+        "imgs": [
+          "https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Azul Marino" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Lino" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Roble" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Comedor" }, { "name": "Mesas" }],
+    "description": "Mesa de comedor extensible fabricada en madera maciza de nogal con acabado mate protector.",
+    "dimensions": { "depth": 100, "height": 76, "width": 180 },
+    "enable": true,
+    "model": "Walnut Elegance",
+    "variations": [
+      {
+        "name": "Nogal Natural",
+        "thumbnail": "https://images.unsplash.com/photo-1615066390971-03e4e1c36ddf?auto=format&fit=crop&w=300&q=80",
+        "sku": "MES-WAL-002-NAT",
+        "price": 899.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1615066390971-03e4e1c36ddf?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Marrón Nogal" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Nogal Macizo" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Oficina" }, { "name": "Sillas" }],
+    "description": "Silla de escritorio ergonómica con soporte lumbar ajustable, malla transpirable y reposabrazos 3D.",
+    "dimensions": { "depth": 65, "height": 120, "width": 65 },
+    "enable": true,
+    "model": "ErgoTask Pro",
+    "variations": [
+      {
+        "name": "Negro Absoluto",
+        "thumbnail": "https://images.unsplash.com/photo-1505797149-43b0069ec26b?auto=format&fit=crop&w=300&q=80",
+        "sku": "SIL-ERG-003-NE",
+        "price": 249.50,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1505797149-43b0069ec26b?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Negro" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Malla Transpirable" },
+          { "attribType": { "id": "MATERIAL" }, "id": "plastico", "value": "Policarbonato Reforzado" }
+        ]
+      },
+      {
+        "name": "Blanco Minimal",
+        "thumbnail": "https://images.unsplash.com/photo-1580481072645-022f9a6dbf27?auto=format&fit=crop&w=300&q=80",
+        "sku": "SIL-ERG-003-BL",
+        "price": 259.50,
+        "top": false,
+        "imgs": [
+          "https://images.unsplash.com/photo-1580481072645-022f9a6dbf27?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Blanco" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Malla Transpirable" },
+          { "attribType": { "id": "MATERIAL" }, "id": "plastico", "value": "Policarbonato Reforzado" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Dormitorio" }, { "name": "Camas" }],
+    "description": "Estructura de cama matrimonial con cabecero tapizado en capitoné aterciopelado.",
+    "dimensions": { "depth": 210, "height": 115, "width": 160 },
+    "enable": true,
+    "model": "Velvet Dream",
+    "variations": [
+      {
+        "name": "Gris Antracita",
+        "thumbnail": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=300&q=80",
+        "sku": "CAM-VEL-004-GR",
+        "price": 420.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Gris Antracita" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Terciopelo" }
+        ]
+      },
+      {
+        "name": "Rosa Viejo",
+        "thumbnail": "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=300&q=80",
+        "sku": "CAM-VEL-004-RO",
+        "price": 420.00,
+        "top": false,
+        "imgs": [
+          "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Rosa Viejo" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Terciopelo" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Salón" }, { "name": "Mesas" }],
+    "description": "Mesa de centro redonda con superficie de mármol de Carrara y estructura geométrica metálica dorada.",
+    "dimensions": { "depth": 80, "height": 42, "width": 80 },
+    "enable": true,
+    "model": "Luxury Marble Round",
+    "variations": [
+      {
+        "name": "Mármol Blanco / Oro",
+        "thumbnail": "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=300&q=80",
+        "sku": "MCE-LUX-005-OR",
+        "price": 310.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Oro y Blanco" },
+          { "attribType": { "id": "MATERIAL" }, "id": "marmol", "value": "Mármol de Carrara" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Acero Dorado" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Dormitorio" }, { "name": "Armarios" }],
+    "description": "Armario ropero de dos puertas correderas con espejo integrado y distribución interior modular.",
+    "dimensions": { "depth": 62, "height": 220, "width": 150 },
+    "enable": true,
+    "model": "SpaceSaver Slide",
+    "variations": [
+      {
+        "name": "Blanco Artik",
+        "thumbnail": "https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=300&q=80",
+        "sku": "ARM-SPA-006-BL",
+        "price": 549.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Blanco Artik" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Melamina de Alta Densidad" },
+          { "attribType": { "id": "MATERIAL" }, "id": "cristal", "value": "Espejo Templado" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Salón" }, { "name": "Sillones" }],
+    "description": "Sillón orejero clásico actualizado con tapizado de pata de gallo y estructura reforzada.",
+    "dimensions": { "depth": 85, "height": 102, "width": 80 },
+    "enable": true,
+    "model": "Vintage Reading Chair",
+    "variations": [
+      {
+        "name": "Monocromo",
+        "thumbnail": "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=300&q=80",
+        "sku": "SIL-VIN-007-MON",
+        "price": 189.99,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Negro y Blanco" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Algodón Jacquard" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Pino Estructural" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Comedor" }, { "name": "Sillas" }],
+    "description": "Pack de 4 sillas de comedor con asiento de polipropileno mate y patas de madera estilo Eiffel.",
+    "dimensions": { "depth": 53, "height": 82, "width": 46 },
+    "enable": true,
+    "model": "Eames Style Pack",
+    "variations": [
+      {
+        "name": "Blanco Puro",
+        "thumbnail": "https://images.unsplash.com/photo-1562184560-a11b7cf7c169?auto=format&fit=crop&w=300&q=80",
+        "sku": "PAC-EAM-008-BL",
+        "price": 120.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1562184560-a11b7cf7c169?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Blanco" },
+          { "attribType": { "id": "MATERIAL" }, "id": "plastico", "value": "Polipropileno" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Haya Natural" }
+        ]
+      },
+      {
+        "name": "Negro Mate",
+        "thumbnail": "https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=300&q=80",
+        "sku": "PAC-EAM-008-NE",
+        "price": 120.00,
+        "top": false,
+        "imgs": [
+          "https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Negro Mate" },
+          { "attribType": { "id": "MATERIAL" }, "id": "plastico", "value": "Polipropileno" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Haya Natural" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Oficina" }, { "name": "Mesas" }],
+    "description": "Escritorio elevable eléctrico programable con tablero de madera reciclada y motor silencioso.",
+    "dimensions": { "depth": 70, "height": 115, "width": 140 },
+    "enable": true,
+    "model": "SmartStand Pro",
+    "variations": [
+      {
+        "name": "Roble / Estructura Negra",
+        "thumbnail": "https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?auto=format&fit=crop&w=300&q=80",
+        "sku": "ESC-SMA-009-RO",
+        "price": 399.99,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Roble / Negro" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Madera de Roble Reciclada" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Acero al Carbono" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Salón" }, { "name": "Aparadores" }],
+    "description": "Aparador bajo para televisión de estilo industrial, combinación de madera texturizada y hierro forjado.",
+    "dimensions": { "depth": 40, "height": 55, "width": 160 },
+    "enable": true,
+    "model": "Ironwood Lowboard",
+    "variations": [
+      {
+        "name": "Madera Envejecida",
+        "thumbnail": "https://images.unsplash.com/photo-1593085260707-5377ba34f9a8?auto=format&fit=crop&w=300&q=80",
+        "sku": "TVM-IRO-010-ENV",
+        "price": 285.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1593085260707-5377ba34f9a8?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Marrón Envejecido" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Pino Recuperado" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Hierro Forjado" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Jardín" }, { "name": "Conjuntos" }],
+    "description": "Conjunto de exterior de ratán sintético compuesto por un sofá de dos plazas, dos sillones y una mesa baja.",
+    "dimensions": { "depth": 75, "height": 80, "width": 130 },
+    "enable": true,
+    "model": "Ibiza Chill Set",
+    "variations": [
+      {
+        "name": "Marrón Trenzado",
+        "thumbnail": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=300&q=80",
+        "sku": "GAR-IBZ-011-BR",
+        "price": 499.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Marrón" },
+          { "attribType": { "id": "MATERIAL" }, "id": "plastico", "value": "Ratán Sintético (PE)" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Poliéster Impermeable" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Dormitorio" }, { "name": "Mesitas" }],
+    "description": "Mesita de noche flotante con un cajón con sistema push-to-open acabado en laca brillante.",
+    "dimensions": { "depth": 35, "height": 20, "width": 45 },
+    "enable": true,
+    "model": "Float Nightstand",
+    "variations": [
+      {
+        "name": "Blanco Glacial",
+        "thumbnail": "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=300&q=80",
+        "sku": "MSN-FLO-012-BL",
+        "price": 79.99,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Blanco Glacial" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "MDF Lacado" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Salón" }, { "name": "Estanterías" }],
+    "description": "Estantería librería de diseño asimétrico con múltiples estantes de diferentes capacidades.",
+    "dimensions": { "depth": 28, "height": 180, "width": 90 },
+    "enable": true,
+    "model": "ZigZag Library",
+    "variations": [
+      {
+        "name": "Roble Sonoma",
+        "thumbnail": "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=300&q=80",
+        "sku": "EST-ZIG-013-RO",
+        "price": 145.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Marrón Claro" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Tablero Aglomerado Roble" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Cocina" }, { "name": "Taburetes" }],
+    "description": "Taburete alto para barra de cocina con asiento tapizado en cuero sintético y reposapiés cromado.",
+    "dimensions": { "depth": 42, "height": 95, "width": 42 },
+    "enable": true,
+    "model": "Barista High",
+    "variations": [
+      {
+        "name": "Cuero Camel",
+        "thumbnail": "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?auto=format&fit=crop&w=300&q=80",
+        "sku": "TAB-BAR-014-CA",
+        "price": 85.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Marrón Camel" },
+          { "attribType": { "id": "MATERIAL" }, "id": "cuero", "value": "Piel Sintética PU" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Acero Cromado" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Recibidor" }, { "name": "Consolas" }],
+    "description": "Mesa consola estrecha ideal para pasillos y entradas, construida con cristal templado de seguridad.",
+    "dimensions": { "depth": 30, "height": 75, "width": 100 },
+    "enable": true,
+    "model": "Glass Entryway",
+    "variations": [
+      {
+        "name": "Transparente",
+        "thumbnail": "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=300&q=80",
+        "sku": "CON-GLA-015-TR",
+        "price": 199.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Transparente" },
+          { "attribType": { "id": "MATERIAL" }, "id": "cristal", "value": "Cristal Templado de 10mm" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Dormitorio" }, { "name": "Cómodas" }],
+    "description": "Cómoda de seis cajones profundos con guías metálicas de suave deslizamiento.",
+    "dimensions": { "depth": 45, "height": 80, "width": 120 },
+    "enable": true,
+    "model": "Nordic Chest",
+    "variations": [
+      {
+        "name": "Madera Clara / Blanco",
+        "thumbnail": "https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=300&q=80",
+        "sku": "COM-NOR-016-MB",
+        "price": 279.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Blanco / Natural" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Pino Macizo y MDF" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Salón" }, { "name": "Sofás" }],
+    "description": "Sofá chaise longue convertible en cama con arcón de almacenaje integrado bajo el asiento.",
+    "dimensions": { "depth": 150, "height": 90, "width": 240 },
+    "enable": true,
+    "model": "Comfy Lounge Bed",
+    "variations": [
+      {
+        "name": "Gris Marengo",
+        "thumbnail": "https://images.unsplash.com/photo-1549488344-1f9b8d2bd1f3?auto=format&fit=crop&w=300&q=80",
+        "sku": "CHL-COM-017-GM",
+        "price": 799.99,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1549488344-1f9b8d2bd1f3?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Gris Marengo" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Chenilla Chenille" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Herrajes de Acero Extensibles" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Infantil" }, { "name": "Camas" }],
+    "description": "Cama nido infantil con cajoneras inferiores de colores intercambiables y cantos redondeados.",
+    "dimensions": { "depth": 98, "height": 65, "width": 195 },
+    "enable": true,
+    "model": "Kids Playground Bed",
+    "variations": [
+      {
+        "name": "Blanco / Azul Pastel",
+        "thumbnail": "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=300&q=80",
+        "sku": "CAM-KID-018-AZ",
+        "price": 340.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Azul y Blanco" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "DM Compacto Lacado" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Salón" }, { "name": "Mesas" }],
+    "description": "Mesa auxiliar de centro cuadrada de estilo rústico tallada a mano en madera maciza de pino.",
+    "dimensions": { "depth": 60, "height": 45, "width": 60 },
+    "enable": true,
+    "model": "Rustic Solid Block",
+    "variations": [
+      {
+        "name": "Pino Encerado",
+        "thumbnail": "https://images.unsplash.com/photo-1604014237800-1c9102c219da?auto=format&fit=crop&w=300&q=80",
+        "sku": "MAU-RUS-019-PIN",
+        "price": 135.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1604014237800-1c9102c219da?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Pino Miel" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Pino Macizo Silvestre" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Oficina" }, { "name": "Armarios" }],
+    "description": "Cajonera de oficina con ruedas, cerradura centralizada y tres cajones aptos para archivos colgantes.",
+    "dimensions": { "depth": 50, "height": 60, "width": 40 },
+    "enable": true,
+    "model": "RollDoc Office",
+    "variations": [
+      {
+        "name": "Gris Técnico",
+        "thumbnail": "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=300&q=80",
+        "sku": "CAJ-ROL-020-GR",
+        "price": 95.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Gris Acero" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Chapa de Acero Galvanizado" },
+          { "attribType": { "id": "MATERIAL" }, "id": "plastico", "value": "Ruedas de Nailon" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Salón" }, { "name": "Sillones" }],
+    "description": "Sillón relax con mecanismo de reclinación eléctrica independiente y sistema de masaje por vibración.",
+    "dimensions": { "depth": 90, "height": 105, "width": 85 },
+    "enable": true,
+    "model": "PowerNap Deluxe",
+    "variations": [
+      {
+        "name": "Chocolate",
+        "thumbnail": "https://images.unsplash.com/photo-1592078615290-033ee584e267?auto=format&fit=crop&w=300&q=80",
+        "sku": "RE-POW-021-CH",
+        "price": 450.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1592078615290-033ee584e267?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Marrón Chocolate" },
+          { "attribType": { "id": "MATERIAL" }, "id": "cuero", "value": "Piel Rectificada Premium" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Motor de Acero" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Jardín" }, { "name": "Tumbonas" }],
+    "description": "Tumbona de jardín reclinable en 5 posiciones con textileno resistente a los rayos UV y estructura de aluminio.",
+    "dimensions": { "depth": 190, "height": 35, "width": 65 },
+    "enable": true,
+    "model": "Solarium Flex",
+    "variations": [
+      {
+        "name": "Blanco / Textileno Beige",
+        "thumbnail": "https://images.unsplash.com/photo-1560185007-c5ca9d2c014d?auto=format&fit=crop&w=300&q=80",
+        "sku": "TUM-SOL-022-BE",
+        "price": 160.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1560185007-c5ca9d2c014d?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Beige / Blanco" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Aluminio Anodizado" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Textileno Técnico" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Comedor" }, { "name": "Aparadores" }],
+    "description": "Vitrina alta de comedor con puertas de cristal y luces LED interiores para exhibición de vajilla.",
+    "dimensions": { "depth": 42, "height": 190, "width": 80 },
+    "enable": true,
+    "model": "GlassShow LED",
+    "variations": [
+      {
+        "name": "Negro Roble",
+        "thumbnail": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=300&q=80",
+        "sku": "VIT-GLA-023-NE",
+        "price": 520.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Negro Roble" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Chapa de Roble Tintado" },
+          { "attribType": { "id": "MATERIAL" }, "id": "cristal", "value": "Vidrio Templado Fumé" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Recibidor" }, { "name": "Zapateros" }],
+    "description": "Mueble zapatero slim de tres trampones batientes con capacidad para hasta 18 pares de zapatos.",
+    "dimensions": { "depth": 22, "height": 115, "width": 70 },
+    "enable": true,
+    "model": "SlimShoe 3D",
+    "variations": [
+      {
+        "name": "Blanco / Madera",
+        "thumbnail": "https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&w=300&q=80",
+        "sku": "ZAP-SLI-024-BM",
+        "price": 110.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Blanco Bicolor" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Melamina Estructurada Haya" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Infantil" }, { "name": "Mesas" }],
+    "description": "Escritorio infantil evolutivo regulable en altura con tablero inclinable y organizador de lápices.",
+    "dimensions": { "depth": 55, "height": 75, "width": 90 },
+    "enable": true,
+    "model": "GrowUp Desk",
+    "variations": [
+      {
+        "name": "Verde Menta",
+        "thumbnail": "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=300&q=80",
+        "sku": "ESC-GRO-025-VE",
+        "price": 175.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Verde Menta" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Madera Industrializada MDF" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Patas de Acero Tubular" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Salón" }, { "name": "Puffs" }],
+    "description": "Puff de pera ergonómico moldeable relleno de perlas de poliestireno de alta densidad.",
+    "dimensions": { "depth": 80, "height": 110, "width": 80 },
+    "enable": true,
+    "model": "RelaxBean Bag",
+    "variations": [
+      {
+        "name": "Mostaza",
+        "thumbnail": "https://images.unsplash.com/photo-1581428982868-e410dd047a90?auto=format&fit=crop&w=300&q=80",
+        "sku": "PUF-REL-026-MO",
+        "price": 65.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1581428982868-e410dd047a90?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Amarillo Mostaza" },
+          { "attribType": { "id": "MATERIAL" }, "id": "tela", "value": "Lona Poliéster Oxford" },
+          { "attribType": { "id": "MATERIAL" }, "id": "plastico", "value": "Perlas de EPS" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Baño" }, { "name": "Armarios" }],
+    "description": "Mueble de baño suspendido de dos cajones con lavabo cerámico integrado (grifería no incluida).",
+    "dimensions": { "depth": 46, "height": 56, "width": 80 },
+    "enable": true,
+    "model": "AquaCubic Suspended",
+    "variations": [
+      {
+        "name": "Gris Cemento",
+        "thumbnail": "https://images.unsplash.com/photo-1620626011160-9928f1b2b634?auto=format&fit=crop&w=300&q=80",
+        "sku": "BAN-AQU-027-GC",
+        "price": 349.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1620626011160-9928f1b2b634?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Gris Cemento" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Tablero Marino Hidrófugo" },
+          { "attribType": { "id": "MATERIAL" }, "id": "marmol", "value": "Cerámica Vitrificada" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Dormitorio" }, { "name": "Tocadores" }],
+    "description": "Mueble tocador de maquillaje con espejo Hollywood de luces LED y cajón con organizador de metacrilato.",
+    "dimensions": { "depth": 40, "height": 140, "width": 90 },
+    "enable": true,
+    "model": "Hollywood Vanity",
+    "variations": [
+      {
+        "name": "Blanco Nieve",
+        "thumbnail": "https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=300&q=80",
+        "sku": "TOC-HOL-028-BL",
+        "price": 229.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Blanco Nieve" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Madera de Pino y DM" },
+          { "attribType": { "id": "MATERIAL" }, "id": "cristal", "value": "Espejo de Alta Reflexión" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Cocina" }, { "name": "Mesas" }],
+    "description": "Camarera isla de cocina con ruedas bloqueables, encimera de acero inoxidable y soportes para botellas.",
+    "dimensions": { "depth": 50, "height": 85, "width": 85 },
+    "enable": true,
+    "model": "ChefHelper Island",
+    "variations": [
+      {
+        "name": "Madera Blanca / Inox",
+        "thumbnail": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=300&q=80",
+        "sku": "ISL-CHE-029-BI",
+        "price": 189.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Blanco e Inox" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Acero Inoxidable AISI 304" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Madera de Bambú" }
+        ]
+      }
+    ]
+  },
+  {
+    "categories": [{ "name": "Salón" }, { "name": "Muebles TV" }],
+    "description": "Mueble de salón completo modular, panel superior para colgar pantallas y estanterías bajas.",
+    "dimensions": { "depth": 42, "height": 160, "width": 220 },
+    "enable": true,
+    "model": "Integra Wall",
+    "variations": [
+      {
+        "name": "Grafito y Roble",
+        "thumbnail": "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=300&q=80",
+        "sku": "MSAL-INT-030-GR",
+        "price": 599.00,
+        "top": true,
+        "imgs": [
+          "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1200&q=80"
+        ],
+        "attribs": [
+          { "attribType": { "id": "COLOR" }, "id": "color", "value": "Gris Grafito / Roble" },
+          { "attribType": { "id": "MATERIAL" }, "id": "madera", "value": "Tablero de Partículas Melaminizado" },
+          { "attribType": { "id": "MATERIAL" }, "id": "metal", "value": "Pistones de Gas Hidráulicos" }
+        ]
+      }
+    ]
+  }
+]

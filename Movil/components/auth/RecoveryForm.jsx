@@ -80,7 +80,7 @@ export default function RecoveryForm() {
 
         <View className="mt-6 items-center gap-3">
           <Link
-            href="/login"
+            href="/view/login"
           >
             <Text className="text-xs font-semibold uppercase tracking-[1px] text-stone-400 dark:text-stone-500">‹ Volver al inicio</Text>
           </Link>

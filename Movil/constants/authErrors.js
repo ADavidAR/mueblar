@@ -10,6 +10,23 @@ export function mapAuthError(err) {
   return err?.message || 'Ocurrió un error. Intentá de nuevo.'
 }
 
+export function mapUpdateUserError(err) {
+  const status = err?.status
+  if (status === 400 && err.details) {
+    err.details.server ='Revisá los datos ingresados e intentá de nuevo.'
+    return err.details
+  }
+  if (status >= 500) return {
+    name: "",
+    lastName: "",
+    email: "",
+    currentPassword: "",
+    newPassword: "",
+    server: "Error del servidor. Intentá de nuevo más tarde.",
+  }
+  return err?.message || 'Ocurrió un error. Intentá de nuevo.'
+}
+
 /** Reglas de validación reutilizables para react-hook-form. */
 export const VALIDATION = {
   email: {

@@ -40,7 +40,7 @@ export default function LoginForm() {
           render={({ field: { onChange, onBlur, value } }) => (
             <UnderlineField
               label="Correo electrónico"
-              placeholder="curator@mueblar.com"
+              placeholder="wombat.reyes@email.com"
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
@@ -74,7 +74,7 @@ export default function LoginForm() {
         />
 
         <View className="items-end">
-          <Link href="/recovery" >
+          <Link href="/view/recovery" >
             <Text className="text-sm text-stone-500 underline dark:text-stone-400">¿Olvidaste tu contraseña?</Text>
           </Link>
         </View>
@@ -88,7 +88,7 @@ export default function LoginForm() {
 
       <View className="mt-8 flex-row justify-center">
         <Text className="text-stone-500 dark:text-stone-400">¿Nuevo en MueblAR? </Text>
-        <Link href="/register" >
+        <Link href="/view/register" >
           <Text className="font-semibold text-copper underline">Crear cuenta</Text>
         </Link>
       </View>

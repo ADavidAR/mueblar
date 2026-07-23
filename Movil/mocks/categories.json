@@ -1,0 +1,31 @@
+[
+    {
+        "id": 1,
+        "name": "Salón"
+    },
+    {
+        "id": 2,
+        "name": "Sofás"
+    },
+    {
+        "id": 3,
+        "name": "Comedor"
+    },
+    {
+        "id": 4,
+        "name": "Mesas"
+    },
+    {
+        "id": 5,
+        "name": "Oficina"
+    },
+    {
+        "id": 6,
+        "name": "Sillas"
+    },
+    {
+        "id": 8,
+        "name": "Dormitorio"
+    }
+
+]

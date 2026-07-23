@@ -23,7 +23,7 @@ export function useLoginForm() {
     setRequestError(null)
     try {
       await loginUser(email, password)
-      router.replace('/(main)/home')
+      router.replace('/view/catalog')
     } catch (err) {
       console.log(err)
       setRequestError(mapAuthError(err))

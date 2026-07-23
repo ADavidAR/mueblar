@@ -1,5 +1,5 @@
-import AuthScreen from '../../components/auth/AuthScreen'
-import RecoveryForm from '../../components/auth/RecoveryForm'
+import AuthScreen from '../../../components/auth/AuthScreen'
+import RecoveryForm from '../../../components/auth/RecoveryForm'
 
 export default function Recovery() {
   return (

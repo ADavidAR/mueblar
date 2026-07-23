@@ -12,12 +12,13 @@ export default function PasswordField({
   onChangeText,
   onBlur,
   placeholder = '••••••••',
+  labelClassName = '',
 }) {
   const [hidden, setHidden] = useState(true)
 
   return (
     <View className="w-full">
-      {label ? <FieldLabel>{label}</FieldLabel> : null}
+      {label ? <FieldLabel className={labelClassName}>{label}</FieldLabel> : null}
       <View className="flex-row items-center border-b border-stone-300 dark:border-stone-700">
         <TextInput
           secureTextEntry={hidden}
