@@ -9,6 +9,13 @@ import PartnersPage from './pages/PartnersPage'
 import DownloadPage from './pages/DownloadPage'
 import ProfilePage from './pages/ProfilePage'
 
+function AdminRoute({ children }) {
+  const { user } = useAuth()
+  if (!user) return <Navigate to="/login" replace />
+  if (user.role !== 'admin') return <Navigate to="/view/main-view" replace />
+  return children
+}
+
 
 function App() {
   return (
@@ -25,7 +32,45 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/perfil" element={<ProfilePage />} />
           </Route>
+
+          
+          {/*-----------------------------------------------------------------*/}
+          <Route
+            path="/view/inventory"
+            element={<AdminRoute><AdminInventoryPage /></AdminRoute>}
+          />
+          <Route
+            path="/view/roles-management"
+            element={<AdminRoute><AdminRolesPage /></AdminRoute>}
+          />
+          <Route
+            path="/view/users-management"
+            element={<AdminRoute><AdminUsersPage /></AdminRoute>}
+          />
+          <Route
+            path="/view/categories-management"
+            element={<AdminRoute><AdminCategoriesPage /></AdminRoute>}
+          />
+          <Route
+            path="/view/product-creation"
+            element={<AdminRoute><CreateProductPage /></AdminRoute>}
+          />
+          <Route
+            path="/view/attribute-type-add"
+            element={<AdminRoute><CreateAttributeTypePage /></AdminRoute>}
+          />
+          <Route
+            path="/view/attribute-type-update"
+            element={<AdminRoute> <UpdateAttributeTypePage /></AdminRoute>}
+          />
+
+
+
+
         </Routes>
+
+
+
       </AuthProvider>
     </BrowserRouter>
   )

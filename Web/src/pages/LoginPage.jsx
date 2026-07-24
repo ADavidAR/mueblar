@@ -31,8 +31,8 @@ export default function LoginPage() {
 
     setErrors({})
     try {
-      await login(email, password)
-      navigate('/')
+       const userData = await login(email, password)
+        navigate(userData.role === 'admin' ? '/view/inventory' : '/view/main-view')
     } catch (err) {
       const status = err.status
       if (status === 401 || status === 400) setErrors({ server: 'Correo o contraseña incorrectos.' })
