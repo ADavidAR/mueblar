@@ -1,4 +1,4 @@
-package project.backendmueblar.modules.catalog.dtos;
+package project.backendmueblar.modules.catalog.dtos.response;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
