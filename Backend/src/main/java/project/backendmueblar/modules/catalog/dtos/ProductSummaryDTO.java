@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
+import project.backendmueblar.modules.catalog.dtos.response.VariationSummaryDTO;
 
 import java.util.List;
 
