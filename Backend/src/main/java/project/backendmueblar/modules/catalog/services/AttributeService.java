@@ -8,8 +8,9 @@ import org.springframework.stereotype.Service;
 import project.backendmueblar.exception.catalog.InternalServerException;
 import project.backendmueblar.exception.catalog.ResourceAlreadyExistsException;
 import project.backendmueblar.exception.catalog.ResourceNotFoundException;
+import project.backendmueblar.modules.catalog.dtos.AttribTypeSummaryForCreatingDTO;
 import project.backendmueblar.modules.catalog.dtos.request.AttributeCreateRequestDTO;
-import project.backendmueblar.modules.catalog.dtos.response.AttributeSummaryResponseDTO;
+import project.backendmueblar.modules.catalog.dtos.response.AttributeResponseDTO;
 import project.backendmueblar.modules.catalog.dtos.response.Attribute_X_VariationSummaryResponseDTO;
 import project.backendmueblar.modules.catalog.entities.AttributeEntity;
 import project.backendmueblar.modules.catalog.entities.AttributeTypeEntity;
@@ -150,7 +151,7 @@ public class AttributeService {
 
     // ------------------------------------------------------------------------------------------------------//
 
-    public Map<String, List<Attribute_X_VariationSummaryResponseDTO>> getAllAttributes(Integer limit, Integer page) {
+    public Map<String, List<Attribute_X_VariationSummaryResponseDTO>> getAllAttributesWithVariations(Integer limit, Integer page) {
         if(limit == 0) {
             throw new InternalServerException("Cannot throw zero Attributes");
         }
@@ -180,9 +181,33 @@ public class AttributeService {
             attributeXVariationSummaryResponseMap.put(attributeId, attributeXVariationSummaryResponseDTOList);
 
         }
-
         return attributeXVariationSummaryResponseMap;
+    }
 
+    public List<AttributeResponseDTO> getAllAttributes(Integer limit, Integer page) {
+        if(limit == 0) {
+            throw new InternalServerException("Cannot throw zero Attributes");
+        }
+
+        Pageable pageableQueryAttributes = PageRequest.of(page, limit);
+
+        List<AttributeEntity> attributeEntityList = repositoryAttribute.findAll(pageableQueryAttributes).getContent();
+        if(attributeEntityList.isEmpty()) {
+            throw new ResourceNotFoundException("Not Exists Any Attribute");
+        }
+
+        List<AttributeResponseDTO> attributeResponseDTOList = new ArrayList<>();
+        for(AttributeEntity thisAttributeEntity : attributeEntityList) {
+            AttributeResponseDTO thisAttributeResponseDTO = new AttributeResponseDTO();
+            thisAttributeResponseDTO.setId(thisAttributeEntity.getAttributeId());
+
+            AttribTypeSummaryForCreatingDTO attribTypeSummaryForCreatingDTO = new AttribTypeSummaryForCreatingDTO();
+            attribTypeSummaryForCreatingDTO.setId(thisAttributeEntity.getAttributeTypeEntity().getAttributeTypeId());
+
+            thisAttributeResponseDTO.setAtribType(attribTypeSummaryForCreatingDTO);
+            attributeResponseDTOList.add(thisAttributeResponseDTO);
+        }
+        return attributeResponseDTOList;
     }
 
 }

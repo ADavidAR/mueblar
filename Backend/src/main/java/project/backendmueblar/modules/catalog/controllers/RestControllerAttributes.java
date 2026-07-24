@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.backendmueblar.modules.catalog.dtos.request.AttributeCreateRequestDTO;
+import project.backendmueblar.modules.catalog.dtos.response.AttributeResponseDTO;
 import project.backendmueblar.modules.catalog.dtos.response.Attribute_X_VariationSummaryResponseDTO;
 import project.backendmueblar.modules.catalog.services.AttributeService;
 
@@ -36,10 +37,23 @@ public class RestControllerAttributes {
         return ResponseEntity.status(204).build();
     }
 
-    @GetMapping(value = "/attributes", produces = "application/json")
-    public ResponseEntity<?> getAttributesByQuery(@RequestParam(defaultValue = "10") Integer limit, @RequestParam(defaultValue = "0") Integer page) {
-        Map<String, List<Attribute_X_VariationSummaryResponseDTO>> mapOfAttribute_X_Variation = attributeService.getAllAttributes(limit, page);
+    @GetMapping(value = "/attributes/variations", produces = "application/json")
+    public ResponseEntity<?> getAttributesWithVariationsByQuery(
+            @RequestParam(defaultValue = "10") Integer limit,
+            @RequestParam(defaultValue = "0") Integer page
+    ){
+        Map<String, List<Attribute_X_VariationSummaryResponseDTO>> mapOfAttribute_X_Variation = attributeService.getAllAttributesWithVariations(limit, page);
         return ResponseEntity.status(200).body(mapOfAttribute_X_Variation);
     }
+
+    @GetMapping(value = "/attributes", produces = "application/json")
+    public ResponseEntity<?> getAttributesByQuery(
+            @RequestParam(defaultValue = "10") Integer limit,
+            @RequestParam(defaultValue = "0") Integer page
+    ){
+        List<AttributeResponseDTO> attributeResponseDTOList = attributeService.getAllAttributes(limit, page);
+        return ResponseEntity.status(200).body(attributeResponseDTOList);
+    }
+
 
 }
