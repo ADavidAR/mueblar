@@ -5,7 +5,8 @@ import { StatusBar } from 'expo-status-bar'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 
-import { ThemeProvider, useTheme } from '../context/ThemeContext'
+import { ThemeProvider } from '../context/ThemeContext'
+import { useTheme } from '../hooks/useTheme'
 
 
 function ThemedStatusBar() {

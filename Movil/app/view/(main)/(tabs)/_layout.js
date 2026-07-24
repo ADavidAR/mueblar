@@ -1,7 +1,7 @@
 import { Tabs } from "expo-router";
 import { COLORS } from "../../../../constants/theme";
 import { ArIcon, CatalogIcon, EmptyHeartIcon } from "../../../../components/Icons";
-import { useTheme } from "../../../../context/ThemeContext";
+import { useTheme } from "../../../../hooks/useTheme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabsLayout () {
@@ -52,7 +52,7 @@ export default function TabsLayout () {
             />
 
             <Tabs.Screen
-                name="collection"
+                name="collections"
                 options={{
                     title: "COLECCIONES",
                     tabBarIcon: ({ color, size }) => <EmptyHeartIcon color={color} size={size} />

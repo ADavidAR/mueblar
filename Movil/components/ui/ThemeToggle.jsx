@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Animated, Pressable } from 'react-native'
 
-import { useTheme } from '../../context/ThemeContext'
+import { useTheme } from '../../hooks/useTheme'
 import { SunIcon, MoonIcon } from '../Icons'
 
 export default function ThemeToggle({ className = '' }) {

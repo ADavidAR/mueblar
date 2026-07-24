@@ -12,7 +12,7 @@ import {
     ChairIcon, BedIcon, TreeIcon, LampIcon, BoxIcon,
 } from "../Icons"
 import { COLORS } from "../../constants/theme"
-import { useTheme } from "../../context/ThemeContext"
+import { useTheme } from "../../hooks/useTheme"
 import SerifText from "../ui/SerifText"
 import Checkbox from "../ui/Checkbox"
 import { useFilters } from "../../hooks/useFilters"

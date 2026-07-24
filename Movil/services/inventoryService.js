@@ -1,4 +1,4 @@
-import {request} from './authService'
+import { request } from './authService'
 
 export const fetchProducts = async (
     search = "",

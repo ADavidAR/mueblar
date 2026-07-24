@@ -11,7 +11,7 @@ import {
     TrashIcon,
 } from "../Icons"
 import { COLORS } from "../../constants/theme"
-import { useTheme } from "../../context/ThemeContext"
+import { useTheme } from "../../hooks/useTheme"
 import SerifText from "../ui/SerifText"
 import { SceneObjectCard } from "../ui/ProductCard"
 import { fetchSingleVariation } from "../../services/inventoryService"

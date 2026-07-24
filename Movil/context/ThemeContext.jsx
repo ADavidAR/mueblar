@@ -1,10 +1,10 @@
-import { createContext, useContext, useEffect, useState, useCallback } from 'react'
+import { createContext, useEffect, useState, useCallback } from 'react'
 import { useColorScheme } from 'nativewind'
 import * as SecureStore from 'expo-secure-store'
 
 import { THEME_STORAGE_KEY } from '../constants/theme'
 
-const ThemeContext = createContext(null)
+export const ThemeContext = createContext(null)
 
 /**
  * Proveedor global del tema claro/oscuro.
@@ -67,10 +67,4 @@ export function ThemeProvider({ children }) {
   }
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
-}
-
-export function useTheme() {
-  const ctx = useContext(ThemeContext)
-  if (!ctx) throw new Error('useTheme debe usarse dentro de <ThemeProvider>')
-  return ctx
 }
