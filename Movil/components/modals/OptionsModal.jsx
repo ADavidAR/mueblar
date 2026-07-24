@@ -4,7 +4,7 @@ import Modal from "react-native-modal"
 
 import SerifText from "../ui/SerifText"
 import { useRouter } from "expo-router"
-import VariantsModal from "../ui/VariantsModal"
+import VariantsModal from "./VariantsModal"
 import { useModelCatalog } from "../../hooks/useModelCatalog"
 
 /**

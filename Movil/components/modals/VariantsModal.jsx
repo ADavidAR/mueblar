@@ -1,104 +1,107 @@
-import { useState } from 'react'
-import { View, Text, Pressable } from 'react-native'
+import { useEffect, useState } from "react"
+import { Text, View, ScrollView } from "react-native"
+import Modal from "react-native-modal"
 
-import { formatPrice } from '../../constants/catalogData'
-import CenterModal from '../ui/CenterModal'
-import SerifText from '../ui/SerifText'
-import FieldLabel from '../ui/FieldLabel'
-import PrimaryButton from '../ui/PrimaryButton'
+import SerifText from "../ui/SerifText"
+import PrimaryButton from "../ui/PrimaryButton"
+import { numberSeparatorFormatter } from "../../utils/formatters"
+import VariationCard from "../ui/VariationCard"
+import { fetchSingleProduct } from "../../services/inventoryService"
 
-const FABRICS = ['Cuero', 'Tela', 'Terciopelo']
-const WOODS = ['Roble', 'Nogal']
-const COLORS_OPTS = [
-  { name: 'Negro', hex: '#1c1c1c' },
-  { name: 'Azul', hex: '#1e2a78' },
-  { name: 'Terracota', hex: '#b5745a' },
-  { name: 'Blanco', hex: '#f5f3ee' },
-]
-
-/** Caja seleccionable para tela/madera. */
-function OptionChip({ label, selected, onPress }) {
-  return (
-    <Pressable
-      onPress={onPress}
-      className={`rounded-xl border px-5 py-3 active:opacity-70 ${
-        selected ? 'border-copper bg-copper/10' : 'border-stone-300 dark:border-stone-700'
-      }`}
-    >
-      <Text className={selected ? 'font-semibold text-copper' : 'text-stone-600 dark:text-stone-300'}>
-        {label}
-      </Text>
-    </Pressable>
-  )
-}
+import products from "../../mocks/products.json"
 
 /**
- * Modal "Variantes de Objeto": filtra telas, madera y color de una pieza.
- * El estado de selección es local; al confirmar, devuelve la selección.
+ * Selector de variantes del producto (modal).
+ *
+ * Trabaja sobre `product.variations` (datos ya existentes) y devuelve la
+ * variante elegida vía `onSelect`, sin tocar la lógica de la pantalla.
  */
-export default function VariantsModal({ visible, onClose, product, onConfirm }) {
-  const [fabric, setFabric] = useState('Tela')
-  const [wood, setWood] = useState('Nogal')
-  const [color, setColor] = useState(COLORS_OPTS[2])
+export default function VariantsModal({ visible, product, selected, onSelect, onClose, shouldLoadVariants = false }) {
+    const [ fetchedVariations, setFetchedVariations ] = useState(null)
+    const variations = fetchedVariations ?? product?.variations ?? []
+    const [draft, setDraft] = useState(selected)
 
-  const confirm = () => {
-    onConfirm?.({ fabric, wood, color: color.name })
-    onClose?.()
-  }
+    // Sincroniza la selección temporal cada vez que se abre el modal.
+    useEffect(() => {
+        
+        if (visible) {
+            if(shouldLoadVariants) {
+                const loadVariations = async () => {
+                    const { variations: newVariations } = products.find( (p) => p.model === product.model ) //await fetchSingleProduct(product.model, false)
+                    setFetchedVariations(newVariations)
+                }
+                loadVariations()
+            }
+            const initDraftSelection = async () => {
+                setDraft(selected)
+            }
 
-  return (
-    <CenterModal visible={visible} onClose={onClose}>
-      <View className="flex-row items-start justify-between">
-        <View className="flex-1">
-          <SerifText className="text-2xl text-stone-900 dark:text-stone-50">
-            Variantes de Objeto
-          </SerifText>
-          <Text className="mt-1 text-xs text-stone-400">{product?.name}</Text>
-        </View>
-        <Text className="font-semibold text-copper">{formatPrice(product?.price ?? 0)}</Text>
-      </View>
+            initDraftSelection()
+        }
+    }, [visible, selected, product.model, shouldLoadVariants])
 
-      <SerifText className="mb-4 mt-5 text-lg text-stone-800 dark:text-stone-100">
-        Filtrar por:
-      </SerifText>
+    const active = draft ?? selected
 
-      <FieldLabel>Telas</FieldLabel>
-      <View className="mb-5 mt-1 flex-row flex-wrap gap-3">
-        {FABRICS.map((f) => (
-          <OptionChip key={f} label={f} selected={fabric === f} onPress={() => setFabric(f)} />
-        ))}
-      </View>
+    return (
+        <Modal
+            isVisible={visible}
+            onBackdropPress={onClose}
+            onBackButtonPress={onClose}
+            useNativeDriver
+            animationIn="fadeInUp"
+            animationOut="fadeOutDown"
+            backdropOpacity={0.6}
+            style={{ justifyContent: "center", margin: 20 }}
+        >
+            <View className="rounded-3xl bg-sand-2 dark:bg-earth-light px-6 py-7">
+                {/* Encabezado */}
+                <View className="flex-row items-start justify-between">
+                    <View className="flex-1 pr-3">
+                        <SerifText className="text-2xl font-bold text-stone-900 dark:text-stone-50">
+                            Variantes de Objeto
+                        </SerifText>
+                        <Text className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+                            {product?.model}
+                        </Text>
+                    </View>
+                    <Text className="text-lg font-semibold text-copper-dark dark:text-copper-light">
+                        L {numberSeparatorFormatter(active?.price)}
+                    </Text>
+                </View>
 
-      <FieldLabel>Madera</FieldLabel>
-      <View className="mb-5 mt-1 flex-row flex-wrap gap-3">
-        {WOODS.map((w) => (
-          <OptionChip key={w} label={w} selected={wood === w} onPress={() => setWood(w)} />
-        ))}
-      </View>
+                <Text className="mt-5 mb-3 text-xs font-semibold uppercase tracking-[3px] text-stone-500 dark:text-stone-400">
+                    Elige una variante
+                </Text>
 
-      <FieldLabel>Colores</FieldLabel>
-      <View className="mb-1 mt-1 flex-row gap-4">
-        {COLORS_OPTS.map((c) => {
-          const selected = color.name === c.name
-          return (
-            <Pressable
-              key={c.name}
-              onPress={() => setColor(c)}
-              className={`h-11 w-11 items-center justify-center rounded-full ${
-                selected ? 'border-2 border-copper' : ''
-              }`}
-            >
-              <View
-                style={{ backgroundColor: c.hex }}
-                className="h-9 w-9 rounded-full border border-black/10"
-              />
-            </Pressable>
-          )
-        })}
-      </View>
-      <Text className="mb-6 text-xs text-copper">{color.name}</Text>
+                <ScrollView
+                    style={{ maxHeight: 280 }}
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={{ gap: 12 }}
+                >
+                    {variations.map((v) => {
+                        const isActive = v.sku === active?.sku
+                        return (
+                            <VariationCard
+                                key={v.sku}
+                                sku={v.sku}
+                                thumbnail={v.thumbnail}
+                                name={v.name}
+                                price={v.price}
+                                isActive={isActive}
+                                onPress={() => setDraft(v)}
+                            />
+                        )
+                    })}
+                </ScrollView>
 
-      <PrimaryButton label="Confirmar Selección" onPress={confirm} />
-    </CenterModal>
-  )
+                <View className="mt-6">
+                    <PrimaryButton
+                        label="Confirmar Selección"
+                        onPress={() => active && onSelect(active)}
+                        className="h-14"
+                    />
+                </View>
+            </View>
+        </Modal>
+    )
 }

@@ -4,7 +4,7 @@ import { updateUserData } from "../services/profileService";
 import { loginUser } from "../services/authService";
 import { mapUpdateUserError } from "../constants/authErrors";
 
-export function useProfileForm({ name, lastName, email }, triggerReload) {
+export function useProfileForm({ name, lastName, email }, changePassword, triggerReload) {
     const [requestError, setRequestError] = useState({
         name: null,
         lastName: null,
@@ -65,8 +65,16 @@ export function useProfileForm({ name, lastName, email }, triggerReload) {
         })
 
         try {
-            await updateUserData(name, lastName, email, newPassword, currentPassword)
-            await loginUser(email, newPassword)
+            await updateUserData(
+                name,
+                lastName,
+                email,
+                changePassword ? newPassword : undefined,
+                changePassword ? currentPassword : undefined,
+            )
+            if (changePassword) {
+                await loginUser(email, newPassword)
+            }
             triggerReload()
         } catch (err) {
             setRequestError(mapUpdateUserError(err))

@@ -3,8 +3,8 @@ import { Animated, Pressable, Text, ActivityIndicator, View } from 'react-native
 
 /**
  * Variantes:
- *  - "solid"   → relleno cobre (acción primaria, ej. REGISTRARSE).
- *  - "outline" → solo borde (acción secundaria, ej. CANCELAR).
+ *  - "solid"   → relleno cobre.
+ *  - "outline" → solo borde.
  */
 export default function GenericButton({
   label,
@@ -16,7 +16,7 @@ export default function GenericButton({
   className = '',
   textColor,
   containerBase,
-  
+  containerStyle,
 }) {
   const [scale] = useState(() => new Animated.Value(1))
   const isDisabled = disabled || loading
@@ -36,6 +36,7 @@ export default function GenericButton({
         onPressIn={() => animateTo(0.97)}
         onPressOut={() => animateTo(1)}
         disabled={isDisabled}
+        style={containerStyle}
         className={`h-16 w-full flex-row items-center justify-center rounded-full ${containerBase} ${
           isDisabled ? 'opacity-50' : ''
         } ${className}`}

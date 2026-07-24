@@ -11,7 +11,7 @@ import ARFurnitureScene from './ARFurnitureScene'
 import ARActionButton from './ARActionButton'
 import Brand from '../ui/Brand'
 import { MenuIcon, MoveIcon, RotateIcon, XIcon } from '../Icons'
-import SceneObjectsModal from './SceneObjectsModal'
+import SceneObjectsModal from '../modals/SceneObjectsModal'
 
 const HIT_EXISTING_PLANE = 'ExistingPlaneUsingExtent'
 const OBSTRUCTION_BANNER_MS = 1200

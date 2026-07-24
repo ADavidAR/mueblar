@@ -4,19 +4,23 @@ import { useCallback, useEffect, useRef, useState } from "react"
 
 import { EmptyHeartIcon, FilledHeartIcon } from "../Icons"
 import { numberSeparatorFormatter } from "../../utils/formatters"
+import { useCollections } from "../../hooks/useCollections"
+import SaveToCollectionModal from "../modals/SaveToCollectionModal"
 import SerifText from "./SerifText"
 
 /**
- * Botón de favorito flotante sobre la imagen.
- * El estado es solo visual (aún no hay lógica de favoritos en esta rama):
- * alterna el corazón para dar feedback táctil sin alterar ninguna lógica.
+ * Botón de favorito flotante sobre la imagen. El corazón relleno no
+ * significa "está en Favoritos" — significa "está guardado en al menos una
+ * colección" (isSaved). Tocarlo abre el modal para elegir en cuál(es).
  */
-function FavoriteButton() {
-    const [liked, setLiked] = useState(false)
-    const [scale] = useState(() => new Animated.Value(1))
+function FavoriteButton({ productId }) {
+    const { isSaved } = useCollections()
+    const [ showModal, setShowModal ] = useState(false)
+    const [ scale ] = useState(() => new Animated.Value(1))
+    const saved = isSaved(productId)
 
-    const toggle = () => {
-        setLiked((v) => !v)
+    const openModal = () => {
+        setShowModal(true)
         scale.setValue(0.7)
         Animated.spring(scale, {
             toValue: 1,
@@ -27,17 +31,24 @@ function FavoriteButton() {
     }
 
     return (
-        <Pressable
-            onPress={toggle}
-            hitSlop={8}
-            className="absolute top-3 right-3 h-9 w-9 items-center justify-center rounded-full bg-black/45"
-        >
-            <Animated.View style={{ transform: [{ scale }] }}>
-                {liked
-                    ? <FilledHeartIcon color="#e2685f" size={16} />
-                    : <EmptyHeartIcon color="#ffffff" size={16} />}
-            </Animated.View>
-        </Pressable>
+        <>
+            <Pressable
+                onPress={openModal}
+                hitSlop={8}
+                className="absolute top-3 right-3 h-9 w-9 items-center justify-center rounded-full bg-black/45"
+            >
+                <Animated.View style={{ transform: [{ scale }] }}>
+                    {saved
+                        ? <FilledHeartIcon color="#e2685f" size={16} />
+                        : <EmptyHeartIcon color="#ffffff" size={16} />}
+                </Animated.View>
+            </Pressable>
+            <SaveToCollectionModal
+                visible={showModal}
+                onClose={() => setShowModal(false)}
+                productId={productId}
+            />
+        </>
     )
 }
 
@@ -67,7 +78,7 @@ export function ProductCard ({ item, topVariation, onImageLoad }) {
                             resizeMode="cover"
                             onLoadEnd={onImageLoad}
                         />
-                        <FavoriteButton />
+                        <FavoriteButton productId={item.model} />
                     </View>
 
                     <SerifText className="mt-3 text-lg font-semibold text-stone-900 dark:text-stone-50">

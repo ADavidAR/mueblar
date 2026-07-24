@@ -32,6 +32,7 @@ const normalize = (raw) => ({
 
 export function CollectionsProvider({ children }) {
     const [collections, setCollections] = useState([])
+    const [ loading, setLoading ] = useState(false)
 
     const reload = useCallback(() => {
         fetchCollections()
@@ -48,6 +49,11 @@ export function CollectionsProvider({ children }) {
     const isFavorite = useCallback(
         (productId) => !!favorites?.productIds.includes(productId),
         [favorites]
+    )
+
+    const isSaved = useCallback(
+        (productId) => collections.some((c) => c.productIds.includes(productId)),
+        [collections]
     )
 
     const toggleFavorite = useCallback(
@@ -77,6 +83,39 @@ export function CollectionsProvider({ children }) {
             })
         },
         [favorites, reload]
+    )
+
+    const toggleSave = useCallback(
+        (productId, collectionsAdd, collectionsDelete) => {
+            setLoading(true)
+
+            setCollections((prev) =>
+                prev.map((c) => {
+                    if (collectionsAdd.includes(c.id)) {
+                        return c.productIds.includes(productId)
+                            ? c
+                            : { ...c, productIds: [...c.productIds, productId] }
+                    }
+                    if (collectionsDelete.includes(c.id)) {
+                        return { ...c, productIds: c.productIds.filter((id) => id !== productId) }
+                    }
+                    return c
+                }),
+            )
+
+            const requests = [
+                ...collectionsAdd.map((id) => addProductToCollection(id, productId)),
+                ...collectionsDelete.map((id) => deleteProductFromCollection(id, productId)),
+            ]
+
+            Promise.all(requests)
+                .catch((e) => {
+                    console.error('No se pudieron actualizar las colecciones', e)
+                    reload()
+                })
+                .finally(() => setLoading(false))
+        },
+        [reload]
     )
 
     const addToCollection = useCallback(
@@ -141,20 +180,26 @@ export function CollectionsProvider({ children }) {
         () => ({
             collections,
             isFavorite,
+            isSaved,
             toggleFavorite,
             addToCollection,
             removeFromCollection,
             createCollection,
             deleteCollection,
+            toggleSave,
+            loading,
         }),
         [
             collections,
             isFavorite,
+            isSaved,
             toggleFavorite,
             addToCollection,
             removeFromCollection,
             createCollection,
             deleteCollection,
+            toggleSave,
+            loading,
         ]
     )
 

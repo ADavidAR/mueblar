@@ -2,16 +2,17 @@ import { useState } from "react"
 
 import MainScreen from "../../../../components/main/MainScreen"
 import ProductsList from "../../../../components/main/ProductsList"
-import SearchModal from "../../../../components/main/SearchModal"
+import SearchModal from "../../../../components/modals/SearchModal"
 import { FiltersProvider } from "../../../../context/FiltersContext"
 
+// CollectionsProvider ya envuelve toda la app desde app/_layout.js
 export default function Catalog() {
     const [ showSearchModal, toggleSearchModal ] = useState(false)
     const [ loadKey, setLoadKey ] = useState(0)
-    
+
     return (
         <FiltersProvider>
-            <SearchModal 
+            <SearchModal
                 visible={showSearchModal}
                 onHide={() => toggleSearchModal(false)}
                 onSearch={() => {
@@ -19,14 +20,14 @@ export default function Catalog() {
                     toggleSearchModal(false)
                 }}
             />
-            <MainScreen 
-                showBrand 
-                showProfile 
+            <MainScreen
+                showBrand
+                showProfile
                 showSearch
                 onSearchPress={() => toggleSearchModal(true)}
                 scrollEnabled={false}
             >
-                <ProductsList 
+                <ProductsList
                     loadKey={loadKey}
                 />
             </MainScreen>

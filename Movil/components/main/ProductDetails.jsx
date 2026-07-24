@@ -7,10 +7,12 @@ import { numberSeparatorFormatter, parseAttributes } from "../../utils/formatter
 import SpecificationTable from "../ui/SpecificationTable"
 import SerifText from "../ui/SerifText"
 import PrimaryButton from "../ui/PrimaryButton"
-import VariantsModal from "../ui/VariantsModal"
+import VariantsModal from "../modals/VariantsModal"
+import SaveToCollectionModal from "../modals/SaveToCollectionModal"
 import "../../assets/img_placeholder.jpeg"
 import { CubeIcon, FilledHeartIcon, EmptyHeartIcon } from "../Icons"
 import { fetchSingleProduct } from "../../services/inventoryService"
+import { useCollections } from "../../hooks/useCollections"
 
 /** Construye la vista de datos derivada de una variación concreta. */
 function buildProductData(prod, variation) {
@@ -30,11 +32,12 @@ function buildProductData(prod, variation) {
 
 export default function ProductDetails ({ model, sku }) {
     const router = useRouter()
-    
+    const { isSaved } = useCollections()
+
     const [ product, setProduct ] = useState({})
     const [ selectedVariation, setSelectedVariation ] = useState()
     const [ selectedImg, setSelectedImg ] = useState("")
-    const [ liked, setLiked ] = useState(false)
+    const [ showSaveModal, setShowSaveModal ] = useState(false)
     const [ showVariants, setShowVariants ] = useState(false)
 
     const [ productData, setProductData ] = useState({
@@ -80,11 +83,11 @@ export default function ProductDetails ({ model, sku }) {
                     resizeMode="cover"
                 />
                 <Pressable
-                    onPress={() => setLiked(v => !v)}
+                    onPress={() => setShowSaveModal(true)}
                     hitSlop={8}
                     className="absolute top-4 right-4 h-10 w-10 items-center justify-center rounded-full bg-black/40"
                 >
-                    {liked
+                    {isSaved(model)
                         ? <FilledHeartIcon color="#e2685f" size={18} />
                         : <EmptyHeartIcon color="#ffffff" size={18} />}
                 </Pressable>
@@ -158,6 +161,12 @@ export default function ProductDetails ({ model, sku }) {
             selected={selectedVariation}
             onSelect={handleSelectVariation}
             onClose={() => setShowVariants(false)}
+        />
+
+        <SaveToCollectionModal
+            visible={showSaveModal}
+            onClose={() => setShowSaveModal(false)}
+            productId={model}
         />
         </>
     )

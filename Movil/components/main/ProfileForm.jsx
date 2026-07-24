@@ -1,4 +1,4 @@
-import { ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import SerifText from "../ui/SerifText";
 import UnderlineField from "../ui/UnderlineField";
 import { useProfileForm } from "../../hooks/useProfileForm";
@@ -9,6 +9,8 @@ import { VALIDATION } from "../../constants/authErrors";
 import PasswordField from "../ui/PasswordField";
 import PrimaryButton from "../ui/PrimaryButton";
 import CustomColorButton from "../ui/CustomColorButton";
+import Checkbox from "../ui/Checkbox";
+import ConfirmModal from "../modals/ConfirmModal";
 import { logoutUser } from "../../services/authService";
 import { useRouter } from "expo-router";
 
@@ -25,6 +27,10 @@ export default function ProfileForm () {
     })
     const [ shouldLoadUserData, setShouldLoadUserData ] = useState(true)
     const [ enableEdit, setEnableEdit ] = useState(false)
+    // Decide si el usuario quiere tocar la contraseña en este modo edición;
+    // si está apagado, los campos de contraseña ni se muestran ni se validan.
+    const [ changePassword, setChangePassword ] = useState(false)
+    const [ showConfirm, setShowConfirm ] = useState(false)
     const {
         form : { control, reset, formState: { errors } },
         requestError,
@@ -32,7 +38,7 @@ export default function ProfileForm () {
         submit,
         updateFormDefaults,
         isSubmitting,
-    } = useProfileForm(currentProfileData, () => setShouldLoadUserData(false))
+    } = useProfileForm(currentProfileData, changePassword, () => setShouldLoadUserData(false))
 
     useEffect(() => {
         if(shouldLoadUserData) {
@@ -51,6 +57,7 @@ export default function ProfileForm () {
         setEnableEdit( prev => {
             if (prev) {
                 reset()
+                setChangePassword(false)
                 return false
             }
             return true
@@ -143,7 +150,19 @@ export default function ProfileForm () {
 
                 { enableEdit ? (
                     <>
-                    <Controller 
+                    <Pressable
+                        onPress={() => setChangePassword((v) => !v)}
+                        className="flex-row items-center gap-x-3"
+                    >
+                        <Checkbox checked={changePassword} />
+                        <Text className="text-sm text-stone-700 dark:text-stone-200">
+                            Quiero cambiar mi contraseña
+                        </Text>
+                    </Pressable>
+
+                    { changePassword ? (
+                    <>
+                    <Controller
                         control={control}
                         name="currentPassword"
                         rules={VALIDATION.password}
@@ -161,7 +180,7 @@ export default function ProfileForm () {
                             />
                         )}
                     />
-                    
+
                     <Controller
                         control={control}
                         name="newPassword"
@@ -172,7 +191,7 @@ export default function ProfileForm () {
                                 labelClassName={LABEL_CLASS}
                                 value={value}
                                 onBlur={onBlur}
-    
+
                                 onChangeText={(t) => {
                                     onChange(t)
                                     clearServerError("newPassword")
@@ -181,6 +200,8 @@ export default function ProfileForm () {
                             />
                         )}
                     />
+                    </>
+                    ) : null }
                     </>
                 )
                 : (
@@ -191,7 +212,7 @@ export default function ProfileForm () {
                         color={"terracotta"}
                     />
                 ) }
-                
+
             </View>
 
             <View className="flex-1" />
@@ -204,7 +225,7 @@ export default function ProfileForm () {
     
                 <PrimaryButton
                     label="Guardar cambios"
-                    onPress={submit}
+                    onPress={() => setShowConfirm(true)}
                     loading={isSubmitting}
                     className="mt-10"
                 />
@@ -215,6 +236,19 @@ export default function ProfileForm () {
                 onPress={handleEditToggle}
                 className={"mt-10"}
                 color={enableEdit ? "terracotta" : "copper"}
+            />
+
+            <ConfirmModal
+                visible={showConfirm}
+                onClose={() => setShowConfirm(false)}
+                onConfirm={submit}
+                title="Confirmar cambios"
+                message={
+                    changePassword
+                        ? "¿Seguro que querés guardar los cambios en tu perfil, incluida la contraseña nueva?"
+                        : "¿Seguro que querés guardar los cambios en tu perfil?"
+                }
+                confirmLabel="Guardar"
             />
         </ScrollView>
     )
