@@ -45,6 +45,10 @@ export default function AdminInventoryPage() {
   const { user } = useAuth()
   //phasspermission gpregunta si el usuario tiene permiso
   const canCreateProduct = hasPermission(user?.permissions, '/api/products', 'POST')
+  const canViewAttributeType= hasPermission(user?.permissions,'/api/attribute-types','GET')
+  const canCreateAttributeType= hasPermission(user?.permissions,'/view/attribute-type-add','POST')
+  const canUpdateAttributeType= hasPermission(user?.permissions,'/api/attribute-types/{id_tipo_atributo}','PUT')
+  const canDeleteAttributeType= hasPermission(user?.permissions,'/api/attribute-types/{id_tipo_atributo}','DELETE')
   //pata eliminar algo
   const [pendingDelete, setPendingDelete] = useState(null) // guarda QUÉ se va a borrar
 
@@ -236,6 +240,7 @@ export default function AdminInventoryPage() {
       </section>
 
       {/* ── Tipo Atributo ── */}
+{canViewAttributeType &&(
       <section className="mt-10">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-display text-2xl text-white">Tipo atributo</h2>
@@ -250,7 +255,10 @@ export default function AdminInventoryPage() {
                 className="w-52 rounded-full border border-neutral-700 bg-neutral-800 py-1.5 pl-8 pr-4 text-sm text-white placeholder:text-neutral-500 focus:border-copper/50 focus:outline-none"
               />
             </div>
-            <AddButton onClick={() => navigate('/view/attribute-type-add')} label="Añadir Tipo de atributo" />
+            {canCreateAttributeType && (
+
+              <AddButton onClick={() => navigate('/view/attribute-type-add')} label="Añadir Tipo de atributo" />
+            )}
           </div>
         </div>
 
@@ -279,17 +287,22 @@ export default function AdminInventoryPage() {
                     <td className="px-6 py-3 text-white">{t.description}</td>
                     <td className="py-3 pr-6 text-right">
                       <div className="inline-flex gap-1">
-                        <button onClick={() => { navigate('/view/attribute-type-update',{
+                        {canUpdateAttributeType && (
+                          <button onClick={() => { navigate('/view/attribute-type-update',{
                           state:t
                         }) }} className="rounded p-1.5 text-neutral-400 hover:bg-neutral-700 hover:text-white">
                           <Pencil className="h-3.5 w-3.5" />
                         </button>
+                      )}
+                      {canDeleteAttributeType && (
+
                         <button onClick={()=>{
                           setPendingDelete(t.id)
                           setFuncion(()=>handleDeleteAttributeType)
-                          }} className="rounded p-1.5 text-neutral-400 hover:bg-red-900/40 hover:text-red-400">
+                        }} className="rounded p-1.5 text-neutral-400 hover:bg-red-900/40 hover:text-red-400">
                           <Trash className="h-3.5 w-3.5" />
                         </button>
+                          )}
                       </div>
                     </td>
                   </tr>
@@ -299,6 +312,8 @@ export default function AdminInventoryPage() {
           )}
         </div>
       </section>
+   )
+}
 
       {/* ── Atributo ── */}
       <section className="mt-10">
