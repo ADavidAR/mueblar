@@ -63,6 +63,7 @@ public class AuthService {
     }
 
     public String authenticationUser(UserAuthRequestDTO userAuthRequestDTO, Long expirationTime){
+        System.out.println(expirationTime);
         Optional<UserEntity> optionalUser = repositoryUser.findByEmail(userAuthRequestDTO.getEmail());
 
         // Bad Responses //

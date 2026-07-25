@@ -1,6 +1,7 @@
 package project.backendmueblar.modules.auth.services;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.AntPathMatcher;
 import project.backendmueblar.exception.auth.EmailNotFoundException;
 import project.backendmueblar.exception.auth.NotPatternURLFoundTokenException;
+import project.backendmueblar.exception.auth.TokenJWTExpiredException;
 import project.backendmueblar.exception.auth.ViolatedJWTIntegrity;
 import project.backendmueblar.modules.users.entities.ModuleEntity;
 import project.backendmueblar.modules.users.entities.UserEntity;
@@ -43,18 +45,16 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public boolean validateJWTIntegrity(String token) {
-         try {
-            Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token);
-             return true;
-        } catch (Exception e) {
-            throw new ViolatedJWTIntegrity("Could not verify JWT token integrity!", e);
-        }
-    }
-
     public String extractEmail(String authHeader) {
         String token = authHeader.substring(7);
-        Claims claims = Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token).getPayload();
+        Claims claims;
+        try {
+            claims = Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token).getPayload();
+        } catch (ExpiredJwtException e) {
+            throw new TokenJWTExpiredException("Token is Expired. Not Valid");
+        } catch (Exception e) {
+            throw new RuntimeException("Could not verify JWT token integrity!");
+        }
 
         if(claims.getSubject() == null) {
             throw new EmailNotFoundException("User with Specified Email not Exists");
@@ -80,8 +80,6 @@ public class JwtService {
     public Map<String, Integer> extractEndpointAndPermission(String token, String endpointURI) {
 
         // Private Method
-        validateJWTIntegrity(token);
-
         String possibleEndpoint = extractPatternEndpointAndPermission(token, endpointURI);
         if(possibleEndpoint == null) {
             throw new NotPatternURLFoundTokenException("Not exist an Pattern for that endpoint in that token");

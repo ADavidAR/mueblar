@@ -24,9 +24,6 @@ public class PermissionEntity {
     @Column(name = "endpoint_url", nullable = false)
     private String endpointUrl;
 
-    @Column(nullable = false)
-    private String api;
-
     @OneToMany(mappedBy = "permissionEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Permission_X_RoleEntity> permissionEntities;
 
