@@ -61,7 +61,6 @@ public class GlobalExceptionController {
         return ResponseEntity.status(500).body(buildErrorResponse(ex));
     }
 
-
     @ExceptionHandler(RecoveryTokenNotFoundException.class)
     public ResponseEntity<Map<String, List<Map<String, String>>>> handleRecoveryTokenNotFoundException(RecoveryTokenNotFoundException ex) {
         return ResponseEntity.status(404).body(buildErrorResponse(ex));

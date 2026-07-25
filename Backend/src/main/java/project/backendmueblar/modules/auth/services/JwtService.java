@@ -12,6 +12,7 @@ import org.springframework.util.AntPathMatcher;
 import project.backendmueblar.exception.auth.EmailNotFoundException;
 import project.backendmueblar.exception.auth.NotPatternURLFoundTokenException;
 import project.backendmueblar.exception.auth.ViolatedJWTIntegrity;
+import project.backendmueblar.modules.users.entities.ModuleEntity;
 import project.backendmueblar.modules.users.entities.UserEntity;
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -25,11 +26,11 @@ public class JwtService {
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-    public String generateToken(UserEntity  userEntity, Map<String, Integer> endpoints, Long expirationTime) {
+    public String generateToken(UserEntity userEntity, Map<Long, Integer> modules, Long expirationTime) {
         return Jwts.builder()
                 .id(userEntity.getUserId().toString())
                 .claims(Map.of("roleId", userEntity.getRoleEntity().getRoleId()))
-                .claim("permissions", endpoints)
+                .claim("modules", modules)
                 .subject(userEntity.getEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expirationTime))

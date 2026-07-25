@@ -14,10 +14,7 @@ import project.backendmueblar.modules.users.entities.ModuleEntity;
 import project.backendmueblar.modules.users.entities.Module_X_RoleEntity;
 import project.backendmueblar.modules.users.entities.RoleEntity;
 import project.backendmueblar.modules.users.entities.UserEntity;
-import project.backendmueblar.modules.users.repositories.RepositoryModule;
-import project.backendmueblar.modules.users.repositories.RepositoryPermission_X_Role;
-import project.backendmueblar.modules.users.repositories.RepositoryRole;
-import project.backendmueblar.modules.users.repositories.RepositoryUser;
+import project.backendmueblar.modules.users.repositories.*;
 
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
@@ -32,6 +29,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final RepositoryRecoveryToken repositoryRecoveryToken;
     private final RepositoryModule repositoryModule;
+    private final RepositoryModule_X_Role repositoryModule_X_Role;
 
     private final JwtService jwtService;
     private final EmailService emailService;
@@ -81,19 +79,16 @@ public class AuthService {
         // Good Response
         UserEntity user = optionalUser.get();
 
-//        List<Module_X_RoleEntityy> listOfEndpointsAndPermissions = repositoryModule.findBy(user);
+        Map<Long, Integer> modulesMapWithPermissionsBitWithID = new HashMap<>();
 
-        if(listOfEndpointsAndPermissions.isEmpty()){
-            throw new NoRelatedPermissionsException("No permissions");
+        List<Module_X_RoleEntity> moduleXRoleEntityList = repositoryModule_X_Role.findAllByRoleEntity(user.getRoleEntity());
+        for (Module_X_RoleEntity moduleXRoleEntity : moduleXRoleEntityList){
+            ModuleEntity thisModuleEntity = moduleXRoleEntity.getModuleEntity();
+            Integer permissionsBitModule = getInteger(moduleXRoleEntity);
+
+            modulesMapWithPermissionsBitWithID.put(thisModuleEntity.getModuleId(), permissionsBitModule);
         }
-
-        Map<String, Integer> endpointsAndPermissionsMap = listOfEndpointsAndPermissions.stream()
-                .collect(Collectors.toMap(
-                        row -> (String) row[0],
-                        row -> ((Number) row[1]).intValue()
-                ));
-
-        return jwtService.generateToken(user, endpointsAndPermissionsMap, expirationTime);
+        return jwtService.generateToken(user, modulesMapWithPermissionsBitWithID, expirationTime);
     }
 
     @Transactional
@@ -161,16 +156,37 @@ public class AuthService {
         return uuid.toString().replace("-", "");
     }
 
-    public Map<String, Integer> extractEndpointAndPermission(String authHeader, UrlRequestDTO urlRequestDTO) {
-        if(authHeader == null && !authHeader.startsWith("Bearer ")){
-            throw new UserDisabledException("Disabled User, not authorized");
-        }
-        String jwt = authHeader.substring(7);
+    private static @NonNull Integer getInteger(Module_X_RoleEntity moduleXRoleEntity) {
+        Integer accessBit1;
+        Integer creationBit2;
+        Integer deleteBit3;
+        Integer modificationBit4;
 
-        if ((jwtService.extractEndpointAndPermission(jwt, urlRequestDTO.getUrl())) == null) {
-            throw new EndpointNotExistForUser("URL / API does not exist");
+        if(moduleXRoleEntity.isAccess()){
+            accessBit1 = 8;
+        } else {
+            accessBit1 = 0;
         }
 
-        return jwtService.extractEndpointAndPermission(jwt, urlRequestDTO.getUrl());
+        if(moduleXRoleEntity.isCreation()){
+            creationBit2 = 4;
+        } else {
+            creationBit2 = 0;
+        }
+
+        if(moduleXRoleEntity.isDeletion()){
+            deleteBit3 = 2;
+        } else {
+            deleteBit3 = 0;
+        }
+
+        if(moduleXRoleEntity.isModification()){
+            modificationBit4 = 1;
+        } else {
+            modificationBit4 = 0;
+        }
+
+        Integer permissionsBitModule = accessBit1 + creationBit2 + deleteBit3 + modificationBit4;
+        return permissionsBitModule;
     }
 }

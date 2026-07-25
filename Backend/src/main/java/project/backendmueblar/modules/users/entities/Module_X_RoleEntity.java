@@ -27,4 +27,16 @@ public class Module_X_RoleEntity {
     @JoinColumn(name = "id_modulo", nullable = false)
     @MapsId("moduleId")
     private ModuleEntity moduleEntity;
+
+    @Column(name = "acceso", nullable = false)
+    private boolean access;
+
+    @Column(name = "creacion", nullable = false)
+    private boolean creation;
+
+    @Column(name = "eliminacion", nullable = false)
+    private boolean deletion;
+
+    @Column(name = "modificacion", nullable = false)
+    private boolean modification;
 }
