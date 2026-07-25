@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import project.backendmueblar.exception.auth.*;
+import project.backendmueblar.modules.auth.EndpointsCacheComponent;
 import project.backendmueblar.modules.auth.dtos.*;
 import project.backendmueblar.modules.auth.repositories.RepositoryRecoveryToken;
 import project.backendmueblar.modules.auth.entities.RecoveryTokenEntity;
@@ -19,8 +20,6 @@ import project.backendmueblar.modules.users.repositories.*;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -33,6 +32,8 @@ public class AuthService {
 
     private final JwtService jwtService;
     private final EmailService emailService;
+
+    private final EndpointsCacheComponent endpointsCacheComponent;
 
     @Value("${EXPIRATION_TIME_RECOVERY_TOKEN}")
     private long expirationTimeRecoveryToken;
@@ -151,6 +152,44 @@ public class AuthService {
             throw new RecoveryTokenIsExpired("The deadline for changing the password has passed.");
         }
     }
+
+    public Integer extractPermissionForEndpoint(String authHeader, UrlRequestDTO urlRequestDTO) {
+        UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
+
+        Map<Long, List<String>> allEndpointsMap = endpointsCacheComponent.getAllEndpointsMap();
+
+        for(Long modulesId : allEndpointsMap.keySet()){
+            List<String> endpointsList = allEndpointsMap.get(modulesId);
+
+            for(String endpoint : endpointsList){
+                if(endpoint.equals(urlRequestDTO.getUrl())){
+                    Module_X_RoleEntity moduleXRoleEntity = repositoryModule_X_Role.findByRoleEntityAndModuleEntity_ModuleId(thisUserEntity.getRoleEntity(), modulesId).get();
+                    return getInteger(moduleXRoleEntity);
+                }
+            }
+        }
+
+        throw new NotPatternURLFoundTokenException("Not exist Permissions for this URL");
+
+    }
+
+    public Map<Long, String> getRoleAssociatedToToken(String authHeader){
+        UserEntity userEntity = existsUserWithToken(authHeader).get();
+        Map<Long, String> mapRole = new HashMap<>();
+
+        mapRole.put(userEntity.getRoleEntity().getRoleId(), userEntity.getRoleEntity().getRoleName());
+        return mapRole;
+    }
+
+    private Optional<UserEntity> existsUserWithToken(String authHeader) {
+        String uniqueEmailForUser = jwtService.extractEmail(authHeader);
+        Optional<UserEntity> optionalUser = repositoryUser.findByEmail(uniqueEmailForUser);
+        if (optionalUser.isEmpty()) {
+            throw new UserIDNotMatchException("User not Found, Cannot create or access to Collection");
+        }
+        return optionalUser;
+    }
+
 
     private static String generateTokenRecovery(){
         UUID uuid = UUID.randomUUID();

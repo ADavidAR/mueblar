@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -15,7 +14,6 @@ import project.backendmueblar.modules.auth.EndpointsCacheComponent;
 import project.backendmueblar.modules.auth.services.JwtService;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +22,7 @@ import java.util.Map;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
+    private final EndpointsCacheComponent endpointsCacheComponent;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -35,19 +34,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String urlRequested =  request.getRequestURI();
         String httpMethod = request.getMethod().toUpperCase();
 
-        // Arreglo donde se encuentran todas las APIS que hacen uso del Token, pero no son propias del Role en cuestion //
-        List<String> apisWithBearerForAllRoles = new ArrayList<>();
-        apisWithBearerForAllRoles.add("/api/auth/permits");
-        apisWithBearerForAllRoles.add("/api/collections");
-        apisWithBearerForAllRoles.add("/api/collections/{id_collections}");
-        apisWithBearerForAllRoles.add("/api/collections/{id_collections}/products/{model}");
-        apisWithBearerForAllRoles.add("/api/products/token");
-
         if(authHeader != null && authHeader.startsWith("Bearer ")) {
             String userEmail = jwtService.extractEmail(authHeader);
 
-            for (String apisNotInsideInToken :  apisWithBearerForAllRoles) {
-                if (pathMatcher.match(apisNotInsideInToken, urlRequested)) {
+            for (String thisEndpointWithToken :  endpointsCacheComponent.getAllEndpointsMapWithToken().get("ApisWithToken")) {
+                if (pathMatcher.match(thisEndpointWithToken, urlRequested)) {
                     if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                         UsernamePasswordAuthenticationToken contextAuthenticationToken = new UsernamePasswordAuthenticationToken(userEmail, null, List.of());
                         SecurityContextHolder.getContext().setAuthentication(contextAuthenticationToken);
@@ -57,7 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
 
-            Map<String, Integer> endpointPatternPermissionMap = jwtService.extractEndpointAndPermission(authHeader.substring(7), urlRequested);
+            Map<String, Integer> endpointPatternPermissionMap = jwtService.extractEndpointAndPermissionMap(authHeader.substring(7), urlRequested, endpointsCacheComponent.getAllEndpointsMap());
             System.out.println(endpointPatternPermissionMap);
             if (endpointPatternPermissionMap != null) {
                 if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -74,6 +65,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private boolean urlHasEnoughPermissionsAPI(Map<String, Integer> endpointPermissionMap, String httpMethod) {
+        System.out.println(endpointPermissionMap);
         Integer permissionsInBits = endpointPermissionMap.values().stream().findFirst().orElse(null);
 
         if(permissionsInBits == null) {

@@ -74,9 +74,15 @@ public class RestControllerAuth {
             @Valid @RequestBody UrlRequestDTO urlRequestDTO) {
 
         Map<String, Integer> map = new HashMap<>();
-        map.put("permits", authService.extractEndpointAndPermission(authHeader, urlRequestDTO).get(urlRequestDTO.getUrl()));
+        map.put("permits", authService.extractPermissionForEndpoint(authHeader, urlRequestDTO));
 
         return ResponseEntity.status(200).body(map);
     }
+
+    @PostMapping(value = "/role", produces = "application/json")
+    public ResponseEntity<Map<Long, String>> getRoleAssociatedToToken(@RequestHeader("Authorization") String authHeader) {
+        return ResponseEntity.status(200).body(authService.getRoleAssociatedToToken(authHeader));
+    }
+
 
 }

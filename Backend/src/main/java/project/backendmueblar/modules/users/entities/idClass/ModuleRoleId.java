@@ -16,8 +16,8 @@ import java.io.Serializable;
 
 public class ModuleRoleId implements Serializable {
     @Column(name = "id_rol")
-    private String roleId;
+    private Long roleId;
 
     @Column(name = "id_modulo")
-    private String moduleId;
+    private Long moduleId;
 }

@@ -13,12 +13,11 @@ import org.springframework.util.AntPathMatcher;
 import project.backendmueblar.exception.auth.EmailNotFoundException;
 import project.backendmueblar.exception.auth.NotPatternURLFoundTokenException;
 import project.backendmueblar.exception.auth.TokenJWTExpiredException;
-import project.backendmueblar.exception.auth.ViolatedJWTIntegrity;
-import project.backendmueblar.modules.users.entities.ModuleEntity;
 import project.backendmueblar.modules.users.entities.UserEntity;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -64,39 +63,52 @@ public class JwtService {
 
     }
 
-    private String extractPatternEndpointAndPermission(String token, String endpointURI) {
+    private String extractPatternEndpointAndPermission(String token, String endpointURI, Map<Long,List<String>> allEndpointsMapCache) {
         Claims claims = Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token).getPayload();
 
-        Map<String, Integer> completeMap = claims.get("permissions", Map.class);
-        for(String patternAllowed : completeMap.keySet()) {
-            if(pathMatcher.match(patternAllowed, endpointURI)){
-                return patternAllowed;
+        Map<String, Integer> completeMapFromToken = claims.get("modules", Map.class);
+
+        for(String moduleIdString : completeMapFromToken.keySet()) {
+            Long moduleId = Long.valueOf(moduleIdString);
+            if(allEndpointsMapCache.containsKey(moduleId)) {
+                List<String> allEndpointsForModule = allEndpointsMapCache.get(moduleId);
+
+                System.out.println(allEndpointsForModule);
+
+                for(String endpoint : allEndpointsForModule) {
+                    if(pathMatcher.match(endpoint, endpointURI.trim())) {
+                        return endpoint;
+                    }
+                }
             }
         }
         return null;
     }
 
-    // Se retornara un Mapa en caso de que se necesite posteriormente
-    public Map<String, Integer> extractEndpointAndPermission(String token, String endpointURI) {
-
+    public Map<String, Integer> extractEndpointAndPermissionMap(String token, String endpointURI, Map<Long,List<String>> allEndpointsMapCache) {
         // Private Method
-        String possibleEndpoint = extractPatternEndpointAndPermission(token, endpointURI);
+        String possibleEndpoint = extractPatternEndpointAndPermission(token, endpointURI, allEndpointsMapCache);
         if(possibleEndpoint == null) {
             throw new NotPatternURLFoundTokenException("Not exist an Pattern for that endpoint in that token");
         }
 
         Claims claims = Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token).getPayload();
-        Map<String, Integer> completeMap = claims.get("permissions", Map.class);
+        Map<String, Integer> completeMapFromToken = claims.get("modules", Map.class);
 
-        for (String endpoint : completeMap.keySet()) {
-            if (pathMatcher.match(possibleEndpoint, endpoint)) {
-                Map<String, Integer> endpointAndPermissionMap = new HashMap<>();
-                endpointAndPermissionMap.put(possibleEndpoint, completeMap.get(endpoint));
-
-                return endpointAndPermissionMap;
+        for (String moduleIdString : completeMapFromToken.keySet()) {
+            Long moduleId = Long.valueOf(moduleIdString);
+            if(allEndpointsMapCache.containsKey(moduleId)) {
+                List<String> allEndpointsForModule = allEndpointsMapCache.get(moduleId);
+                for(String endpoint : allEndpointsForModule) {
+                    if(pathMatcher.match(possibleEndpoint, endpoint)) {
+                        Map<String, Integer> endpointAndPermissionAssociatedMap = new HashMap<>();
+                        endpointAndPermissionAssociatedMap.put(possibleEndpoint, completeMapFromToken.get(moduleIdString));
+                        return endpointAndPermissionAssociatedMap;
+                    }
+                }
             }
         }
 
-        throw new NotPatternURLFoundTokenException("Not exist an Pattern for that endpoint in that token");
+        throw new NotPatternURLFoundTokenException("Not exist an Pattern in the MAP for that endpoint in that token");
     }
 }

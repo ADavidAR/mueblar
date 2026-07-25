@@ -1,9 +1,12 @@
 package project.backendmueblar.modules.auth;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import project.backendmueblar.modules.users.entities.ModuleEntity;
 import project.backendmueblar.modules.users.entities.PermissionEntity;
@@ -23,10 +26,11 @@ public class EndpointsCacheComponent {
 
     private final RepositoryModule repositoryModule;
 
-    private final Map<String, Map<Long, List<String>>> allEndpointsMap = new ConcurrentHashMap<>();
+    private final Map<Long, List<String>> allEndpointsMap = new ConcurrentHashMap<>();
     private final Map<String, List<String>> allEndpointsMapWithToken = new ConcurrentHashMap<>();
 
-    @PostConstruct
+    @Transactional
+    @EventListener(ApplicationReadyEvent.class)
     public void initCache() {
         List<ModuleEntity> moduleEntityList = repositoryModule.findAll();
 
@@ -35,20 +39,16 @@ public class EndpointsCacheComponent {
     }
 
     private void loadEndpointsFromDB(List<ModuleEntity> moduleEntityList) {
-        Map<Long, List<String>> endpointsMap = new HashMap<>();
-
         for(ModuleEntity thisModuleEntity : moduleEntityList) {
             List<String> endpointsForModuleEntity = new ArrayList<>();
             Long moduleId = thisModuleEntity.getModuleId();
 
             List<PermissionEntity> permissionEntityList = thisModuleEntity.getPermissionEntityList();
             for(PermissionEntity permissionEntity : permissionEntityList) {
-                endpointsForModuleEntity.add(permissionEntity.getEndpointUrl());
+                endpointsForModuleEntity.add(permissionEntity.getEndpointUrl().trim());
             }
-            endpointsMap.put(moduleId, endpointsForModuleEntity);
+            allEndpointsMap.put(moduleId, endpointsForModuleEntity);
         }
-
-        allEndpointsMap.put("ApisInDatabase", endpointsMap);
     }
 
     private void loadEndpointsWithToken() {
@@ -59,6 +59,7 @@ public class EndpointsCacheComponent {
         endpointsForModuleEntity.add("/api/collections");
         endpointsForModuleEntity.add("/api/collections/{id_collections}");
         endpointsForModuleEntity.add("/api/collections/{id_collections}/products/{model}");
+        endpointsForModuleEntity.add("/api/auth/role");
 
         allEndpointsMapWithToken.put("ApisWithToken", endpointsForModuleEntity);
     }
