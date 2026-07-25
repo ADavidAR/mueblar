@@ -25,11 +25,11 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
           cache: 'maven'
-          cache-dependancy-path: 'Backend/pom.xml'
+          cache-dependency-path: 'Backend/pom.xml'
 
       # 3. Compilar el proyecto Java con Maven
       - name: Build with Maven
-        wordking-directory: ./Backend
+        working-directory: ./Backend
         run: ./mvnw clean package -DskipTests
 
       # 4. Desplegar el ejecutable .jar en Azure
