@@ -48,12 +48,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             for (String apisNotInsideInToken :  apisWithBearerForAllRoles) {
                 if (pathMatcher.match(apisNotInsideInToken, urlRequested)) {
                     if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                        if (jwtService.validateJWTIntegrity(authHeader.substring(7))) {
-                            UsernamePasswordAuthenticationToken contextAuthenticationToken = new UsernamePasswordAuthenticationToken(userEmail, null, List.of());
-                            SecurityContextHolder.getContext().setAuthentication(contextAuthenticationToken);
-                            filterChain.doFilter(request, response);
-                            return;
-                        }
+                        UsernamePasswordAuthenticationToken contextAuthenticationToken = new UsernamePasswordAuthenticationToken(userEmail, null, List.of());
+                        SecurityContextHolder.getContext().setAuthentication(contextAuthenticationToken);
+                        filterChain.doFilter(request, response);
+                        return;
                     }
                 }
             }
@@ -66,10 +64,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado: No tienes los permisos necesarios para esta acción.");
                         return;
                     }
-                    if (jwtService.validateJWTIntegrity(authHeader.substring(7))) {
-                        UsernamePasswordAuthenticationToken contextAuthenticationToken = new UsernamePasswordAuthenticationToken(userEmail, null, List.of());
-                        SecurityContextHolder.getContext().setAuthentication(contextAuthenticationToken);
-                    }
+                    UsernamePasswordAuthenticationToken contextAuthenticationToken = new UsernamePasswordAuthenticationToken(userEmail, null, List.of());
+                    SecurityContextHolder.getContext().setAuthentication(contextAuthenticationToken);
                 }
             }
         }
@@ -79,7 +75,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private boolean urlHasEnoughPermissionsAPI(Map<String, Integer> endpointPermissionMap, String httpMethod) {
         Integer permissionsInBits = endpointPermissionMap.values().stream().findFirst().orElse(null);
 
-        if(permissionsInBits == null) return false;
+        if(permissionsInBits == null) {
+            return false;
+        }
 
         int requiredBit = switch (httpMethod) {
             case "GET" -> 8;
