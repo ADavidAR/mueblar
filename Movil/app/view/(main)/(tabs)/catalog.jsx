@@ -5,7 +5,7 @@ import ProductsList from "../../../../components/main/ProductsList"
 import SearchModal from "../../../../components/modals/SearchModal"
 import { FiltersProvider } from "../../../../context/FiltersContext"
 
-// CollectionsProvider ya envuelve toda la app desde app/_layout.js
+
 export default function Catalog() {
     const [ showSearchModal, toggleSearchModal ] = useState(false)
     const [ loadKey, setLoadKey ] = useState(0)

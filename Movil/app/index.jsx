@@ -12,7 +12,7 @@ export default function Index() {
   useEffect(() => {
     let active = true
     ;(async () => {
-      const authed = true// await isAuthenticated()
+      const authed = await isAuthenticated()
       if (!active) return
       router.replace(authed ? '/view/catalog' : '/view/login')
     })()

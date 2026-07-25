@@ -12,15 +12,15 @@ export function useFilters() {
     const getFilteredProduucts = useCallback(
         async (page, limit = PRODUCTS_FETCHING.limit) => {
 
-            // const res =   await fetchProducts(
-            //     filters.search,
-            //     limit,
-            //     page,
-            //     filters.categories,
-            //     filters.materials
-            // )
+            const res =   await fetchProducts(
+                filters.search,
+                limit,
+                page,
+                filters.categories,
+                filters.materials
+            )
             
-            const filteredProducts = data.slice(page * PRODUCTS_FETCHING.limit, (page + 1) * PRODUCTS_FETCHING.limit )//await res.json()
+            const filteredProducts = await res.json()
             return filteredProducts
         }, [filters])
 
