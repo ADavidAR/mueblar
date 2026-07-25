@@ -2,7 +2,7 @@ import request from './request'
 
 // ── Productos ──────────────────────────────────────────────────────────────
 
-/*export const getProducts = ({ limit, offset, category } = {}) => {
+export const getProducts = ({ limit, offset, category } = {}) => {
   const params = new URLSearchParams()
   if (limit !== undefined)    params.set('limit', limit)
   if (offset !== undefined)   params.set('offset', offset)
@@ -31,7 +31,7 @@ export const updateProduct = (model, payload) =>
 
 export const deleteProduct = (model) =>
   request(`/api/products/${encodeURIComponent(model)}`, { method: 'DELETE' })
-*/
+
 // ── Tipos de Atributo ──────────────────────────────────────────────────────
 
 export const getAttributeTypes = ({ limit, offset } = {}) => {

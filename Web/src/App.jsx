@@ -1,5 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { AuthProvider } from './context/AuthContext'
+import { BrowserRouter, Routes, Route,Navigate } from 'react-router-dom'
+import { AuthProvider,useAuth } from './context/AuthContext'
 import SiteLayout from './components/layout/SiteLayout'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
@@ -8,6 +8,10 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import PartnersPage from './pages/PartnersPage'
 import DownloadPage from './pages/DownloadPage'
 import ProfilePage from './pages/ProfilePage'
+import AdminInventoryPage from './pages/Admin/AdminInventoryPage'
+
+import CreateAttributeTypePage from './pages/Admin/CreateAttributeTypePage'
+import UpdateAttributeTypePage from './pages/Admin/UpdateAttributeTypePage'
 
 function AdminRoute({ children }) {
   const { user } = useAuth()
@@ -39,22 +43,10 @@ function App() {
             path="/view/inventory"
             element={<AdminRoute><AdminInventoryPage /></AdminRoute>}
           />
-          <Route
-            path="/view/roles-management"
-            element={<AdminRoute><AdminRolesPage /></AdminRoute>}
-          />
-          <Route
-            path="/view/users-management"
-            element={<AdminRoute><AdminUsersPage /></AdminRoute>}
-          />
-          <Route
-            path="/view/categories-management"
-            element={<AdminRoute><AdminCategoriesPage /></AdminRoute>}
-          />
-          <Route
-            path="/view/product-creation"
-            element={<AdminRoute><CreateProductPage /></AdminRoute>}
-          />
+         
+         
+          
+          
           <Route
             path="/view/attribute-type-add"
             element={<AdminRoute><CreateAttributeTypePage /></AdminRoute>}

@@ -5,6 +5,45 @@ const AuthContext = createContext(null)
 
 const USER_KEY = 'auth_user'
 
+function decodeJwt(token) {
+  try {
+    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+    const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4)
+    return JSON.parse(atob(padded))
+  } catch {
+    return {}
+  }
+}
+
+const ADMIN_ROUTES = ['/view/inventory', '/view/roles-management']
+
+const ALL_MODULES = [
+  { path: '/view/inventory',             label: 'Inventario',                to: '/view/inventory' },
+  { path: '/view/roles-management',      label: 'Gestión de Roles',          to: '/view/roles-management' },
+  { path: '/view/users-management',      label: 'Configuración de Usuarios', to: '/view/users-management' },
+  { path: '/view/categories-management', label: 'Categorías',                to: '/view/categories-management' },
+]
+
+
+// Mismos valores de bit que usa tu backend en JwtAuthenticationFilter
+// (el switch de "GET" -> 8, "POST" -> 4, etc.), para que la comparación
+// del lado del frontend coincida exactamente con la del lado del servidor.
+const PERMISSION_BITS = { GET: 8, POST: 4, DELETE: 2, PUT: 1 }
+
+/*
+  Revisa si el mapa de permisos de un usuario tiene el bit necesario
+  para actuar sobre una ruta con un método HTTP específico.
+
+  Ejemplo de uso:
+    hasPermission(user.permissions, '/api/products', 'POST')
+*/
+export function hasPermission(permissions, path, method) {
+  const bits = permissions?.[path]
+  if (bits == null) return false
+  const requiredBit = PERMISSION_BITS[method]
+  return (bits & requiredBit) === requiredBit
+} 
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     if (!getToken()) return null
@@ -18,8 +57,12 @@ export function AuthProvider({ children }) {
   const loading = false
 
   const login = useCallback(async (email, password) => {
-    await loginUser(email, password)
-    const userData = { email }
+    const data = await loginUser(email, password)
+    const payload = decodeJwt(data.token)
+    const permissions = payload.permissions ?? {}
+    const role = ADMIN_ROUTES.some((r) => permissions[r] > 0) ? 'admin' : 'client'
+    const modules = ALL_MODULES.filter(({ path }) => permissions[path] > 0)
+    const userData = { email, role, id: payload.jti, modules,permissions }
     localStorage.setItem(USER_KEY, JSON.stringify(userData))
     setUser(userData)
     return userData
