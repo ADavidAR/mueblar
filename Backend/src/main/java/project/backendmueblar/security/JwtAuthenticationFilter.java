@@ -59,9 +59,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             Map<String, Integer> endpointPatternPermissionMap = jwtService.extractEndpointAndPermission(authHeader.substring(7), urlRequested);
+            System.out.println(endpointPatternPermissionMap);
             if (endpointPatternPermissionMap != null) {
                 if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    if (!urlHasEnoughPermissionsAPI(endpointPatternPermissionMap, urlRequested, httpMethod)) {
+                    if (!urlHasEnoughPermissionsAPI(endpointPatternPermissionMap, httpMethod)) {
                         response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado: No tienes los permisos necesarios para esta acción.");
                         return;
                     }
@@ -75,8 +76,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private boolean urlHasEnoughPermissionsAPI(Map<String, Integer> endpointPermissionMap, String urlRequested, String httpMethod) {
-        Integer permissionsInBits = endpointPermissionMap.get(urlRequested);
+    private boolean urlHasEnoughPermissionsAPI(Map<String, Integer> endpointPermissionMap, String httpMethod) {
+        Integer permissionsInBits = endpointPermissionMap.values().stream().findFirst().orElse(null);
+
+        if(permissionsInBits == null) return false;
+
         int requiredBit = switch (httpMethod) {
             case "GET" -> 8;
             case "POST" -> 4;
