@@ -1,0 +1,41 @@
+name: Deploy Spring Boot to Azure
+
+on:
+  push:
+    branches:
+      - main  # Cambia a master si esa es tu rama principal
+
+env:
+  AZURE_WEBAPP_NAME: 'mueblar-backend' # Pon el NOMBRE EXACTO de tu App Service en Azure
+  JAVA_VERSION: '17'                          # Ajusta tu versión de Java (17, 21, etc.)
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Obtener el código fuente de GitHub
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Configurar Java
+      - name: Set up Java JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'maven'
+          cache-dependancy-path: 'Backend/pom.xml'
+
+      # 3. Compilar el proyecto Java con Maven
+      - name: Build with Maven
+        wordking-directory: ./Backend
+        run: ./mvnw clean package -DskipTests
+
+      # 4. Desplegar el ejecutable .jar en Azure
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: '${{ github.workspace }}/Backend/target/*.jar'
