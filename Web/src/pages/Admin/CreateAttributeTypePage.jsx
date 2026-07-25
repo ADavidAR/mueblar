@@ -65,7 +65,7 @@
           id:id.trim(),
           description:description.trim()
         })
-      console.log(description)
+    
         navigate('/view/inventory')
       } catch (error) {
         setError(error.message)
@@ -73,7 +73,7 @@
       }finally{
         setSaving(false)
       }
-      console.log("hola")
+      
     }
 
     

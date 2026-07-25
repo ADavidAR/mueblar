@@ -116,7 +116,7 @@ export default function AdminInventoryPage() {
     try {
       await deleteAttributeType(id)
       setAttrTypes((prev) => prev.filter((AT) => AT.id !== id))
-      console.log(id)
+      
     } catch (err) {
       console.log (err.message)
     }
