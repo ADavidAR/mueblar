@@ -46,4 +46,10 @@ public class RestControllerUser {
         userService.updateUser(userId, userUpdateRequestDTO);
         return ResponseEntity.status(200).build();
     }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable("id") Long userId) {
+        userService.deleteUser(userId);
+        return ResponseEntity.status(204).build();
+    }
 }

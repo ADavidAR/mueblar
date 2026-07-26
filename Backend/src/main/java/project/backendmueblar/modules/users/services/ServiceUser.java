@@ -171,6 +171,24 @@ public class ServiceUser {
 
         thisUserEntity.setRoleEntity(thisRoleEntity);
         repositoryUser.save(thisUserEntity);
+    }
+
+    @Transactional
+    public void deleteUser(Long userId) {
+        Optional<UserEntity> optionalUser = repositoryUser.findById(userId);
+        if(optionalUser.isEmpty()) {
+            throw new UserIDNotMatchException("User not Exists");
+        }
+
+        if(userId == 1) {
+            throw new RuntimeException("Administrator cannot be deleted");
+        }
+
+        if(optionalUser.get().getRoleEntity().getRoleId() == 2L) {
+            throw new RuntimeException("Las cuentas de Cliente no pueden ser eliminadas desde el panel administrativo.");
+        }
+
+        repositoryUser.delete(optionalUser.get());
 
     }
 }
