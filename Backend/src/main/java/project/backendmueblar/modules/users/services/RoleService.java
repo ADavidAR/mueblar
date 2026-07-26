@@ -2,8 +2,11 @@ package project.backendmueblar.modules.users.services;
 
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.backendmueblar.exception.auth.RoleNotFoundException;
+import project.backendmueblar.exception.catalog.InternalServerException;
 import project.backendmueblar.modules.users.dtos.response.PermissionResponseDTO;
 import project.backendmueblar.modules.users.dtos.response.RoleResponseDTO;
 import project.backendmueblar.modules.users.entities.Module_X_RoleEntity;
@@ -84,5 +87,42 @@ public class RoleService {
         }
         roleResponseDTO.setPermissions(permissionResponseDTOList);
         return roleResponseDTO;
+    }
+
+    // ------------------------------------------------------------------------------------------------------------- //
+
+    public List<RoleResponseDTO> getAllRoles(Integer limit, Integer page, String search){
+        if(limit == 0){
+            throw new InternalServerException("Cannot throw zero Roles");
+        }
+
+        List<RoleEntity> roleEntityList;
+        Pageable pageable = PageRequest.of(page, limit);
+        boolean hasSearch = (search != null && !search.trim().isEmpty());
+
+        if(hasSearch){
+            roleEntityList = repositoryRole.findAllByRoleNameContainingIgnoreCase(search, pageable);
+            List<RoleResponseDTO> roleResponseDTOList = new ArrayList<>();
+
+            for(RoleEntity thisRoleEntity : roleEntityList){
+                RoleResponseDTO thisRoleResponseDTO = getSpecificRole(thisRoleEntity.getRoleId());
+                roleResponseDTOList.add(thisRoleResponseDTO);
+            }
+
+            return roleResponseDTOList;
+        } else {
+            roleEntityList = repositoryRole.findAll(pageable).getContent();
+            List<RoleResponseDTO> roleResponseDTOList = new ArrayList<>();
+
+            for(RoleEntity thisRoleEntity : roleEntityList){
+                RoleResponseDTO thisRoleResponseDTO = getSpecificRole(thisRoleEntity.getRoleId());
+                roleResponseDTOList.add(thisRoleResponseDTO);
+            }
+
+            return roleResponseDTOList;
+        }
+
+
+
     }
 }
