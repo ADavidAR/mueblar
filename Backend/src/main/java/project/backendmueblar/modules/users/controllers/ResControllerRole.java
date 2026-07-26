@@ -1,8 +1,10 @@
 package project.backendmueblar.modules.users.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import project.backendmueblar.modules.users.dtos.request.RoleCreateRequestDTO;
 import project.backendmueblar.modules.users.dtos.response.RoleResponseDTO;
 import project.backendmueblar.modules.users.services.RoleService;
 
@@ -25,5 +27,11 @@ public class ResControllerRole {
                                                              @RequestParam(required = false) String search
     ){
         return ResponseEntity.status(200).body(roleService.getAllRoles(limit, page, search));
+    }
+
+    @PostMapping(consumes = "application/json")
+    public ResponseEntity<?> createRole(@Valid @RequestBody RoleCreateRequestDTO roleCreateRequestDTO){
+        roleService.createRole(roleCreateRequestDTO);
+        return ResponseEntity.status(201).build();
     }
 }

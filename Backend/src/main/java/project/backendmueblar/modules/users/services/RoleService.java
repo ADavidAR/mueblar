@@ -1,5 +1,6 @@
 package project.backendmueblar.modules.users.services;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.PageRequest;
@@ -7,11 +8,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.backendmueblar.exception.auth.RoleNotFoundException;
 import project.backendmueblar.exception.catalog.InternalServerException;
+import project.backendmueblar.exception.catalog.ResourceNotFoundException;
+import project.backendmueblar.modules.users.dtos.request.PermissionCreateRequestDTO;
+import project.backendmueblar.modules.users.dtos.request.RoleCreateRequestDTO;
 import project.backendmueblar.modules.users.dtos.response.PermissionResponseDTO;
 import project.backendmueblar.modules.users.dtos.response.RoleResponseDTO;
+import project.backendmueblar.modules.users.entities.ModuleEntity;
 import project.backendmueblar.modules.users.entities.Module_X_RoleEntity;
 import project.backendmueblar.modules.users.entities.PermissionEntity;
 import project.backendmueblar.modules.users.entities.RoleEntity;
+import project.backendmueblar.modules.users.repositories.RepositoryModule;
 import project.backendmueblar.modules.users.repositories.RepositoryModule_X_Role;
 import project.backendmueblar.modules.users.repositories.RepositoryRole;
 
@@ -25,6 +31,7 @@ import java.util.Optional;
 public class RoleService {
     private final RepositoryRole repositoryRole;
     private final RepositoryModule_X_Role repositoryModule_X_Role;
+    private final RepositoryModule repositoryModule;
 
     private static @NonNull Integer getInteger(Module_X_RoleEntity moduleXRoleEntity) {
         Integer accessBit1;
@@ -121,8 +128,50 @@ public class RoleService {
 
             return roleResponseDTOList;
         }
+    }
 
+    // ------------------------------------------------------------------------------------------------------------- //
 
+    @Transactional
+    public void createRole(RoleCreateRequestDTO roleCreateRequestDTO){
+        RoleEntity roleEntity = new RoleEntity();
+        roleEntity.setRoleName(roleCreateRequestDTO.getName());
+        roleEntity.setEditable(roleCreateRequestDTO.getEditable());
+
+        repositoryRole.save(roleEntity);
+
+        List<PermissionCreateRequestDTO> permissionCreateRequestDTOList = roleCreateRequestDTO.getPermissions();
+        if(permissionCreateRequestDTOList.size() != repositoryModule.count()){
+            throw new InternalServerException("Cannot create role.");
+        }
+
+        List<Module_X_RoleEntity> moduleXRoleEntityList = new ArrayList<>();
+
+        for(PermissionCreateRequestDTO thisPermissionCreateRequestDTO : permissionCreateRequestDTOList){
+            Module_X_RoleEntity thisModuleXRoleEntity = new Module_X_RoleEntity();
+            thisModuleXRoleEntity.setAccess(thisPermissionCreateRequestDTO.getAccess());
+            if(thisPermissionCreateRequestDTO.getAccess() == false){
+                thisModuleXRoleEntity.setCreation(false);
+                thisModuleXRoleEntity.setDeletion(false);
+                thisModuleXRoleEntity.setModification(false);
+            } else {
+                thisModuleXRoleEntity.setCreation(thisPermissionCreateRequestDTO.getCreate());
+                thisModuleXRoleEntity.setDeletion(thisPermissionCreateRequestDTO.getDelete());
+                thisModuleXRoleEntity.setModification(thisPermissionCreateRequestDTO.getModify());
+            }
+
+            Optional<ModuleEntity> optionalModule = repositoryModule.findByModuleId(thisPermissionCreateRequestDTO.getId());
+            if(optionalModule.isEmpty()){
+                throw new ResourceNotFoundException("Module ID was not found");
+            }
+
+            thisModuleXRoleEntity.setModuleEntity(optionalModule.get());
+            thisModuleXRoleEntity.setRoleEntity(roleEntity);
+            moduleXRoleEntityList.add(thisModuleXRoleEntity);
+        }
+
+        repositoryModule_X_Role.saveAll(moduleXRoleEntityList);
 
     }
+
 }
