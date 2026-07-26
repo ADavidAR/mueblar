@@ -1,10 +1,12 @@
 package project.backendmueblar.modules.auth.dtos;
 
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
+import project.backendmueblar.modules.users.dtos.request.RoleSummaryRequestDTO;
 
 @Getter
 @Setter
@@ -31,6 +33,9 @@ public class UserCreateRequestDTO {
     )
     @NotBlank(message = "La contraseña es obligatoria")
     private String password;
+
+    @Valid
+    private RoleSummaryRequestDTO role;
 
 }
 

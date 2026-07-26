@@ -1,8 +1,10 @@
 package project.backendmueblar.modules.users.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import project.backendmueblar.modules.auth.dtos.UserCreateRequestDTO;
 import project.backendmueblar.modules.users.dtos.response.UserSummaryResponseDTO;
 import project.backendmueblar.modules.users.services.ServiceUser;
 
@@ -28,5 +30,11 @@ public class RestControllerUser {
                                                                     @RequestParam(required = false) String lastName
     ) {
         return ResponseEntity.status(200).body(userService.getAllUsers(limit, page, email, firstName, lastName));
+    }
+
+    @PostMapping(consumes = "application/json")
+    public ResponseEntity<?> createUser(@Valid @RequestBody UserCreateRequestDTO userCreateRequestDTO){
+        userService.createUser(userCreateRequestDTO);
+        return ResponseEntity.status(201).build();
     }
 }

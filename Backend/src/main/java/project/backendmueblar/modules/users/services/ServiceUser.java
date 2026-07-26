@@ -3,24 +3,35 @@ package project.backendmueblar.modules.users.services;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import project.backendmueblar.exception.auth.EmailAlreadyExistsException;
+import project.backendmueblar.exception.auth.RoleNotFoundException;
 import project.backendmueblar.exception.auth.UserIDNotMatchException;
 import project.backendmueblar.exception.catalog.InternalServerException;
+import project.backendmueblar.modules.auth.dtos.UserCreateRequestDTO;
 import project.backendmueblar.modules.users.dtos.response.RoleSummaryResponseDTO;
 import project.backendmueblar.modules.users.dtos.response.UserSummaryResponseDTO;
+import project.backendmueblar.modules.users.entities.RoleEntity;
 import project.backendmueblar.modules.users.entities.UserEntity;
+import project.backendmueblar.modules.users.repositories.RepositoryRole;
 import project.backendmueblar.modules.users.repositories.RepositoryUser;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ServiceUser {
     private final RepositoryUser repositoryUser;
+    private final PasswordEncoder passwordEncoder;
+    private final RepositoryRole repositoryRole;
+
 
     private UserSummaryResponseDTO mapToUserSummaryDTO(UserEntity thisUserEntity) {
         UserSummaryResponseDTO dto = new UserSummaryResponseDTO();
@@ -92,5 +103,35 @@ public class ServiceUser {
             userSummaryResponseDTOList.add(mapToUserSummaryDTO(userEntity));
         }
         return userSummaryResponseDTOList;
+    }
+
+    // ------------------------------------------------------------------------------------------------------- //
+
+    public void createUser(UserCreateRequestDTO userCreateRequestDTO){
+        Optional<UserEntity> optionalUserWithEmail = repositoryUser.findByEmail(userCreateRequestDTO.getEmail());
+        if(optionalUserWithEmail.isPresent()) {
+            throw new EmailAlreadyExistsException("Email Already Exists. Cannot create User");
+        }
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setEmail(userCreateRequestDTO.getEmail());
+        userEntity.setFirstName(userCreateRequestDTO.getName());
+        userEntity.setLastName(userCreateRequestDTO.getLastName());
+        userEntity.setEnabled(true);
+        userEntity.setPasswordHash(passwordEncoder.encode(userCreateRequestDTO.getPassword()));
+
+        Optional<RoleEntity> optionalRole = repositoryRole.findByRoleId(userCreateRequestDTO.getRole().getId());
+        if (optionalRole.isEmpty()) {
+            throw new RoleNotFoundException("Role Not Found");
+        }
+
+        RoleEntity thisRoleEntity = optionalRole.get();
+
+        if(thisRoleEntity.getRoleId() == 2) {
+            throw new RuntimeException("Cannot create 'Cliente' User");
+        }
+
+        userEntity.setRoleEntity(thisRoleEntity);
+        repositoryUser.save(userEntity);
     }
 }
