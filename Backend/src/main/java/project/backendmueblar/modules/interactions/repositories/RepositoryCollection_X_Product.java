@@ -11,5 +11,5 @@ import java.util.Optional;
 
 public interface RepositoryCollection_X_Product extends JpaRepository<Collection_X_ProductEntity, CollectionProductId> {
     Optional<Collection_X_ProductEntity> findByProductEntityAndCollectionEntity(ProductEntity productEntity, CollectionEntity collectionEntity);
-    List<ProductEntity> findAllByCollectionEntity(CollectionEntity collectionEntity);
+    List<Collection_X_ProductEntity> findByCollectionEntityIn(List<CollectionEntity> collectionEntity);
 }
