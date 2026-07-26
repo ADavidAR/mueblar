@@ -60,6 +60,7 @@ public class EndpointsCacheComponent {
         endpointsForModuleEntity.add("/api/collections/{id_collections}");
         endpointsForModuleEntity.add("/api/collections/{id_collections}/products/{model}");
         endpointsForModuleEntity.add("/api/auth/role");
+        endpointsForModuleEntity.add("/api/profile");
 
         allEndpointsMapWithToken.put("ApisWithToken", endpointsForModuleEntity);
     }
