@@ -32,4 +32,7 @@ public class RoleEntity {
 
     @OneToMany(mappedBy = "roleEntity")
     private List<Permission_X_RoleEntity> permissionRoleEntities;
+
+    @OneToMany(mappedBy = "roleEntity")
+    private List<Module_X_RoleEntity> moduleXRoleEntityList;
 }
