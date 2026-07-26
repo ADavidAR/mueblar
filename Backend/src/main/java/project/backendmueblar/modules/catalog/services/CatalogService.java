@@ -479,7 +479,7 @@ public class CatalogService {
 
         List<ProductResponseDTO> productResponseDTOList = new ArrayList<>();
         for(ProductEntity thisProductEntity : productEntityList){
-            ProductResponseDTO productResponseDTO = getSpecificProduct(thisProductEntity.getModelName(), true);
+            ProductResponseDTO productResponseDTO = getSpecificProduct(thisProductEntity.getModelName(), false);
             productResponseDTOList.add(productResponseDTO);
         }
         return productResponseDTOList;
@@ -548,7 +548,7 @@ public class CatalogService {
         List<CollectionEntity> collectionEntityList = repositoryCollection.findAllByUserEntity(thisUserEntity);
 
         for(ProductEntity thisProductEntity : productEntityList){
-            ProductResponseDTO productResponseDTO = getSpecificProduct(thisProductEntity.getModelName(), true);
+            ProductResponseDTO productResponseDTO = getSpecificProduct(thisProductEntity.getModelName(), false);
 
             for(CollectionEntity collectionEntity : collectionEntityList) {
                 Optional<Collection_X_ProductEntity> optionalCollectionXProduct = repositoryCollection_X_Product.findByProductEntityAndCollectionEntity(thisProductEntity, collectionEntity);
