@@ -224,4 +224,16 @@ public class RoleService {
         repositoryModule_X_Role.saveAll(moduleXRoleEntityList);
 
     }
+
+    // ------------------------------------------------------------------------------------------------------------- //
+
+    public void deleteRoleSpecific(Long roleId){
+        Optional<RoleEntity> optionalRoleEntity = repositoryRole.findById(roleId);
+        if(optionalRoleEntity.isEmpty()){
+            throw new RoleNotFoundException("Role was not found");
+        }
+
+
+
+    }
 }

@@ -42,4 +42,10 @@ public class ResControllerRole {
         roleService.updateRole(roleId, roleUpdateRequestDTO);
         return ResponseEntity.status(200).build();
     }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<?> deleteRoleSpecific(@PathVariable("id") Long roleId){
+        roleService.deleteRoleSpecific(roleId);
+        return ResponseEntity.status(204).build();
+    }
 }
