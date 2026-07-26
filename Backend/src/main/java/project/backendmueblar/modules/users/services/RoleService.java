@@ -13,10 +13,7 @@ import project.backendmueblar.modules.users.dtos.request.PermissionCreateRequest
 import project.backendmueblar.modules.users.dtos.request.RoleCreateRequestDTO;
 import project.backendmueblar.modules.users.dtos.response.PermissionResponseDTO;
 import project.backendmueblar.modules.users.dtos.response.RoleResponseDTO;
-import project.backendmueblar.modules.users.entities.ModuleEntity;
-import project.backendmueblar.modules.users.entities.Module_X_RoleEntity;
-import project.backendmueblar.modules.users.entities.PermissionEntity;
-import project.backendmueblar.modules.users.entities.RoleEntity;
+import project.backendmueblar.modules.users.entities.*;
 import project.backendmueblar.modules.users.repositories.RepositoryModule;
 import project.backendmueblar.modules.users.repositories.RepositoryModule_X_Role;
 import project.backendmueblar.modules.users.repositories.RepositoryRole;
@@ -226,14 +223,21 @@ public class RoleService {
     }
 
     // ------------------------------------------------------------------------------------------------------------- //
-
+    @Transactional
     public void deleteRoleSpecific(Long roleId){
         Optional<RoleEntity> optionalRoleEntity = repositoryRole.findById(roleId);
         if(optionalRoleEntity.isEmpty()){
             throw new RoleNotFoundException("Role was not found");
         }
 
+        if(optionalRoleEntity.get().getEditable() == false){
+            throw new RuntimeException("Role is not Modifiable. Cannot Delete it");
+        }
 
+        if(!optionalRoleEntity.get().getUserEntity().isEmpty()) {
+            throw new InternalServerException("Cannot delete role. Still exists Users");
+        }
 
+        repositoryRole.delete(optionalRoleEntity.get());
     }
 }

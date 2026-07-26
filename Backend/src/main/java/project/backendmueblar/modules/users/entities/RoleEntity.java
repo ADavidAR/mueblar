@@ -27,12 +27,12 @@ public class RoleEntity {
     @Column(name = "editable", nullable = false)
     private Boolean editable;
 
-    @OneToMany(mappedBy = "roleEntity")
+    @OneToMany(mappedBy = "roleEntity", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<UserEntity> userEntity;
 
     @OneToMany(mappedBy = "roleEntity")
     private List<Permission_X_RoleEntity> permissionRoleEntities;
 
-    @OneToMany(mappedBy = "roleEntity")
+    @OneToMany(mappedBy = "roleEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Module_X_RoleEntity> moduleXRoleEntityList;
 }
