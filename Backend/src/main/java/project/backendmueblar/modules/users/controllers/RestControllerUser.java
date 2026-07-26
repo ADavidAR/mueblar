@@ -2,6 +2,7 @@ package project.backendmueblar.modules.users.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.backendmueblar.modules.auth.dtos.UserCreateRequestDTO;
@@ -36,5 +37,13 @@ public class RestControllerUser {
     public ResponseEntity<?> createUser(@Valid @RequestBody UserCreateRequestDTO userCreateRequestDTO){
         userService.createUser(userCreateRequestDTO);
         return ResponseEntity.status(201).build();
+    }
+
+    @PutMapping(value = "/{id}", consumes = "application/json")
+    public ResponseEntity<?> updateUser(@PathVariable("id") Long userId,
+                                        @Valid @RequestBody UserCreateRequestDTO userUpdateRequestDTO
+    ){
+        userService.updateUser(userId, userUpdateRequestDTO);
+        return ResponseEntity.status(200).build();
     }
 }

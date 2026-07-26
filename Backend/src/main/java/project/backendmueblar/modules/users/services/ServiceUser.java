@@ -1,5 +1,6 @@
 package project.backendmueblar.modules.users.services;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -106,7 +107,7 @@ public class ServiceUser {
     }
 
     // ------------------------------------------------------------------------------------------------------- //
-
+    @Transactional
     public void createUser(UserCreateRequestDTO userCreateRequestDTO){
         Optional<UserEntity> optionalUserWithEmail = repositoryUser.findByEmail(userCreateRequestDTO.getEmail());
         if(optionalUserWithEmail.isPresent()) {
@@ -133,5 +134,43 @@ public class ServiceUser {
 
         userEntity.setRoleEntity(thisRoleEntity);
         repositoryUser.save(userEntity);
+    }
+
+    // ------------------------------------------------------------------------------------------------------- //
+    @Transactional
+    public void updateUser(Long userId, UserCreateRequestDTO userUpdateRequestDTO){
+        Optional<UserEntity> optionalUser = repositoryUser.findById(userId);
+        if(optionalUser.isEmpty()) {
+            throw new UserIDNotMatchException("User not Exists");
+        }
+
+        UserEntity thisUserEntity = optionalUser.get();
+
+        if(thisUserEntity.getRoleEntity().getRoleId() == 2) {
+            throw new RuntimeException("Cannot update 'Cliente' User");
+        }
+        Optional<UserEntity> optionalUserWithEmail = repositoryUser.findByEmail(userUpdateRequestDTO.getEmail());
+        if(optionalUserWithEmail.isPresent() && !optionalUserWithEmail.get().getUserId().equals(thisUserEntity.getUserId())) {
+            throw new EmailAlreadyExistsException("Email Already Exists. Cannot update User");
+        }
+
+        thisUserEntity.setEmail(userUpdateRequestDTO.getEmail());
+        thisUserEntity.setFirstName(userUpdateRequestDTO.getName());
+        thisUserEntity.setLastName(userUpdateRequestDTO.getLastName());
+        thisUserEntity.setPasswordHash(passwordEncoder.encode(userUpdateRequestDTO.getPassword()));
+        thisUserEntity.setEnabled(userUpdateRequestDTO.getEnabled());
+
+        Optional<RoleEntity> optionalRole = repositoryRole.findByRoleId(userUpdateRequestDTO.getRole().getId());
+        if (optionalRole.isEmpty()) {
+            throw new RoleNotFoundException("Role Not Found");
+        }
+        RoleEntity thisRoleEntity = optionalRole.get();
+        if(thisRoleEntity.getRoleId() == 2) {
+            throw new RuntimeException("Cannot update to 'Cliente' User");
+        }
+
+        thisUserEntity.setRoleEntity(thisRoleEntity);
+        repositoryUser.save(thisUserEntity);
+
     }
 }
