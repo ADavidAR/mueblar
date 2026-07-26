@@ -64,7 +64,6 @@ export default function ProfilePage() {
     )
   }
   if (!user) return <Navigate to="/login" replace />
-
   return (
     <div className="mx-auto max-w-[1280px] px-6 pb-24 pt-32 md:px-10">
       <div className="grid gap-10 md:grid-cols-[240px_1fr]">

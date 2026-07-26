@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import Navbar from './Navbar'
 import Footer from './Footer'
+import PageTransition from './PageTransition'
 import { ArrowUp } from '../ui/icons'
 
 function ScrollToTopButton() {
@@ -33,11 +34,15 @@ function ScrollToTopButton() {
 }
 
 export default function SiteLayout() {
+  const { pathname } = useLocation()
+
   return (
     <div className="flex min-h-screen flex-col bg-bg">
       <Navbar />
       <main className="flex-1">
-        <Outlet />
+        <PageTransition pathKey={pathname}>
+          <Outlet />
+        </PageTransition>
       </main>
       <Footer />
       <ScrollToTopButton />
