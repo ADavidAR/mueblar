@@ -76,7 +76,7 @@ public class RoleService {
                  permissionResponseDTO.setCreate(thisModuleXRoleEntity.isCreation());
                  permissionResponseDTO.setDelete(thisModuleXRoleEntity.isDeletion());
                  permissionResponseDTO.setModify(thisModuleXRoleEntity.isModification());
-                 permissionResponseDTO.setId(permissionEntity.getPermissionId());
+                 permissionResponseDTO.setId(thisModuleXRoleEntity.getModuleEntity().getModuleId());
                  permissionResponseDTO.setEndpoint(permissionEntity.getEndpointUrl());
                  permissionResponseDTO.setDescription(thisModuleXRoleEntity.getModuleEntity().getDescription());
                  permissionResponseDTOList.add(permissionResponseDTO);
