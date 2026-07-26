@@ -174,4 +174,54 @@ public class RoleService {
 
     }
 
+    // ------------------------------------------------------------------------------------------------------------- //
+    @Transactional
+    public void updateRole(Long roleId, RoleCreateRequestDTO roleUpdateRequestDTO){
+        Optional<RoleEntity> optionalRoleEntity = repositoryRole.findById(roleId);
+        if(optionalRoleEntity.isEmpty()){
+            throw new ResourceNotFoundException("Role was not found");
+        }
+
+        RoleEntity thisRoleEntity = optionalRoleEntity.get();
+        if(thisRoleEntity.getEditable() == false){
+            throw new RuntimeException("Role is not Modifiable");
+        }
+
+        thisRoleEntity.setEditable(roleUpdateRequestDTO.getEditable());
+        thisRoleEntity.setRoleName(roleUpdateRequestDTO.getName());
+
+        repositoryRole.save(thisRoleEntity);
+
+        List<PermissionCreateRequestDTO> permissionCreateRequestDTOList = roleUpdateRequestDTO.getPermissions();
+        if(permissionCreateRequestDTOList.size() != repositoryModule.count()){
+            throw new InternalServerException("Cannot update role.");
+        }
+
+        List<Module_X_RoleEntity> moduleXRoleEntityList = new ArrayList<>();
+
+        for(PermissionCreateRequestDTO thisPermissionCreateRequestDTO : permissionCreateRequestDTOList){
+
+            Optional<Module_X_RoleEntity> optionalModuleXRole = repositoryModule_X_Role.findByRoleEntityAndModuleEntity_ModuleId(thisRoleEntity, thisPermissionCreateRequestDTO.getId());
+            if(optionalModuleXRole.isEmpty()){
+                throw new ResourceNotFoundException("Module was not found");
+            }
+
+            Module_X_RoleEntity thisModuleXRoleEntity = optionalModuleXRole.get();
+
+            thisModuleXRoleEntity.setAccess(thisPermissionCreateRequestDTO.getAccess());
+            if(thisPermissionCreateRequestDTO.getAccess() == false){
+                thisModuleXRoleEntity.setCreation(false);
+                thisModuleXRoleEntity.setDeletion(false);
+                thisModuleXRoleEntity.setModification(false);
+            } else {
+                thisModuleXRoleEntity.setCreation(thisPermissionCreateRequestDTO.getCreate());
+                thisModuleXRoleEntity.setDeletion(thisPermissionCreateRequestDTO.getDelete());
+                thisModuleXRoleEntity.setModification(thisPermissionCreateRequestDTO.getModify());
+            }
+            moduleXRoleEntityList.add(thisModuleXRoleEntity);
+        }
+
+        repositoryModule_X_Role.saveAll(moduleXRoleEntityList);
+
+    }
 }

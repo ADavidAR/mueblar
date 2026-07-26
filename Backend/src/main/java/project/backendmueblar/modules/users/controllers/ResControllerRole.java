@@ -34,4 +34,12 @@ public class ResControllerRole {
         roleService.createRole(roleCreateRequestDTO);
         return ResponseEntity.status(201).build();
     }
+
+    @PutMapping(value = "/{id}", consumes = "application/json")
+    public ResponseEntity<?> updateRole(@PathVariable("id") Long roleId,
+                                        @Valid @RequestBody RoleCreateRequestDTO roleUpdateRequestDTO
+    ){
+        roleService.updateRole(roleId, roleUpdateRequestDTO);
+        return ResponseEntity.status(200).build();
+    }
 }
