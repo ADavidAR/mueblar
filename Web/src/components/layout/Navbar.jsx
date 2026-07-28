@@ -1,7 +1,7 @@
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import Logo from './Logo'
 import Button from '../ui/Button'
-import { User, LogOut } from '../ui/icons'
+import { User, LogOut, Shield } from '../ui/icons'
 import { useAuth } from '../../context/AuthContext'
 
 /*
@@ -13,9 +13,9 @@ import { useAuth } from '../../context/AuthContext'
 */
 
 const NAV_LINKS = [
-  { label: 'Inicio', to: '/' },
-  { label: 'Colecciones', to: '/colecciones' },
-  { label: 'Nosotros', to: '/nosotros' },
+  { label: 'Inicio', to: '/view/main-view' },
+  { label: 'Catalogo', to: '/view/catalog' },
+  { label: 'Nosotros', to: '/view/about-us' },
 ]
 
 function navLinkClass({ isActive }) {
@@ -32,7 +32,7 @@ function GuestActions() {
       <Button to="/login" variant="outline" size="sm">
         Iniciar Sesión
       </Button>
-      <Button to="/register" variant="orange" size="sm">
+      <Button to="/view/sign-up" variant="orange" size="sm">
         Registrarse
       </Button>
     </>
@@ -47,7 +47,13 @@ function UserActions({ user, onLogout }) {
 
   return (
     <>
-      <Button to="/perfil" variant="outline" size="sm" aria-label="Ir a mi perfil">
+      {user?.role === 'admin' && (
+        <Button to="/view/dashboard" variant="outline" size="sm">
+          <Shield className="h-3.5 w-3.5" />
+          Portal Admin
+        </Button>
+      )}
+      <Button to="/view/client-profile" variant="outline" size="sm" aria-label="Ir a mi perfil">
         <span className="flex h-5 w-5 items-center justify-center rounded-full bg-copper/30 text-[10px] font-semibold text-copper-light">
           {initials || <User className="h-3 w-3" />}
         </span>
@@ -61,18 +67,18 @@ function UserActions({ user, onLogout }) {
   )
 }
 
-const AUTH_ROUTES = ['/login', '/register', '/forgot-password']
+const AUTH_ROUTES = ['/login', '/view/sign-up', '/view/forgot-password']
 
 export default function Navbar() {
   const { isAuthenticated, user, logout } = useAuth()
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const hideNav =
-    AUTH_ROUTES.includes(pathname) || pathname.startsWith('/reset-password')
+    AUTH_ROUTES.includes(pathname) || pathname.startsWith('/view/reset-password')
 
   function handleLogout() {
     logout() // limpia estado + borra token
-    navigate('/') // redirige al inicio
+    navigate('/view/main-view')
   }
 
   return (
@@ -94,7 +100,7 @@ export default function Navbar() {
 
         <div className="flex items-center gap-2.5">
           <Button
-            to="/descargar"
+            to="/view/download"
             variant="outline"
             size="sm"
             className="hidden lg:inline-flex"

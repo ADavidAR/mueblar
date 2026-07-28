@@ -1,36 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL ?? ''
-
-async function request(path, options = {}) {
-  const { skipAuth = false, ...fetchOptions } = options
-  const token = !skipAuth ? localStorage.getItem('token') : null
-
-  const res = await fetch(`${BASE_URL}${path}`, {
-    ...fetchOptions,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...fetchOptions.headers
-    }
-  })
-
-  if (!res.ok) {
-    const text = await res.text()
-    let message = `Error ${res.status}`
-    try {
-      const parsed = JSON.parse(text)
-      message = parsed?.message ?? parsed?.errors?.[0]?.message ?? message
-    } catch {
-      message = text || message
-    }
-    const err = new Error(message)
-    err.status = res.status
-    throw err
-  }
-
-  const text = await res.text()
-  if (!text) return null
-  try { return JSON.parse(text) } catch { return text }
-}
+import request from './request'
 
 export const getToken = () => localStorage.getItem('token')
 
@@ -64,9 +32,46 @@ export const recoveryEmail = (email) =>
     body: JSON.stringify({ email })
   })
 
-export const resetPassword = (email, password) =>
+export const resetPassword = (id, password, tokenReset) =>
   request('/api/auth/reset-password', {
     skipAuth: true,
     method: 'POST',
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ id, password, tokenReset })
   })
+
+/*
+  Verifica en el backend si el token de recuperación es válido y no expiró.
+  GET /api/auth/token-verification/{token} → 200 OK | 401 | 404.
+  Lanza un error (con .status) si el token no es válido.
+*/
+export const verifyToken = (token) =>
+  request(`/api/auth/token-verification/${token}`, { skipAuth: true })
+
+export const getCurrentUser = () => request('/api/profile')
+
+// El backend decodifica el token y devuelve { "<roleId>": "<roleName>" }.
+export const getRoleFromToken = async () => {
+  const map = await request('/api/auth/role', { method: 'POST' })
+  const [roleId] = Object.keys(map)
+  return { roleId: Number(roleId), roleName: map[roleId] }
+}
+
+export const getPermitsForUrl = async (url) => {
+  const { permits } = await request('/api/auth/permits', {
+    skipAuth: false,
+    method: 'POST',
+    body: JSON.stringify({ url }),
+  })
+  return {
+    access: Boolean(permits & 8),
+    create: Boolean(permits & 4),
+    delete: Boolean(permits & 2),
+    modify: Boolean(permits & 1),
+  }
+}
+
+export const updateProfile = (payload) =>
+  request('/api/profile', {
+    method: 'PUT',
+    body: JSON.stringify(payload)
+  })  

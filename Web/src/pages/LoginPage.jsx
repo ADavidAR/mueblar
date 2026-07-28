@@ -31,8 +31,8 @@ export default function LoginPage() {
 
     setErrors({})
     try {
-      await login(email, password)
-      navigate('/')
+      const userData = await login(email, password)
+      navigate(userData.role === 'admin' ? '/view/dashboard' : '/view/main-view')
     } catch (err) {
       const status = err.status
       if (status === 401 || status === 400) setErrors({ server: 'Correo o contraseña incorrectos.' })
@@ -73,7 +73,7 @@ export default function LoginPage() {
           />
 
           <Link
-            to="/forgot-password"
+            to="/view/forgot-password"
             className="block text-sm italic text-muted transition-colors hover:text-copper-light"
           >
             ¿Olvidaste tu contraseña?
@@ -93,7 +93,7 @@ export default function LoginPage() {
         <div className="mt-8 border-t border-line pt-6 text-center text-sm text-muted">
           ¿No tienes una cuenta?{' '}
           <Link
-            to="/register"
+            to="/view/sign-up"
             className="text-copper-light underline underline-offset-4 hover:text-copper"
           >
             Crear una cuenta

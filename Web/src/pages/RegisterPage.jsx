@@ -53,7 +53,7 @@ export default function RegisterPage() {
     try {
       await registerUser(name, lastName, email, password)
       await login(email, password)
-      navigate('/')
+      navigate('/view/main-view')
     } catch (err) {
       const status = err.status
       if (status === 409) setErrors({ server: 'Ya existe una cuenta con ese correo.' })
@@ -137,6 +137,7 @@ export default function RegisterPage() {
           ¿Ya tienes cuenta?{' '}
           <Link
             to="/login"
+
             className="text-copper-light underline underline-offset-4 hover:text-copper"
           >
             Inicia sesión

@@ -6,6 +6,7 @@ import { Eye, EyeOff } from './icons'
   variant:
     - "box": input con relleno y borde redondeado (Login / Registro).
     - "underline": sólo borde inferior (Recuperar contraseña).
+  Los campos de tipo password muestran un botón para ver/ocultar el texto.
   Mantiene el control en el padre vía value/onChange (componente controlado).
 */
 
