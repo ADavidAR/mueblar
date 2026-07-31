@@ -29,10 +29,12 @@ public class ServiceUser {
         userSummaryResponseDTO.setId(thisUserEntity.getUserId());
         userSummaryResponseDTO.setApellido(thisUserEntity.getLastName());
         userSummaryResponseDTO.setNombre(thisUserEntity.getFirstName());
+        userSummaryResponseDTO.setEnabled(thisUserEntity.getEnabled());
 
         RoleSummaryResponseDTO roleSummaryResponseDTO = new RoleSummaryResponseDTO();
         roleSummaryResponseDTO.setId(thisUserEntity.getRoleEntity().getRoleId());
         roleSummaryResponseDTO.setName(thisUserEntity.getRoleEntity().getRoleName());
+        roleSummaryResponseDTO.setEditable(thisUserEntity.getRoleEntity().getEditable());
 
         userSummaryResponseDTO.setRole(roleSummaryResponseDTO);
         return userSummaryResponseDTO;
