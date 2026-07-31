@@ -11,5 +11,7 @@ public class UserSummaryResponseDTO {
     private String email;
     private Long id;
     private String nombre;
+    private boolean enabled;
+    
     private RoleSummaryResponseDTO role;
 }
