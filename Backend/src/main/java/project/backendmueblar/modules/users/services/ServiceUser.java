@@ -39,10 +39,12 @@ public class ServiceUser {
         dto.setId(thisUserEntity.getUserId());
         dto.setApellido(thisUserEntity.getLastName());
         dto.setNombre(thisUserEntity.getFirstName());
+        dto.setEnabled(thisUserEntity.getEnabled());
 
         RoleSummaryResponseDTO roleDTO = new RoleSummaryResponseDTO();
         roleDTO.setId(thisUserEntity.getRoleEntity().getRoleId());
         roleDTO.setName(thisUserEntity.getRoleEntity().getRoleName());
+        roleDTO.setEditable(thisUserEntity.getRoleEntity().getEditable());
 
         dto.setRole(roleDTO);
         return dto;

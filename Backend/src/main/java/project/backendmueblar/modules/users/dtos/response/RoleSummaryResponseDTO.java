@@ -9,4 +9,5 @@ import lombok.Setter;
 public class RoleSummaryResponseDTO {
     private Long id;
     private String name;
+    private boolean editable;
 }
