@@ -28,9 +28,6 @@ public class LogsEntity {
     @Column(name = "tabla_nombre", nullable = false)
     private String tableName;
 
-    @Column(name = "operacion", nullable = false)
-    private String operation;
-
     @Column(name = "registro_id", nullable = false)
     private String externalRegisterId;
 
@@ -48,4 +45,8 @@ public class LogsEntity {
     @JoinColumn(name = "id_usuario", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity userEntity;
+
+    @JoinColumn(name = "id_operacion", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private OperationTypeEntity operationTypeEntity;
 }
