@@ -1,5 +1,6 @@
 package project.backendmueblar.modules.catalog.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,6 +25,7 @@ public class AttributeTypeEntity {
     @Column(name = "descripcion", nullable = true)
     private String description;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "attributeTypeEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AttributeEntity> attributeEntities;
 }

@@ -1,5 +1,6 @@
-package project.backendmueblar.modules.logEntry;
+package project.backendmueblar.modules.logEntry.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,6 +25,7 @@ public class OperationTypeEntity {
     @Column(name = "nombre_operacion")
     private String operationTypeName;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "operationTypeEntity", fetch = FetchType.LAZY)
     private List<LogsEntity> logsEntityList;
 }

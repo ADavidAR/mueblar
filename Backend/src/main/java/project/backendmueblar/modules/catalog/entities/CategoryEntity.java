@@ -1,5 +1,6 @@
 package project.backendmueblar.modules.catalog.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,6 +25,7 @@ public class CategoryEntity {
     @Column(name = "nombre_categoria", nullable = false)
     private String categoryName;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "categoryEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product_X_CategoryEntity> productCategories;
 

@@ -24,20 +24,20 @@ public class RestControllerAttributesType {
     }
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<?> createAttributeType(@Valid @RequestBody AttributeTypeCreateRequestDTO attributeTypeCreateDTO) {
-        attributeTypeService.createAttributeType(attributeTypeCreateDTO);
+    public ResponseEntity<?> createAttributeType(@RequestHeader("Authorization") String authHeader, @Valid @RequestBody AttributeTypeCreateRequestDTO attributeTypeCreateDTO) {
+        attributeTypeService.createAttributeType(authHeader, attributeTypeCreateDTO);
         return ResponseEntity.status(201).build();
     }
 
     @DeleteMapping(value = "/{id_tipo_atributo}")
-    public ResponseEntity<?> deleteAttributeType(@PathVariable("id_tipo_atributo") String attributeTypeId){
-        attributeTypeService.deleteAttributeType(attributeTypeId);
+    public ResponseEntity<?> deleteAttributeType(@RequestHeader("Authorization") String authHeader, @PathVariable("id_tipo_atributo") String attributeTypeId){
+        attributeTypeService.deleteAttributeType(authHeader, attributeTypeId);
         return ResponseEntity.status(204).build();
     }
 
     @PutMapping(value = "/{id_tipo_atributo}", consumes = "application/json")
-    public ResponseEntity<?> updateAttributeType(@PathVariable("id_tipo_atributo") String attributeTypeId, @Valid @RequestBody AttributeTypeCreateRequestDTO attributeTypeUpdateDTO) {
-        attributeTypeService.updateAttributeType(attributeTypeId, attributeTypeUpdateDTO);
+    public ResponseEntity<?> updateAttributeType(@RequestHeader("Authorization") String authHeader, @PathVariable("id_tipo_atributo") String attributeTypeId, @Valid @RequestBody AttributeTypeCreateRequestDTO attributeTypeUpdateDTO) {
+        attributeTypeService.updateAttributeType(authHeader, attributeTypeId, attributeTypeUpdateDTO);
         return ResponseEntity.status(200).build();
     }
 

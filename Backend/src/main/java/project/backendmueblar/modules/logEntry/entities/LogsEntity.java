@@ -1,4 +1,4 @@
-package project.backendmueblar.modules.logEntry;
+package project.backendmueblar.modules.logEntry.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -28,15 +28,12 @@ public class LogsEntity {
     @Column(name = "tabla_nombre", nullable = false)
     private String tableName;
 
-    @Column(name = "registro_id", nullable = false)
-    private String externalRegisterId;
-
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "volor_anterior", columnDefinition = "jsonb", nullable = false)
+    @Column(name = "valor_anterior", columnDefinition = "jsonb")
     private Map<String, Object> previousValues;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "valor_nuevo", columnDefinition = "jsonb", nullable = false)
+    @Column(name = "valor_nuevo", columnDefinition = "jsonb")
     private Map<String, Object> newValues;
 
     @Column(name = "creado_at", nullable = false)

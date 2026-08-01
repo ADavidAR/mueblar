@@ -24,12 +24,10 @@ public class Product_X_CategoryEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_producto", nullable = false)
     @MapsId("productId")
-//    @OnDelete(action = OnDeleteAction.CASCADE)
     private ProductEntity productEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_categoria", nullable = false)
     @MapsId("categoryId")
-//    @OnDelete(action = OnDeleteAction.CASCADE)
     private CategoryEntity categoryEntity;
 }

@@ -1,5 +1,6 @@
 package project.backendmueblar.modules.users.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
@@ -8,8 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import project.backendmueblar.modules.auth.entities.RecoveryTokenEntity;
 import project.backendmueblar.modules.interactions.entities.CollectionEntity;
-import project.backendmueblar.modules.interactions.entities.VisualizationMetricsEntity;
-import project.backendmueblar.modules.logEntry.LogsEntity;
+import project.backendmueblar.modules.logEntry.entities.LogsEntity;
 
 import java.util.List;
 
@@ -45,15 +45,15 @@ public class UserEntity {
     @JoinColumn(name = "id_rol", nullable = false)
     private RoleEntity roleEntity;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RecoveryTokenEntity> recoveryTokens;
 
-    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<VisualizationMetricsEntity> visualizationMetricsEntities;
-
+    @JsonIgnore
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CollectionEntity> collectionEntities;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LogsEntity> logsEntities;
 }

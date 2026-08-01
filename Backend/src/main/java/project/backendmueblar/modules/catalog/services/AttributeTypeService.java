@@ -1,26 +1,59 @@
 package project.backendmueblar.modules.catalog.services;
 
+import jakarta.persistence.Table;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import project.backendmueblar.exception.auth.UserIDNotMatchException;
 import project.backendmueblar.exception.catalog.ResourceAlreadyExistsException;
 import project.backendmueblar.exception.catalog.ResourceNotFoundException;
+import project.backendmueblar.modules.auth.services.JwtService;
 import project.backendmueblar.modules.catalog.dtos.request.AttributeTypeCreateRequestDTO;
 import project.backendmueblar.modules.catalog.dtos.response.AttributeTypeResponseDTO;
 import project.backendmueblar.modules.catalog.entities.AttributeEntity;
 import project.backendmueblar.modules.catalog.entities.AttributeTypeEntity;
 import project.backendmueblar.modules.catalog.repositories.RepositoryAttributeType;
+import project.backendmueblar.modules.logEntry.services.LogService;
+import project.backendmueblar.modules.users.entities.UserEntity;
+import project.backendmueblar.modules.users.repositories.RepositoryUser;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class AttributeTypeService {
     private final RepositoryAttributeType repositoryAttributeType;
+
+    private final LogService logService;
+    private final ObjectMapper objectMapper;
+    private final JwtService jwtService;
+    private final RepositoryUser userRepository;
+
+    private String tableNameFromEntity(Object entity){
+        Class<?> entityClass = entity.getClass();
+        Table tableAnnotation = entityClass.getAnnotation(Table.class);
+
+        if (tableAnnotation != null && !tableAnnotation.name().isEmpty()) {
+            return tableAnnotation.name();
+        }
+        return entityClass.getSimpleName().toLowerCase();
+    }
+
+    private Optional<UserEntity> existsUserWithToken(String authHeader) {
+        String uniqueEmailForUser = jwtService.extractEmail(authHeader);
+        Optional<UserEntity> optionalUser = userRepository.findByEmail(uniqueEmailForUser);
+        if (optionalUser.isEmpty()) {
+            throw new UserIDNotMatchException("User not Found, Cannot create or access to Collection");
+        }
+        return optionalUser;
+    }
 
     public AttributeTypeResponseDTO getSpecificAttributeType(String attributeTypeId) {
         Optional<AttributeTypeEntity> optionalAttributeType = repositoryAttributeType.findByAttributeTypeId(attributeTypeId);
@@ -38,7 +71,8 @@ public class AttributeTypeService {
     // ----------------------------------------------------------------------------------------------------------------------------------------//
 
     @Transactional
-    public void createAttributeType(AttributeTypeCreateRequestDTO attributeTypeCreateRequestDTO) {
+    public void createAttributeType(String authHeader, AttributeTypeCreateRequestDTO attributeTypeCreateRequestDTO) {
+        UserEntity thisUserEntity =  existsUserWithToken(authHeader).get();
 
         Optional<AttributeTypeEntity> optionalAttributeType = repositoryAttributeType.findByAttributeTypeId(attributeTypeCreateRequestDTO.getId());
         if(optionalAttributeType.isPresent()) {
@@ -49,12 +83,16 @@ public class AttributeTypeService {
         attributeTypeEntity.setDescription(attributeTypeCreateRequestDTO.getDescription());
         attributeTypeEntity.setAttributeTypeId(attributeTypeCreateRequestDTO.getId());
         repositoryAttributeType.save(attributeTypeEntity);
+        logService.logEntryDataBase(tableNameFromEntity(attributeTypeEntity), thisUserEntity.getUserId(), objectMapper.convertValue(attributeTypeEntity, new TypeReference<Map<String, Object>>() {}), null, 1);
+
     }
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
 
     @Transactional
-    public void deleteAttributeType(String attributeTypeId) {
+    public void deleteAttributeType(String authHeader, String attributeTypeId) {
+        UserEntity thisUserEntity =  existsUserWithToken(authHeader).get();
+
         Optional<AttributeTypeEntity> optionalAttributeType = repositoryAttributeType.findByAttributeTypeId(attributeTypeId);
         if(optionalAttributeType.isEmpty()) {
             throw new ResourceNotFoundException("AttributeType not found");
@@ -67,13 +105,15 @@ public class AttributeTypeService {
         }
 
         repositoryAttributeType.delete(thisAttributeTypeEntity);
-
+        logService.logEntryDataBase(tableNameFromEntity(thisAttributeTypeEntity), thisUserEntity.getUserId(), null, objectMapper.convertValue(thisAttributeTypeEntity, new TypeReference<Map<String, Object>>() {}), 3);
     }
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
 
     @Transactional
-    public void updateAttributeType(String attributeTypeId, AttributeTypeCreateRequestDTO attributeTypeUpdateRequestDTO) {
+    public void updateAttributeType(String authHeader, String attributeTypeId, AttributeTypeCreateRequestDTO attributeTypeUpdateRequestDTO) {
+        UserEntity thisUserEntity =  existsUserWithToken(authHeader).get();
+
         Optional<AttributeTypeEntity> optionalAttributeType = repositoryAttributeType.findByAttributeTypeId(attributeTypeId);
         if(optionalAttributeType.isEmpty()) {
             throw new ResourceNotFoundException("AttributeType not found");
@@ -103,6 +143,7 @@ public class AttributeTypeService {
 
         repositoryAttributeType.delete(thisAttributeTypeEntity);
         repositoryAttributeType.save(attributeTypeEntity);
+        logService.logEntryDataBase(tableNameFromEntity(attributeTypeEntity), thisUserEntity.getUserId(), objectMapper.convertValue(attributeTypeEntity, new TypeReference<Map<String, Object>>() {}), objectMapper.convertValue(thisAttributeTypeEntity, new TypeReference<Map<String, Object>>() {}), 2);
     }
 
     public List<AttributeTypeResponseDTO> getAllAttributesTypes(Integer limit, Integer page){

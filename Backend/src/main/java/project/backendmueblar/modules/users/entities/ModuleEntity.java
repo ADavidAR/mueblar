@@ -1,5 +1,6 @@
 package project.backendmueblar.modules.users.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,9 +25,11 @@ public class ModuleEntity {
     @Column(name = "descripcion", nullable = true)
     private String description;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "moduleEntity", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<PermissionEntity> permissionEntityList;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "moduleEntity", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Module_X_RoleEntity> moduleXRoleEntityList;
 }

@@ -20,20 +20,20 @@ public class RestControllerAttributes {
     private final AttributeService attributeService;
 
     @PostMapping(value = "/attribute", consumes = "application/json")
-    public ResponseEntity<?> createAttribute(@Valid @RequestBody AttributeCreateRequestDTO attributeCreateRequestDTO) {
-        attributeService.createAttribute(attributeCreateRequestDTO);
+    public ResponseEntity<?> createAttribute(@RequestHeader("Authorization") String authHeader, @Valid @RequestBody AttributeCreateRequestDTO attributeCreateRequestDTO) {
+        attributeService.createAttribute(authHeader, attributeCreateRequestDTO);
         return ResponseEntity.status(201).build();
     }
 
     @PutMapping(value = "/attributes/{id_atributo}", consumes = "application/json")
-    public ResponseEntity<?> updateAttribute(@PathVariable ("id_atributo") String attributeId, @Valid @RequestBody AttributeCreateRequestDTO attributeUpdateRequestDTO){
-        attributeService.updateAttribute(attributeId, attributeUpdateRequestDTO);
+    public ResponseEntity<?> updateAttribute(@RequestHeader("Authorization") String authHeader, @PathVariable ("id_atributo") String attributeId, @Valid @RequestBody AttributeCreateRequestDTO attributeUpdateRequestDTO){
+        attributeService.updateAttribute(authHeader, attributeId, attributeUpdateRequestDTO);
         return ResponseEntity.status(200).build();
     }
 
     @DeleteMapping(value = "/attributes/{id_atributo}")
-    public ResponseEntity<?> deleteAttribute(@PathVariable ("id_atributo") String attributeId){
-        attributeService.deleteAttribute(attributeId);
+    public ResponseEntity<?> deleteAttribute(@RequestHeader("Authorization") String authHeader, @PathVariable ("id_atributo") String attributeId){
+        attributeService.deleteAttribute(authHeader, attributeId);
         return ResponseEntity.status(204).build();
     }
 

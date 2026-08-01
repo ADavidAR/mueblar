@@ -1,5 +1,6 @@
 package project.backendmueblar.modules.users.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,6 +25,7 @@ public class PermissionEntity {
     @Column(name = "endpoint_url", nullable = false)
     private String endpointUrl;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "permissionEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Permission_X_RoleEntity> permissionEntities;
 

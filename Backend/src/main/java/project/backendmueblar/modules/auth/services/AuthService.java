@@ -1,5 +1,6 @@
 package project.backendmueblar.modules.auth.services;
 
+import jakarta.persistence.Table;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
@@ -11,11 +12,14 @@ import project.backendmueblar.modules.auth.EndpointsCacheComponent;
 import project.backendmueblar.modules.auth.dtos.*;
 import project.backendmueblar.modules.auth.repositories.RepositoryRecoveryToken;
 import project.backendmueblar.modules.auth.entities.RecoveryTokenEntity;
+import project.backendmueblar.modules.logEntry.services.LogService;
 import project.backendmueblar.modules.users.entities.ModuleEntity;
 import project.backendmueblar.modules.users.entities.Module_X_RoleEntity;
 import project.backendmueblar.modules.users.entities.RoleEntity;
 import project.backendmueblar.modules.users.entities.UserEntity;
 import project.backendmueblar.modules.users.repositories.*;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
@@ -35,8 +39,21 @@ public class AuthService {
 
     private final EndpointsCacheComponent endpointsCacheComponent;
 
+    private final LogService logService;
+    private final ObjectMapper objectMapper;
+
     @Value("${EXPIRATION_TIME_RECOVERY_TOKEN}")
     private long expirationTimeRecoveryToken;
+
+    private String tableNameFromEntity(Object entity){
+        Class<?> entityClass = entity.getClass();
+        Table tableAnnotation = entityClass.getAnnotation(Table.class);
+
+        if (tableAnnotation != null && !tableAnnotation.name().isEmpty()) {
+            return tableAnnotation.name();
+        }
+        return entityClass.getSimpleName().toLowerCase();
+    }
 
     @Transactional
     public void registerUser(@NonNull UserCreateRequestDTO userCreateRequestDTO){
@@ -61,6 +78,8 @@ public class AuthService {
         userEntity.setEnabled(true);
         userEntity.setRoleEntity(roleEntity.get());
         repositoryUser.save(userEntity);
+
+        logService.logEntryDataBase(tableNameFromEntity(userEntity), userEntity.getUserId(), objectMapper.convertValue(userEntity, new TypeReference<Map<String, Object>>() {}), null, 1);
     }
 
     public String authenticationUser(UserAuthRequestDTO userAuthRequestDTO, Long expirationTime){
@@ -114,6 +133,7 @@ public class AuthService {
 
         repositoryRecoveryToken.save(recoveryTokenEntity);
         emailService.sendRecoveryEmail(user.getEmail(), recoveryTokenEntity.getToken(), user.getUserId().toString());
+        logService.logEntryDataBase(tableNameFromEntity(recoveryTokenEntity), user.getUserId(), objectMapper.convertValue(recoveryTokenEntity, new TypeReference<Map<String, Object>>() {}), null, 1);
     }
 
     @Transactional
@@ -137,6 +157,7 @@ public class AuthService {
 
         userEntity.setPasswordHash(passwordEncoder.encode(resetPasswordRequestDTO.getPassword()));
         repositoryRecoveryToken.delete(recoveryTokenEntity);
+        logService.logEntryDataBase(tableNameFromEntity(recoveryTokenEntity), userEntity.getUserId(), null, objectMapper.convertValue(recoveryTokenEntity, new TypeReference<Map<String, Object>>() {}), 3);
     }
 
     public void getTokenVerification(String verificationToken) {

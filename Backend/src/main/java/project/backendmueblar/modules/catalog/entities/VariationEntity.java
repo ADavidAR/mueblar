@@ -1,5 +1,6 @@
 package project.backendmueblar.modules.catalog.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import project.backendmueblar.modules.interactions.entities.VisualizationMetricsEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -47,12 +47,11 @@ public class VariationEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private ProductEntity productEntity;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "variationEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ThumbnailEntity> thumbnailEntities;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "variationEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Attribute_X_VariationEntity> attributeXVariationEntities;
-
-    @OneToMany(mappedBy = "variationEntity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<VisualizationMetricsEntity> visualizationMetricsEntities;
 }

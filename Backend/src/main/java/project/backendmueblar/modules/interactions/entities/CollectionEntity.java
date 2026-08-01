@@ -1,5 +1,6 @@
 package project.backendmueblar.modules.interactions.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,6 +33,7 @@ public class CollectionEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity userEntity;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "collectionEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Collection_X_ProductEntity> collectionXProductEntityList;
 }

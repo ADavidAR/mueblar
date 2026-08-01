@@ -1,5 +1,6 @@
 package project.backendmueblar.modules.catalog.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,9 +25,11 @@ public class AttributeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private AttributeTypeEntity attributeTypeEntity;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "attributeEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Attribute_X_ProductEntity> attributeXProductEntities;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "attributeEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Attribute_X_VariationEntity> attributeXVariationEntities;
 }

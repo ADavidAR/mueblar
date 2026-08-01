@@ -1,5 +1,6 @@
 package project.backendmueblar.modules.catalog.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,15 +35,19 @@ public class ProductEntity {
     @Column(name = "habilitado", nullable = false)
     private Boolean enabled;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VariationEntity> variationEntityList;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product_X_CategoryEntity> productXCategoryEntityList;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Collection_X_ProductEntity> collectionXProductEntityList;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Attribute_X_ProductEntity> attributeXProductEntities;
 }

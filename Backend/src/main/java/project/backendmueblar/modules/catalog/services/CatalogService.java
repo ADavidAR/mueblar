@@ -1,5 +1,6 @@
 package project.backendmueblar.modules.catalog.services;
 
+import jakarta.persistence.Table;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -26,8 +27,11 @@ import project.backendmueblar.modules.interactions.entities.CollectionEntity;
 import project.backendmueblar.modules.interactions.entities.Collection_X_ProductEntity;
 import project.backendmueblar.modules.interactions.repositories.RepositoryCollection;
 import project.backendmueblar.modules.interactions.repositories.RepositoryCollection_X_Product;
+import project.backendmueblar.modules.logEntry.services.LogService;
 import project.backendmueblar.modules.users.entities.UserEntity;
 import project.backendmueblar.modules.users.repositories.RepositoryUser;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.*;
 
@@ -45,8 +49,24 @@ public class CatalogService {
 
     private final JwtService jwtService;
 
+    private final LogService logService;
+    private final ObjectMapper objectMapper;
+    private final RepositoryUser userRepository;
+
+    private String tableNameFromEntity(Object entity){
+        Class<?> entityClass = entity.getClass();
+        Table tableAnnotation = entityClass.getAnnotation(Table.class);
+
+        if (tableAnnotation != null && !tableAnnotation.name().isEmpty()) {
+            return tableAnnotation.name();
+        }
+        return entityClass.getSimpleName().toLowerCase();
+    }
+
     @Transactional
-    public void createProductAndVariations(ProductCreateRequestDTO productCreateRequestDTO) {
+    public void createProductAndVariations(String authHeader, ProductCreateRequestDTO productCreateRequestDTO) {
+        UserEntity thisUserEntity =  existsUserWithToken(authHeader).get();
+
         Optional<ProductEntity> optionalProduct = repositoryProduct.findByModelName(productCreateRequestDTO.getModel());
         if (optionalProduct.isPresent()) {
             throw new ProductAlreadyExistException("Product already exist with that model name");
@@ -139,24 +159,28 @@ public class CatalogService {
         productEntity.setAttributeXProductEntities(attributes_X_ProductEntityList);
 
         repositoryProduct.save(productEntity);
+        logService.logEntryDataBase(tableNameFromEntity(productEntity), thisUserEntity.getUserId(), objectMapper.convertValue(productEntity, new TypeReference<Map<String, Object>>() {}), null, 1);
     }
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
 
     @Transactional
-    public void updateProductAndVariations(String modelOfProduct, ProductCreateRequestDTO productCreateRequestDTO) {
+    public void updateProductAndVariations(String authHeader, String modelOfProduct, ProductCreateRequestDTO productCreateRequestDTO) {
+        UserEntity thisUserEntity =  existsUserWithToken(authHeader).get();
+
         Optional<ProductEntity> optionalProduct = repositoryProduct.findByModelName(modelOfProduct);
         if(optionalProduct.isEmpty()) {
-            createProductAndVariations(productCreateRequestDTO);
+            createProductAndVariations(authHeader, productCreateRequestDTO);
             return;
         }
 
         ProductEntity thisProductEntity = optionalProduct.get();
 
         if (!(modelOfProduct.equals(productCreateRequestDTO.getModel()))) {
-            createProductAndVariations(productCreateRequestDTO);
+            createProductAndVariations(authHeader, productCreateRequestDTO);
             repositoryProduct.delete(thisProductEntity);
             repositoryProduct.flush();
+            logService.logEntryDataBase(tableNameFromEntity(thisProductEntity), thisUserEntity.getUserId(), null, objectMapper.convertValue(thisProductEntity, new TypeReference<Map<String, Object>>() {}), 2);
             return;
         }
 
@@ -338,6 +362,7 @@ public class CatalogService {
             product_x_categoryEntityList.add(thisProduct_X_CategoryEntity);
         }
         repositoryProduct.save(thisProductEntity);
+        logService.logEntryDataBase(tableNameFromEntity(thisProductEntity), thisUserEntity.getUserId(), objectMapper.convertValue(thisProductEntity, new TypeReference<Map<String, Object>>() {}), null, 1);
     }
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
