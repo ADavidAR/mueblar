@@ -6,6 +6,7 @@ import org.apache.catalina.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.backendmueblar.modules.auth.dtos.UserCreateRequestDTO;
+import project.backendmueblar.modules.auth.dtos.UserUpdateRequestDTO;
 import project.backendmueblar.modules.users.dtos.response.UserSummaryResponseDTO;
 import project.backendmueblar.modules.users.services.ServiceUser;
 
@@ -41,7 +42,7 @@ public class RestControllerUser {
 
     @PutMapping(value = "/{id}", consumes = "application/json")
     public ResponseEntity<?> updateUser(@PathVariable("id") Long userId,
-                                        @Valid @RequestBody UserCreateRequestDTO userUpdateRequestDTO
+                                        @Valid @RequestBody UserUpdateRequestDTO userUpdateRequestDTO
     ){
         userService.updateUser(userId, userUpdateRequestDTO);
         return ResponseEntity.status(200).build();
