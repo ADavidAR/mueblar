@@ -14,6 +14,7 @@ import project.backendmueblar.exception.auth.RoleNotFoundException;
 import project.backendmueblar.exception.auth.UserIDNotMatchException;
 import project.backendmueblar.exception.catalog.InternalServerException;
 import project.backendmueblar.modules.auth.dtos.UserCreateRequestDTO;
+import project.backendmueblar.modules.auth.dtos.UserUpdateRequestDTO;
 import project.backendmueblar.modules.users.dtos.response.RoleSummaryResponseDTO;
 import project.backendmueblar.modules.users.dtos.response.UserSummaryResponseDTO;
 import project.backendmueblar.modules.users.entities.RoleEntity;
@@ -140,7 +141,7 @@ public class ServiceUser {
 
     // ------------------------------------------------------------------------------------------------------- //
     @Transactional
-    public void updateUser(Long userId, UserCreateRequestDTO userUpdateRequestDTO){
+    public void updateUser(Long userId, UserUpdateRequestDTO userUpdateRequestDTO){
         Optional<UserEntity> optionalUser = repositoryUser.findById(userId);
         if(optionalUser.isEmpty()) {
             throw new UserIDNotMatchException("User not Exists");
@@ -159,7 +160,6 @@ public class ServiceUser {
         thisUserEntity.setEmail(userUpdateRequestDTO.getEmail());
         thisUserEntity.setFirstName(userUpdateRequestDTO.getName());
         thisUserEntity.setLastName(userUpdateRequestDTO.getLastName());
-        thisUserEntity.setPasswordHash(passwordEncoder.encode(userUpdateRequestDTO.getPassword()));
         thisUserEntity.setEnabled(userUpdateRequestDTO.getEnabled());
 
         Optional<RoleEntity> optionalRole = repositoryRole.findByRoleId(userUpdateRequestDTO.getRole().getId());
@@ -170,8 +170,18 @@ public class ServiceUser {
         if(thisRoleEntity.getRoleId() == 2) {
             throw new RuntimeException("Cannot update to 'Cliente' User");
         }
-
         thisUserEntity.setRoleEntity(thisRoleEntity);
+
+        String optionalNewPasswordToHash = userUpdateRequestDTO.getPassword();
+
+        if (optionalNewPasswordToHash != null && !optionalNewPasswordToHash.trim().isEmpty()) {
+            String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$";
+            if (!optionalNewPasswordToHash.matches(regex)) {
+                throw new RuntimeException("Invalid Password");
+            }
+            thisUserEntity.setPasswordHash(passwordEncoder.encode(optionalNewPasswordToHash));
+        }
+
         repositoryUser.save(thisUserEntity);
 
     }
