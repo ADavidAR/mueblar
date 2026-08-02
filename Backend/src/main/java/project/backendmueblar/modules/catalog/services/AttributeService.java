@@ -99,16 +99,21 @@ public class AttributeService {
             throw new ResourceNotFoundException("AttributeType with name " + attributeUpdateRequestDTO.getAtribType().getId() + " not found");
         }
 
-        AttributeEntity oldAttributeEntity = optionalAttribute.get();
+        AttributeEntity thisAttributeEntity = optionalAttribute.get();
+        Map<String, Object> oldValueMap = objectMapper.convertValue(thisAttributeEntity, new TypeReference<Map<String, Object>>() {});
 
         if(attributeId.equals(attributeUpdateRequestDTO.getName())) {
-            oldAttributeEntity.setAttributeTypeEntity(optionalAttributeType.get());
-            repositoryAttribute.save(oldAttributeEntity);
+            thisAttributeEntity.setAttributeTypeEntity(optionalAttributeType.get());
+            repositoryAttribute.save(thisAttributeEntity);
+
+            Map<String, Object> newValueMap = objectMapper.convertValue(thisAttributeEntity, new TypeReference<Map<String, Object>>() {});
+
+            logService.logEntryDataBase(tableNameFromEntity(thisAttributeEntity), thisUserEntity.getUserId(), newValueMap, oldValueMap, 2);
             return;
         }
 
-        List<Attribute_X_ProductEntity> attributeXProductEntityList = oldAttributeEntity.getAttributeXProductEntities();
-        List<Attribute_X_VariationEntity> attributeXVariationEntityList = oldAttributeEntity.getAttributeXVariationEntities();
+        List<Attribute_X_ProductEntity> attributeXProductEntityList = thisAttributeEntity.getAttributeXProductEntities();
+        List<Attribute_X_VariationEntity> attributeXVariationEntityList = thisAttributeEntity.getAttributeXVariationEntities();
 
         if(!attributeXProductEntityList.isEmpty() || !attributeXVariationEntityList.isEmpty()) {
             List<String> products = new ArrayList<>();
@@ -135,21 +140,21 @@ public class AttributeService {
             throw new ResourceAlreadyExistsException("Attribute with name " + attributeUpdateRequestDTO.getName() + " already exists");
         }
 
-        AttributeEntity newAttributeEntity = new AttributeEntity();
-        newAttributeEntity.setAttributeId(attributeUpdateRequestDTO.getName());
-        newAttributeEntity.setAttributeTypeEntity(optionalAttributeType.get());
+        AttributeEntity attributeEntity = new AttributeEntity();
+        attributeEntity.setAttributeId(attributeUpdateRequestDTO.getName());
+        attributeEntity.setAttributeTypeEntity(optionalAttributeType.get());
 
-        repositoryAttribute.delete(oldAttributeEntity);
-        repositoryAttribute.save(newAttributeEntity);
+        repositoryAttribute.delete(thisAttributeEntity);
+        repositoryAttribute.save(attributeEntity);
 
-        logService.logEntryDataBase(tableNameFromEntity(newAttributeEntity), thisUserEntity.getUserId(), objectMapper.convertValue(newAttributeEntity, new TypeReference<Map<String, Object>>() {}), objectMapper.convertValue(oldAttributeEntity, new TypeReference<Map<String, Object>>() {}), 2);
+        logService.logEntryDataBase(tableNameFromEntity(attributeEntity), thisUserEntity.getUserId(), objectMapper.convertValue(attributeEntity, new TypeReference<Map<String, Object>>() {}), oldValueMap, 2);
     }
 
     // ------------------------------------------------------------------------------------------------------//
 
     @Transactional
     public void deleteAttribute(String authHeader, String attributeId) {
-        UserEntity thisUserEntity =  existsUserWithToken(authHeader).get();
+        UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
 
         Optional<AttributeEntity> optionalAttribute = repositoryAttribute.findByAttributeId(attributeId);
         if(optionalAttribute.isEmpty()) {

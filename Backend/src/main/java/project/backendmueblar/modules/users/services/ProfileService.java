@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import project.backendmueblar.exception.auth.EmailAlreadyExistsException;
 import project.backendmueblar.exception.auth.UserIDNotMatchException;
+import project.backendmueblar.exception.catalog.ResourceNotFoundException;
 import project.backendmueblar.modules.auth.dtos.UserCreateRequestDTO;
 import project.backendmueblar.modules.auth.services.JwtService;
 import project.backendmueblar.modules.logEntry.services.LogService;
@@ -16,6 +17,7 @@ import project.backendmueblar.modules.users.repositories.RepositoryUser;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
+import java.lang.module.ResolutionException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -73,19 +75,21 @@ public class ProfileService {
             throw new EmailAlreadyExistsException("Email Already Exists");
         }
 
-        UserEntity oldUserEntity = thisUserEntity;
+        Map<String, Object> oldValueMap = objectMapper.convertValue(thisUserEntity, new TypeReference<Map<String, Object>>() {});
 
         thisUserEntity.setEmail(userUpdateRequestDTO.getEmail());
         thisUserEntity.setFirstName(userUpdateRequestDTO.getName());
         thisUserEntity.setLastName(userUpdateRequestDTO.getLastName());
 
-        if(userUpdateRequestDTO.getPassword() != null && !userUpdateRequestDTO.getPassword().trim().isEmpty()) {
-            thisUserEntity.setPasswordHash(passwordEncoder.encode(userUpdateRequestDTO.getPassword()));
+        if(!(userUpdateRequestDTO.getPassword() != null && !userUpdateRequestDTO.getPassword().trim().isEmpty())) {
+            throw new ResourceNotFoundException("Password Missing");
         }
 
+        thisUserEntity.setPasswordHash(passwordEncoder.encode(userUpdateRequestDTO.getPassword()));
         thisUserEntity.setEnabled(userUpdateRequestDTO.getEnabled());
+
         repositoryUser.save(thisUserEntity);
-        logService.logEntryDataBase(tableNameFromEntity(thisUserEntity), thisUserEntity.getUserId(), objectMapper.convertValue(thisUserEntity, new TypeReference<Map<String, Object>>() {}), objectMapper.convertValue(oldUserEntity, new TypeReference<Map<String, Object>>() {}), 2);
+        logService.logEntryDataBase(tableNameFromEntity(thisUserEntity), thisUserEntity.getUserId(), objectMapper.convertValue(thisUserEntity, new TypeReference<Map<String, Object>>() {}), oldValueMap, 2);
 
     }
 }

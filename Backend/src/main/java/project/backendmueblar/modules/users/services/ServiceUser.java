@@ -187,7 +187,7 @@ public class ServiceUser {
         }
 
         UserEntity thisUserEntity = optionalUser.get();
-        UserEntity oldUserEntity = thisUserEntity;
+        Map<String, Object> oldValueMap = objectMapper.convertValue(thisUserEntity, new TypeReference<Map<String, Object>>() {});
 
         if(thisUserEntity.getRoleEntity().getRoleId() == 2) {
             throw new RuntimeException("Cannot update 'Cliente' User");
@@ -220,10 +220,12 @@ public class ServiceUser {
                 throw new RuntimeException("Invalid Password");
             }
             thisUserEntity.setPasswordHash(passwordEncoder.encode(optionalNewPasswordToHash));
+        } else {
+            throw new RuntimeException("Invalid Password");
         }
 
         repositoryUser.save(thisUserEntity);
-        logService.logEntryDataBase(tableNameFromEntity(thisUserEntity), thisUserEntity.getUserId(), objectMapper.convertValue(thisUserEntity, new TypeReference<Map<String, Object>>() {}), objectMapper.convertValue(oldUserEntity, new TypeReference<Map<String, Object>>() {}), 2);
+        logService.logEntryDataBase(tableNameFromEntity(thisUserEntity), userEntity.getUserId(), objectMapper.convertValue(thisUserEntity, new TypeReference<Map<String, Object>>() {}), oldValueMap, 2);
     }
 
     @Transactional
@@ -244,7 +246,7 @@ public class ServiceUser {
         }
 
         repositoryUser.delete(optionalUser.get());
-        logService.logEntryDataBase(tableNameFromEntity(optionalUser.get()), optionalUser.get().getUserId(), null, objectMapper.convertValue(optionalUser.get(), new TypeReference<Map<String, Object>>() {}), 3);
+        logService.logEntryDataBase(tableNameFromEntity(optionalUser.get()), userEntity.getUserId(), null, objectMapper.convertValue(optionalUser.get(), new TypeReference<Map<String, Object>>() {}), 3);
 
     }
 }

@@ -95,7 +95,7 @@ public class CategoryService {
     // ------------------------------------------------------------------------------------------------------//
     @Transactional
     public void updateCategory(String authHeader, Long categoryID, CategoryCreateRequestDTO categoryUpdateRequestDTO) {
-        UserEntity thisUserEntity =  existsUserWithToken(authHeader).get();
+        UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
 
         Optional<CategoryEntity> optionalCategory = repositoryCategory.findByCategoryId(categoryID);
         if(optionalCategory.isEmpty()) {
@@ -120,12 +120,13 @@ public class CategoryService {
             throw new ResourceAlreadyExistsException("Category already exists");
         }
 
-        CategoryEntity categoryEntity = new CategoryEntity();
-        categoryEntity.setCategoryName(categoryUpdateRequestDTO.getName());
+        CategoryEntity thisCategoryEntity = optionalCategory.get();
+        Map<String, Object> oldValueMap = objectMapper.convertValue(thisCategoryEntity, new TypeReference<Map<String, Object>>() {});
 
-        repositoryCategory.delete(optionalCategory.get());
-        repositoryCategory.save(categoryEntity);
-        logService.logEntryDataBase(tableNameFromEntity(categoryEntity), thisUserEntity.getUserId(), objectMapper.convertValue(categoryEntity, new TypeReference<Map<String, Object>>() {}), objectMapper.convertValue(optionalCategory.get(), new TypeReference<Map<String, Object>>() {}), 2);
+        thisCategoryEntity.setCategoryName(categoryUpdateRequestDTO.getName());
+        repositoryCategory.save(thisCategoryEntity);
+
+        logService.logEntryDataBase(tableNameFromEntity(thisCategoryEntity), thisUserEntity.getUserId(), objectMapper.convertValue(thisCategoryEntity, new TypeReference<Map<String, Object>>() {}), oldValueMap, 2);
     }
 
     // ------------------------------------------------------------------------------------------------------//

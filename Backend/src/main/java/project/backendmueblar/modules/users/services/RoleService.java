@@ -204,6 +204,7 @@ public class RoleService {
             thisModuleXRoleEntity.setModuleEntity(optionalModule.get());
             thisModuleXRoleEntity.setRoleEntity(roleEntity);
             moduleXRoleEntityList.add(thisModuleXRoleEntity);
+            logService.logEntryDataBase(tableNameFromEntity(thisModuleXRoleEntity), thisUserEntity.getUserId(), objectMapper.convertValue(thisModuleXRoleEntity, new TypeReference<Map<String, Object>>() {}), null, 1);
         }
 
         repositoryModule_X_Role.saveAll(moduleXRoleEntityList);
@@ -225,27 +226,26 @@ public class RoleService {
             throw new RuntimeException("Role is not Modifiable");
         }
 
-        RoleEntity oldRoleEntity = thisRoleEntity;
+        Map<String, Object> oldValueMap = objectMapper.convertValue(thisRoleEntity, new TypeReference<Map<String, Object>>() {});
+
         thisRoleEntity.setEditable(roleUpdateRequestDTO.getEditable());
         thisRoleEntity.setRoleName(roleUpdateRequestDTO.getName());
-
         repositoryRole.save(thisRoleEntity);
 
         List<PermissionCreateRequestDTO> permissionCreateRequestDTOList = roleUpdateRequestDTO.getPermissions();
         if(permissionCreateRequestDTOList.size() != repositoryModule.count()){
-            throw new InternalServerException("Cannot update role.");
+            throw new RuntimeException("Cannot update role. Module size not Correct");
         }
 
         List<Module_X_RoleEntity> moduleXRoleEntityList = new ArrayList<>();
-
         for(PermissionCreateRequestDTO thisPermissionCreateRequestDTO : permissionCreateRequestDTOList){
-
             Optional<Module_X_RoleEntity> optionalModuleXRole = repositoryModule_X_Role.findByRoleEntityAndModuleEntity_ModuleId(thisRoleEntity, thisPermissionCreateRequestDTO.getId());
             if(optionalModuleXRole.isEmpty()){
                 throw new ResourceNotFoundException("Module was not found");
             }
 
             Module_X_RoleEntity thisModuleXRoleEntity = optionalModuleXRole.get();
+            Map<String, Object> oldValueXMap =  objectMapper.convertValue(thisModuleXRoleEntity, new TypeReference<Map<String, Object>>() {});
 
             thisModuleXRoleEntity.setAccess(thisPermissionCreateRequestDTO.getAccess());
             if(thisPermissionCreateRequestDTO.getAccess() == false){
@@ -257,11 +257,12 @@ public class RoleService {
                 thisModuleXRoleEntity.setDeletion(thisPermissionCreateRequestDTO.getDelete());
                 thisModuleXRoleEntity.setModification(thisPermissionCreateRequestDTO.getModify());
             }
+            logService.logEntryDataBase(tableNameFromEntity(thisModuleXRoleEntity), thisUserEntity.getUserId(), objectMapper.convertValue(thisModuleXRoleEntity, new TypeReference<Map<String, Object>>() {}), oldValueXMap, 2);
             moduleXRoleEntityList.add(thisModuleXRoleEntity);
         }
 
         repositoryModule_X_Role.saveAll(moduleXRoleEntityList);
-        logService.logEntryDataBase(tableNameFromEntity(thisRoleEntity), thisUserEntity.getUserId(), objectMapper.convertValue(thisRoleEntity, new TypeReference<Map<String, Object>>() {}), objectMapper.convertValue(oldRoleEntity, new TypeReference<Map<String, Object>>() {}), 2);
+        logService.logEntryDataBase(tableNameFromEntity(thisRoleEntity), thisUserEntity.getUserId(), objectMapper.convertValue(thisRoleEntity, new TypeReference<Map<String, Object>>() {}), oldValueMap, 2);
     }
 
     // ------------------------------------------------------------------------------------------------------------- //

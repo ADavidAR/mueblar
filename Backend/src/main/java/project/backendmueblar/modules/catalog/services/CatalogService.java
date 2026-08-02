@@ -77,7 +77,7 @@ public class CatalogService {
 
     @Transactional
     protected ProductEntity createProductAndVariationsForUpdate(String authHeader, ProductCreateRequestDTO productCreateRequestDTO) {
-        UserEntity thisUserEntity =  existsUserWithToken(authHeader).get();
+        UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
 
         Optional<ProductEntity> optionalProduct = repositoryProduct.findByModelName(productCreateRequestDTO.getModel());
         if (optionalProduct.isPresent()) {
@@ -288,13 +288,15 @@ public class CatalogService {
         }
 
         ProductEntity thisProductEntity = optionalProduct.get();
-        ProductEntity oldProductEntity = thisProductEntity;
+        Map<String, Object> oldValueMap = objectMapper.convertValue(thisProductEntity, new TypeReference<Map<String, Object>>() {});
 
         if (!(modelOfProduct.equals(productCreateRequestDTO.getModel()))) {
             ProductEntity newProductEntity = createProductAndVariationsForUpdate(authHeader, productCreateRequestDTO);
+
             repositoryProduct.delete(thisProductEntity);
             repositoryProduct.flush();
-            logService.logEntryDataBase(tableNameFromEntity(thisProductEntity), thisUserEntity.getUserId(), objectMapper.convertValue(newProductEntity, new TypeReference<Map<String, Object>>() {}), objectMapper.convertValue(thisProductEntity, new TypeReference<Map<String, Object>>() {}), 2);
+
+            logService.logEntryDataBase(tableNameFromEntity(thisProductEntity), thisUserEntity.getUserId(), objectMapper.convertValue(newProductEntity, new TypeReference<Map<String, Object>>() {}), oldValueMap, 2);
             return;
         }
 
@@ -475,8 +477,9 @@ public class CatalogService {
 
             product_x_categoryEntityList.add(thisProduct_X_CategoryEntity);
         }
+
         repositoryProduct.save(thisProductEntity);
-        logService.logEntryDataBase(tableNameFromEntity(thisProductEntity), thisUserEntity.getUserId(), objectMapper.convertValue(thisProductEntity, new TypeReference<Map<String, Object>>() {}), objectMapper.convertValue(oldProductEntity, new TypeReference<Map<String, Object>>() {}), 2);
+        logService.logEntryDataBase(tableNameFromEntity(thisProductEntity), thisUserEntity.getUserId(), objectMapper.convertValue(thisProductEntity, new TypeReference<Map<String, Object>>() {}), oldValueMap, 2);
     }
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//

@@ -84,11 +84,13 @@ public class AttributeTypeService {
         }
 
         AttributeTypeEntity attributeTypeEntity = new AttributeTypeEntity();
+
         attributeTypeEntity.setDescription(attributeTypeCreateRequestDTO.getDescription());
         attributeTypeEntity.setAttributeTypeId(attributeTypeCreateRequestDTO.getId());
-        repositoryAttributeType.save(attributeTypeEntity);
-        logService.logEntryDataBase(tableNameFromEntity(attributeTypeEntity), thisUserEntity.getUserId(), objectMapper.convertValue(attributeTypeEntity, new TypeReference<Map<String, Object>>() {}), null, 1);
 
+        repositoryAttributeType.save(attributeTypeEntity);
+
+        logService.logEntryDataBase(tableNameFromEntity(attributeTypeEntity), thisUserEntity.getUserId(), objectMapper.convertValue(attributeTypeEntity, new TypeReference<Map<String, Object>>() {}), null, 1);
     }
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
@@ -124,10 +126,15 @@ public class AttributeTypeService {
         }
 
         AttributeTypeEntity thisAttributeTypeEntity = optionalAttributeType.get();
+        Map<String, Object> oldValueMap = objectMapper.convertValue(thisAttributeTypeEntity, new TypeReference<Map<String, Object>>() {});
 
         if(attributeTypeUpdateRequestDTO.getId().equals(thisAttributeTypeEntity.getAttributeTypeId())) {
             thisAttributeTypeEntity.setDescription(attributeTypeUpdateRequestDTO.getDescription());
             repositoryAttributeType.save(thisAttributeTypeEntity);
+
+            Map<String, Object> newValueMap = objectMapper.convertValue(thisAttributeTypeEntity, new TypeReference<Map<String, Object>>() {});
+
+            logService.logEntryDataBase(tableNameFromEntity(thisAttributeTypeEntity), thisUserEntity.getUserId(), newValueMap, oldValueMap, 2);
             return;
         }
 
@@ -147,7 +154,7 @@ public class AttributeTypeService {
 
         repositoryAttributeType.delete(thisAttributeTypeEntity);
         repositoryAttributeType.save(attributeTypeEntity);
-        logService.logEntryDataBase(tableNameFromEntity(attributeTypeEntity), thisUserEntity.getUserId(), objectMapper.convertValue(attributeTypeEntity, new TypeReference<Map<String, Object>>() {}), objectMapper.convertValue(thisAttributeTypeEntity, new TypeReference<Map<String, Object>>() {}), 2);
+        logService.logEntryDataBase(tableNameFromEntity(attributeTypeEntity), thisUserEntity.getUserId(), objectMapper.convertValue(attributeTypeEntity, new TypeReference<Map<String, Object>>() {}), oldValueMap, 2);
     }
 
     public List<AttributeTypeResponseDTO> getAllAttributesTypes(Integer limit, Integer page){

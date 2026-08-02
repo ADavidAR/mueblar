@@ -85,6 +85,7 @@ public class CollectionService {
         collectionEntity.setTitle(collectionCreateRequestDTO.getTitle());
         collectionEntity.setErasable(true);
         collectionEntity.setUserEntity(thisUserEntity);
+
         collectionRepository.save(collectionEntity);
         logService.logEntryDataBase(tableNameFromEntity(collectionEntity), thisUserEntity.getUserId(), objectMapper.convertValue(collectionEntity, new TypeReference<Map<String, Object>>() {}), null, 1);
 
@@ -101,7 +102,7 @@ public class CollectionService {
         }
 
         CollectionEntity thisCollectionEntity = optionalCollection.get();
-        CollectionEntity oldCollectionEntity = thisCollectionEntity;
+        Map<String, Object> oldValueMap = objectMapper.convertValue(thisCollectionEntity, new TypeReference<Map<String, Object>>() {});
 
         if(!(thisCollectionEntity.getUserEntity().getUserId().equals(thisUserEntity.getUserId()))) {
             throw new UserIDNotMatchException("The Collection does not belong to this user");
@@ -109,7 +110,7 @@ public class CollectionService {
 
         thisCollectionEntity.setTitle(collectionUpdateRequestDTO.getTitle());
         collectionRepository.save(thisCollectionEntity);
-        logService.logEntryDataBase(tableNameFromEntity(thisCollectionEntity), thisUserEntity.getUserId(), objectMapper.convertValue(thisCollectionEntity, new TypeReference<Map<String, Object>>() {}), objectMapper.convertValue(oldCollectionEntity, new TypeReference<Map<String, Object>>() {}), 2);
+        logService.logEntryDataBase(tableNameFromEntity(thisCollectionEntity), thisUserEntity.getUserId(), objectMapper.convertValue(thisCollectionEntity, new TypeReference<Map<String, Object>>() {}), oldValueMap, 2);
     }
 
     // --------------------------------------------------------------------------------------------------------- //
