@@ -3,6 +3,7 @@ package project.backendmueblar.modules.logEntry.controllers;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,6 +13,7 @@ import project.backendmueblar.modules.logEntry.entities.LogsEntity;
 import project.backendmueblar.modules.logEntry.entities.dtos.responses.LogResponseDTO;
 import project.backendmueblar.modules.logEntry.services.LogService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -24,8 +26,9 @@ public class LogController {
     public ResponseEntity<List<LogResponseDTO>> getLogsFromDBFilter(@NotNull @RequestParam(defaultValue = "10") Integer limit,
                                                                     @NotNull @RequestParam(defaultValue = "0") Integer page,
                                                                     @RequestParam(required = false) String tableName,
-                                                                    @RequestParam(required = false) String operationName
+                                                                    @RequestParam(required = false) String operationName,
+                                                                    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ){
-        return ResponseEntity.status(200).body(logService.getLogsFromDBFilter(limit, page, tableName, operationName));
+        return ResponseEntity.status(200).body(logService.getLogsFromDBFilter(limit, page, tableName, operationName, date));
     }
 }

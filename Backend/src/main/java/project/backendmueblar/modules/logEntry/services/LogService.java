@@ -16,7 +16,10 @@ import project.backendmueblar.modules.users.entities.RoleEntity;
 import project.backendmueblar.modules.users.entities.UserEntity;
 import project.backendmueblar.modules.users.repositories.RepositoryUser;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +65,11 @@ public class LogService {
         logRepository.save(logsEntity);
     }
 
-    public List<LogResponseDTO> getLogsFromDBFilter(Integer limit, Integer page, String tableName, String operationName){
+    public List<LogResponseDTO> getLogsFromDBFilter(Integer limit,
+                                                    Integer page,
+                                                    String tableName, String operationName,
+                                                    LocalDate date
+    ){
         if(limit == 0){
             throw new InternalServerException("Cannot throw zero Roles");
         }
@@ -70,15 +77,36 @@ public class LogService {
         List<LogsEntity> logsEntityList;
         List<LogResponseDTO> logResponseDTOList = new ArrayList<>();
         Pageable pageable = PageRequest.of(page, limit);
+
         boolean hasTableName = (tableName != null && !tableName.trim().isEmpty());
         boolean hasOperationName = (operationName != null && !operationName.trim().isEmpty());
+        boolean hasDate = (date != null);
 
-        if(hasTableName && hasOperationName){
-            logsEntityList = logRepository.findAllByTableNameContainingIgnoreCaseAndOperationTypeEntity_OperationTypeName(tableName, operationName, pageable);
-        } else if (hasTableName){
+        OffsetDateTime startOfDay = null;
+        OffsetDateTime endOfDay = null;
+        if (hasDate) {
+            startOfDay = OffsetDateTime.of(date, LocalTime.MIN, ZoneOffset.UTC);
+            endOfDay = OffsetDateTime.of(date, LocalTime.MAX, ZoneOffset.UTC);
+        }
+
+        if (hasTableName && hasOperationName && hasDate) {
+            logsEntityList = logRepository.findAllByTableNameContainingIgnoreCaseAndOperationTypeEntity_OperationTypeNameAndCreationDateBetween(
+                    tableName, operationName, startOfDay, endOfDay, pageable);
+        } else if (hasTableName && hasOperationName) {
+            logsEntityList = logRepository.findAllByTableNameContainingIgnoreCaseAndOperationTypeEntity_OperationTypeName(
+                    tableName, operationName, pageable);
+        } else if (hasTableName && hasDate) {
+            logsEntityList = logRepository.findAllByTableNameContainingIgnoreCaseAndCreationDateBetween(
+                    tableName, startOfDay, endOfDay, pageable);
+        } else if (hasOperationName && hasDate) {
+            logsEntityList = logRepository.findAllByOperationTypeEntity_OperationTypeNameAndCreationDateBetween(
+                    operationName, startOfDay, endOfDay, pageable);
+        } else if (hasTableName) {
             logsEntityList = logRepository.findAllByTableNameContainingIgnoreCase(tableName, pageable);
-        } else if (hasOperationName){
+        } else if (hasOperationName) {
             logsEntityList = logRepository.findAllByOperationTypeEntity_OperationTypeName(operationName, pageable);
+        } else if (hasDate) {
+            logsEntityList = logRepository.findAllByCreationDateBetween(startOfDay, endOfDay, pageable);
         } else {
             logsEntityList = logRepository.findAll(pageable).getContent();
         }
@@ -97,6 +125,7 @@ public class LogService {
             thisLogResponseDTO.setUserFullName(String.format("%s %s", thisLogsEntity.getUserEntity().getFirstName(), thisLogsEntity.getUserEntity().getLastName()));
             logResponseDTOList.add(thisLogResponseDTO);
         }
+
         return logResponseDTOList;
     }
 }
