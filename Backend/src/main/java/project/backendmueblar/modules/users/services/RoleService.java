@@ -1,5 +1,6 @@
 package project.backendmueblar.modules.users.services;
 
+import jakarta.persistence.Table;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
@@ -7,8 +8,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.backendmueblar.exception.auth.RoleNotFoundException;
+import project.backendmueblar.exception.auth.UserIDNotMatchException;
 import project.backendmueblar.exception.catalog.InternalServerException;
 import project.backendmueblar.exception.catalog.ResourceNotFoundException;
+import project.backendmueblar.modules.auth.services.JwtService;
+import project.backendmueblar.modules.logEntry.services.LogService;
 import project.backendmueblar.modules.users.dtos.request.PermissionCreateRequestDTO;
 import project.backendmueblar.modules.users.dtos.request.RoleCreateRequestDTO;
 import project.backendmueblar.modules.users.dtos.response.PermissionResponseDTO;
@@ -17,9 +21,13 @@ import project.backendmueblar.modules.users.entities.*;
 import project.backendmueblar.modules.users.repositories.RepositoryModule;
 import project.backendmueblar.modules.users.repositories.RepositoryModule_X_Role;
 import project.backendmueblar.modules.users.repositories.RepositoryRole;
+import project.backendmueblar.modules.users.repositories.RepositoryUser;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -29,6 +37,35 @@ public class RoleService {
     private final RepositoryRole repositoryRole;
     private final RepositoryModule_X_Role repositoryModule_X_Role;
     private final RepositoryModule repositoryModule;
+
+    private final LogService logService;
+    private final ObjectMapper objectMapper;
+    private final JwtService jwtService;
+    private final RepositoryUser userRepository;
+
+    private String tableNameFromEntity(Object entity){
+        Class<?> entityClass = entity.getClass();
+        Table tableAnnotation = entityClass.getAnnotation(Table.class);
+
+        if (tableAnnotation != null && !tableAnnotation.name().isEmpty()) {
+            return tableAnnotation.name();
+        }
+        return entityClass.getSimpleName().toLowerCase();
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
+
+    private Optional<UserEntity> existsUserWithToken(String authHeader) {
+        String uniqueEmailForUser = jwtService.extractEmail(authHeader);
+        Optional<UserEntity> optionalUser = userRepository.findByEmail(uniqueEmailForUser);
+        if (optionalUser.isEmpty()) {
+            throw new UserIDNotMatchException("User not Found");
+        }
+        return optionalUser;
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
+
 
     private static @NonNull Integer getInteger(Module_X_RoleEntity moduleXRoleEntity) {
         Integer accessBit1;
@@ -130,7 +167,9 @@ public class RoleService {
     // ------------------------------------------------------------------------------------------------------------- //
 
     @Transactional
-    public void createRole(RoleCreateRequestDTO roleCreateRequestDTO){
+    public void createRole(String authHeader, RoleCreateRequestDTO roleCreateRequestDTO){
+        UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
+
         RoleEntity roleEntity = new RoleEntity();
         roleEntity.setRoleName(roleCreateRequestDTO.getName());
         roleEntity.setEditable(roleCreateRequestDTO.getEditable());
@@ -168,12 +207,14 @@ public class RoleService {
         }
 
         repositoryModule_X_Role.saveAll(moduleXRoleEntityList);
-
+        logService.logEntryDataBase(tableNameFromEntity(roleEntity), thisUserEntity.getUserId(), objectMapper.convertValue(roleEntity, new TypeReference<Map<String, Object>>() {}), null, 1);
     }
 
     // ------------------------------------------------------------------------------------------------------------- //
     @Transactional
-    public void updateRole(Long roleId, RoleCreateRequestDTO roleUpdateRequestDTO){
+    public void updateRole(String authHeader, Long roleId, RoleCreateRequestDTO roleUpdateRequestDTO){
+        UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
+
         Optional<RoleEntity> optionalRoleEntity = repositoryRole.findById(roleId);
         if(optionalRoleEntity.isEmpty()){
             throw new ResourceNotFoundException("Role was not found");
@@ -184,6 +225,7 @@ public class RoleService {
             throw new RuntimeException("Role is not Modifiable");
         }
 
+        RoleEntity oldRoleEntity = thisRoleEntity;
         thisRoleEntity.setEditable(roleUpdateRequestDTO.getEditable());
         thisRoleEntity.setRoleName(roleUpdateRequestDTO.getName());
 
@@ -219,12 +261,14 @@ public class RoleService {
         }
 
         repositoryModule_X_Role.saveAll(moduleXRoleEntityList);
-
+        logService.logEntryDataBase(tableNameFromEntity(thisRoleEntity), thisUserEntity.getUserId(), objectMapper.convertValue(thisRoleEntity, new TypeReference<Map<String, Object>>() {}), objectMapper.convertValue(oldRoleEntity, new TypeReference<Map<String, Object>>() {}), 2);
     }
 
     // ------------------------------------------------------------------------------------------------------------- //
     @Transactional
-    public void deleteRoleSpecific(Long roleId){
+    public void deleteRoleSpecific(String authHeader, Long roleId){
+        UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
+
         Optional<RoleEntity> optionalRoleEntity = repositoryRole.findById(roleId);
         if(optionalRoleEntity.isEmpty()){
             throw new RoleNotFoundException("Role was not found");
@@ -239,5 +283,7 @@ public class RoleService {
         }
 
         repositoryRole.delete(optionalRoleEntity.get());
+        logService.logEntryDataBase(tableNameFromEntity(optionalRoleEntity.get()), thisUserEntity.getUserId(), null, objectMapper.convertValue(optionalRoleEntity.get(), new TypeReference<Map<String, Object>>() {}), 3);
+
     }
 }

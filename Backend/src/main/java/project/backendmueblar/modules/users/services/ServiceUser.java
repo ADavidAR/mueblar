@@ -1,5 +1,6 @@
 package project.backendmueblar.modules.users.services;
 
+import jakarta.persistence.Table;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -15,15 +16,20 @@ import project.backendmueblar.exception.auth.UserIDNotMatchException;
 import project.backendmueblar.exception.catalog.InternalServerException;
 import project.backendmueblar.modules.auth.dtos.UserCreateRequestDTO;
 import project.backendmueblar.modules.auth.dtos.UserUpdateRequestDTO;
+import project.backendmueblar.modules.auth.services.JwtService;
+import project.backendmueblar.modules.logEntry.services.LogService;
 import project.backendmueblar.modules.users.dtos.response.RoleSummaryResponseDTO;
 import project.backendmueblar.modules.users.dtos.response.UserSummaryResponseDTO;
 import project.backendmueblar.modules.users.entities.RoleEntity;
 import project.backendmueblar.modules.users.entities.UserEntity;
 import project.backendmueblar.modules.users.repositories.RepositoryRole;
 import project.backendmueblar.modules.users.repositories.RepositoryUser;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -33,6 +39,34 @@ public class ServiceUser {
     private final RepositoryUser repositoryUser;
     private final PasswordEncoder passwordEncoder;
     private final RepositoryRole repositoryRole;
+
+    private final LogService logService;
+    private final ObjectMapper objectMapper;
+    private final JwtService jwtService;
+    private final RepositoryUser userRepository;
+
+    private String tableNameFromEntity(Object entity){
+        Class<?> entityClass = entity.getClass();
+        Table tableAnnotation = entityClass.getAnnotation(Table.class);
+
+        if (tableAnnotation != null && !tableAnnotation.name().isEmpty()) {
+            return tableAnnotation.name();
+        }
+        return entityClass.getSimpleName().toLowerCase();
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
+
+    private Optional<UserEntity> existsUserWithToken(String authHeader) {
+        String uniqueEmailForUser = jwtService.extractEmail(authHeader);
+        Optional<UserEntity> optionalUser = userRepository.findByEmail(uniqueEmailForUser);
+        if (optionalUser.isEmpty()) {
+            throw new UserIDNotMatchException("User not Found");
+        }
+        return optionalUser;
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
 
 
     private UserSummaryResponseDTO mapToUserSummaryDTO(UserEntity thisUserEntity) {
@@ -111,7 +145,9 @@ public class ServiceUser {
 
     // ------------------------------------------------------------------------------------------------------- //
     @Transactional
-    public void createUser(UserCreateRequestDTO userCreateRequestDTO){
+    public void createUser(String authHeader, UserCreateRequestDTO userCreateRequestDTO){
+        UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
+
         Optional<UserEntity> optionalUserWithEmail = repositoryUser.findByEmail(userCreateRequestDTO.getEmail());
         if(optionalUserWithEmail.isPresent()) {
             throw new EmailAlreadyExistsException("Email Already Exists. Cannot create User");
@@ -137,17 +173,21 @@ public class ServiceUser {
 
         userEntity.setRoleEntity(thisRoleEntity);
         repositoryUser.save(userEntity);
+        logService.logEntryDataBase(tableNameFromEntity(userEntity), thisUserEntity.getUserId(), objectMapper.convertValue(userEntity, new TypeReference<Map<String, Object>>() {}), null, 1);
     }
 
     // ------------------------------------------------------------------------------------------------------- //
     @Transactional
-    public void updateUser(Long userId, UserUpdateRequestDTO userUpdateRequestDTO){
+    public void updateUser(String authHeader, Long userId, UserUpdateRequestDTO userUpdateRequestDTO){
+        UserEntity userEntity = existsUserWithToken(authHeader).get();
+
         Optional<UserEntity> optionalUser = repositoryUser.findById(userId);
         if(optionalUser.isEmpty()) {
             throw new UserIDNotMatchException("User not Exists");
         }
 
         UserEntity thisUserEntity = optionalUser.get();
+        UserEntity oldUserEntity = thisUserEntity;
 
         if(thisUserEntity.getRoleEntity().getRoleId() == 2) {
             throw new RuntimeException("Cannot update 'Cliente' User");
@@ -183,10 +223,13 @@ public class ServiceUser {
         }
 
         repositoryUser.save(thisUserEntity);
+        logService.logEntryDataBase(tableNameFromEntity(thisUserEntity), thisUserEntity.getUserId(), objectMapper.convertValue(thisUserEntity, new TypeReference<Map<String, Object>>() {}), objectMapper.convertValue(oldUserEntity, new TypeReference<Map<String, Object>>() {}), 2);
     }
 
     @Transactional
-    public void deleteUser(Long userId) {
+    public void deleteUser(String authHeader, Long userId) {
+        UserEntity userEntity = existsUserWithToken(authHeader).get();
+
         Optional<UserEntity> optionalUser = repositoryUser.findById(userId);
         if(optionalUser.isEmpty()) {
             throw new UserIDNotMatchException("User not Exists");
@@ -201,6 +244,7 @@ public class ServiceUser {
         }
 
         repositoryUser.delete(optionalUser.get());
+        logService.logEntryDataBase(tableNameFromEntity(optionalUser.get()), optionalUser.get().getUserId(), null, objectMapper.convertValue(optionalUser.get(), new TypeReference<Map<String, Object>>() {}), 3);
 
     }
 }

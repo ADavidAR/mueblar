@@ -25,20 +25,20 @@ public class RestControllerCatalog {
     }
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<?> createProduct(@Valid @RequestBody ProductCreateRequestDTO productCreateDTO) {
-        catalogService.createProductAndVariations(productCreateDTO);
+    public ResponseEntity<?> createProduct(@RequestHeader("Authorization") String authHeader, @Valid @RequestBody ProductCreateRequestDTO productCreateDTO) {
+        catalogService.createProductAndVariations(authHeader, productCreateDTO);
         return ResponseEntity.status(201).build();
     }
 
     @PutMapping(value = "/{model}", consumes = "application/json")
-    public ResponseEntity<?> updateProduct(@PathVariable("model") String modelOfProduct, @Valid @RequestBody ProductCreateRequestDTO productUpdateDTO) {
-        catalogService.updateProductAndVariations(modelOfProduct, productUpdateDTO);
+    public ResponseEntity<?> updateProduct(@RequestHeader("Authorization") String authHeader, @PathVariable("model") String modelOfProduct, @Valid @RequestBody ProductCreateRequestDTO productUpdateDTO) {
+        catalogService.updateProductAndVariations(authHeader, modelOfProduct, productUpdateDTO);
         return ResponseEntity.status(200).build();
     }
 
     @DeleteMapping(value = "/{model}")
-    public ResponseEntity<?> deleteProduct(@PathVariable("model") String modelOfProduct){
-        catalogService.deleteProductCascade(modelOfProduct);
+    public ResponseEntity<?> deleteProduct(@RequestHeader("Authorization") String authHeader, @PathVariable("model") String modelOfProduct){
+        catalogService.deleteProductCascade(authHeader, modelOfProduct);
         return ResponseEntity.status(204).build();
     }
 

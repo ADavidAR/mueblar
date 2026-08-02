@@ -1,6 +1,7 @@
 package project.backendmueblar.modules.interactions.services;
 
 
+import jakarta.persistence.Table;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,35 +25,53 @@ import project.backendmueblar.modules.interactions.entities.CollectionEntity;
 import project.backendmueblar.modules.interactions.entities.Collection_X_ProductEntity;
 import project.backendmueblar.modules.interactions.repositories.RepositoryCollection;
 import project.backendmueblar.modules.interactions.repositories.RepositoryCollection_X_Product;
+import project.backendmueblar.modules.logEntry.services.LogService;
 import project.backendmueblar.modules.users.entities.UserEntity;
 import project.backendmueblar.modules.users.repositories.RepositoryUser;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class CollectionService {
-
-    private final JwtService jwtService;
-    private final RepositoryUser userRepository;
     private final RepositoryCollection collectionRepository;
     private final RepositoryProduct repositoryProduct;
     private final RepositoryCollection_X_Product repositoryCollectionXProduct;
 
     private final CatalogService catalogService;
 
+    private final JwtService jwtService;
+    private final LogService logService;
+    private final ObjectMapper objectMapper;
+    private final RepositoryUser userRepository;
+
+    private String tableNameFromEntity(Object entity){
+        Class<?> entityClass = entity.getClass();
+        Table tableAnnotation = entityClass.getAnnotation(Table.class);
+
+        if (tableAnnotation != null && !tableAnnotation.name().isEmpty()) {
+            return tableAnnotation.name();
+        }
+        return entityClass.getSimpleName().toLowerCase();
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
+
     private Optional<UserEntity> existsUserWithToken(String authHeader) {
         String uniqueEmailForUser = jwtService.extractEmail(authHeader);
         Optional<UserEntity> optionalUser = userRepository.findByEmail(uniqueEmailForUser);
         if (optionalUser.isEmpty()) {
-            throw new UserIDNotMatchException("User not Found, Cannot create or access to Collection");
+            throw new UserIDNotMatchException("User not Found");
         }
         return optionalUser;
     }
 
-    // --------------------------------------------------------------------------------------------------------- //
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
 
     public void createCollection(CollectionCreateRequestDTO collectionCreateRequestDTO, String authHeader) {
         UserEntity thisUserEntity =  existsUserWithToken(authHeader).get();
@@ -67,6 +86,8 @@ public class CollectionService {
         collectionEntity.setErasable(true);
         collectionEntity.setUserEntity(thisUserEntity);
         collectionRepository.save(collectionEntity);
+        logService.logEntryDataBase(tableNameFromEntity(collectionEntity), thisUserEntity.getUserId(), objectMapper.convertValue(collectionEntity, new TypeReference<Map<String, Object>>() {}), null, 1);
+
     }
 
     // --------------------------------------------------------------------------------------------------------- //
@@ -80,6 +101,7 @@ public class CollectionService {
         }
 
         CollectionEntity thisCollectionEntity = optionalCollection.get();
+        CollectionEntity oldCollectionEntity = thisCollectionEntity;
 
         if(!(thisCollectionEntity.getUserEntity().getUserId().equals(thisUserEntity.getUserId()))) {
             throw new UserIDNotMatchException("The Collection does not belong to this user");
@@ -87,6 +109,7 @@ public class CollectionService {
 
         thisCollectionEntity.setTitle(collectionUpdateRequestDTO.getTitle());
         collectionRepository.save(thisCollectionEntity);
+        logService.logEntryDataBase(tableNameFromEntity(thisCollectionEntity), thisUserEntity.getUserId(), objectMapper.convertValue(thisCollectionEntity, new TypeReference<Map<String, Object>>() {}), objectMapper.convertValue(oldCollectionEntity, new TypeReference<Map<String, Object>>() {}), 2);
     }
 
     // --------------------------------------------------------------------------------------------------------- //
@@ -106,6 +129,7 @@ public class CollectionService {
         }
 
         collectionRepository.delete(thisCollectionEntity);
+        logService.logEntryDataBase(tableNameFromEntity(thisCollectionEntity), thisUserEntity.getUserId(), null, objectMapper.convertValue(thisCollectionEntity, new TypeReference<Map<String, Object>>() {}), 3);
     }
 
     // --------------------------------------------------------------------------------------------------------- //
@@ -140,6 +164,7 @@ public class CollectionService {
         collection_X_ProductEntity.setCollectionEntity(thisCollectionEntity);
         collection_X_ProductEntity.setProductEntity(thisProduct);
         repositoryCollectionXProduct.save(collection_X_ProductEntity);
+        logService.logEntryDataBase(tableNameFromEntity(collection_X_ProductEntity), thisUserEntity.getUserId(), objectMapper.convertValue(collection_X_ProductEntity, new TypeReference<Map<String, Object>>() {}), null, 1);
     }
 
     // --------------------------------------------------------------------------------------------------------- //
@@ -172,7 +197,7 @@ public class CollectionService {
 
         Collection_X_ProductEntity thisCollection_X_ProductEntity = optionalCollectionXProductEntity.get();
         repositoryCollectionXProduct.delete(thisCollection_X_ProductEntity);
-
+        logService.logEntryDataBase(tableNameFromEntity(thisCollection_X_ProductEntity), thisUserEntity.getUserId(), null, objectMapper.convertValue(thisCollection_X_ProductEntity, new TypeReference<Map<String, Object>>() {}), 3);
     }
 
     // --------------------------------------------------------------------------------------------------------- //

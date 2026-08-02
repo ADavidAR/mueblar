@@ -48,7 +48,6 @@ public class CatalogService {
     private final RepositoryCollection_X_Product repositoryCollection_X_Product;
 
     private final JwtService jwtService;
-
     private final LogService logService;
     private final ObjectMapper objectMapper;
     private final RepositoryUser userRepository;
@@ -62,6 +61,120 @@ public class CatalogService {
         }
         return entityClass.getSimpleName().toLowerCase();
     }
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
+
+    private Optional<UserEntity> existsUserWithToken(String authHeader) {
+        String uniqueEmailForUser = jwtService.extractEmail(authHeader);
+        Optional<UserEntity> optionalUser = userRepository.findByEmail(uniqueEmailForUser);
+        if (optionalUser.isEmpty()) {
+            throw new UserIDNotMatchException("User not Found");
+        }
+        return optionalUser;
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
+
+    @Transactional
+    protected ProductEntity createProductAndVariationsForUpdate(String authHeader, ProductCreateRequestDTO productCreateRequestDTO) {
+        UserEntity thisUserEntity =  existsUserWithToken(authHeader).get();
+
+        Optional<ProductEntity> optionalProduct = repositoryProduct.findByModelName(productCreateRequestDTO.getModel());
+        if (optionalProduct.isPresent()) {
+            throw new ProductAlreadyExistException("Product already exist with that model name");
+        }
+
+        ProductEntity productEntity = new ProductEntity();
+        productEntity.setModelName(productCreateRequestDTO.getModel());
+        productEntity.setDescription(productCreateRequestDTO.getDescription());
+        productEntity.setDimensions(productCreateRequestDTO.getDimensions());
+        productEntity.setEnabled(productCreateRequestDTO.getEnable());
+
+        Set<String> attributes_X_Product = new HashSet<>();
+        List<Attribute_X_ProductEntity> attributes_X_ProductEntityList = new ArrayList<>();
+        List<VariationEntity> variationEntityList = new ArrayList<>();
+        List<Product_X_CategoryEntity> product_x_categoryEntityList = new ArrayList<>();
+
+        List<VariationRequestDTO> variationRequestDTOList = productCreateRequestDTO.getVariations();
+        for(VariationRequestDTO thisVariationRequestDTO : variationRequestDTOList) {
+            VariationEntity thisVariationEntity = new VariationEntity();
+            thisVariationEntity.setSku(thisVariationRequestDTO.getSku());
+            thisVariationEntity.setVariationName(thisVariationRequestDTO.getName());
+            thisVariationEntity.setInstationParameters(thisVariationRequestDTO.getInstance_params());
+            thisVariationEntity.setModel3dPath(thisVariationRequestDTO.getModel_3d());
+            thisVariationEntity.setPrice(thisVariationRequestDTO.getPrice());
+            thisVariationEntity.setIsTop(thisVariationRequestDTO.getTop());
+            thisVariationEntity.setEnabled(thisVariationRequestDTO.getEnabled());
+
+            thisVariationEntity.setProductEntity(productEntity);
+
+            List<ThumbnailEntity> thumbnailEntityList = new ArrayList<>();
+            ThumbnailEntity thumbnailEntity = new ThumbnailEntity();
+            thumbnailEntity.setThumbnailPath(thisVariationRequestDTO.getThumbnail());
+            thumbnailEntity.setIsTop(true);
+            thumbnailEntity.setVariationEntity(thisVariationEntity);
+            thumbnailEntityList.add(thumbnailEntity);
+
+            List<String> thumbnailResponseList = thisVariationRequestDTO.getImgs();
+            for(String thisThumbnailRequest : thumbnailResponseList) {
+                ThumbnailEntity thisThumbnailEntity = new ThumbnailEntity();
+                thisThumbnailEntity.setThumbnailPath(thisThumbnailRequest);
+                thisThumbnailEntity.setIsTop(false);
+                thisThumbnailEntity.setVariationEntity(thisVariationEntity);
+                thumbnailEntityList.add(thisThumbnailEntity);
+            }
+            thisVariationEntity.setThumbnailEntities(thumbnailEntityList);
+
+            List<Attribute_X_VariationEntity> attribute_X_variationEntityList = new ArrayList<>();
+            List<AttributeSummaryRequestDTO> attributeSummaryRequestDTOList = thisVariationRequestDTO.getAtribs();
+            for(AttributeSummaryRequestDTO thisAttributeSummaryRequestDTO : attributeSummaryRequestDTOList) {
+                Optional<AttributeEntity> optionalAttribute = repositoryAttribute.findByAttributeId(thisAttributeSummaryRequestDTO.getId());
+                if(optionalAttribute.isEmpty()) {
+                    throw new ResourceNotFoundException("Attribute was not found");
+                }
+
+                AttributeEntity thisAttributeEntity = optionalAttribute.get();
+                Attribute_X_VariationEntity thisAttribute_X_VariationEntity = new Attribute_X_VariationEntity();
+                thisAttribute_X_VariationEntity.setAttributeValue(thisAttributeSummaryRequestDTO.getValue());
+                thisAttribute_X_VariationEntity.setAttributeEntity(thisAttributeEntity);
+                thisAttribute_X_VariationEntity.setVariationEntity(thisVariationEntity);
+                attribute_X_variationEntityList.add(thisAttribute_X_VariationEntity);
+
+                if (!attributes_X_Product.contains(thisAttributeEntity.getAttributeId())) {
+                    Attribute_X_ProductEntity thisAttribute_x_ProductEntity = new Attribute_X_ProductEntity();
+                    thisAttribute_x_ProductEntity.setAttributeEntity(thisAttributeEntity);
+                    thisAttribute_x_ProductEntity.setProductEntity(productEntity);
+                    attributes_X_ProductEntityList.add(thisAttribute_x_ProductEntity);
+
+                    attributes_X_Product.add(thisAttributeEntity.getAttributeId());
+                }
+            }
+            thisVariationEntity.setAttributeXVariationEntities(attribute_X_variationEntityList);
+            variationEntityList.add(thisVariationEntity);
+        }
+
+        List<CategoryRequestDTO> categoryRequestDTOList = productCreateRequestDTO.getCategories();
+        for(CategoryRequestDTO thisCategoryResponseDTO : categoryRequestDTOList) {
+            Optional<CategoryEntity> optionalCategory = repositoryCategory.findByCategoryId(thisCategoryResponseDTO.getId());
+            if(optionalCategory.isEmpty()){
+                throw new ResourceNotFoundException("Category not found");
+            }
+            Product_X_CategoryEntity thisProduct_X_CategoryEntity = new Product_X_CategoryEntity();
+            thisProduct_X_CategoryEntity.setCategoryEntity(optionalCategory.get());
+            thisProduct_X_CategoryEntity.setProductEntity(productEntity);
+            thisProduct_X_CategoryEntity.setProductEntity(productEntity);
+            product_x_categoryEntityList.add(thisProduct_X_CategoryEntity);
+        }
+
+        productEntity.setVariationEntityList(variationEntityList);
+        productEntity.setProductXCategoryEntityList(product_x_categoryEntityList);
+        productEntity.setAttributeXProductEntities(attributes_X_ProductEntityList);
+
+        repositoryProduct.save(productEntity);
+        return productEntity;
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
 
     @Transactional
     public void createProductAndVariations(String authHeader, ProductCreateRequestDTO productCreateRequestDTO) {
@@ -175,12 +288,13 @@ public class CatalogService {
         }
 
         ProductEntity thisProductEntity = optionalProduct.get();
+        ProductEntity oldProductEntity = thisProductEntity;
 
         if (!(modelOfProduct.equals(productCreateRequestDTO.getModel()))) {
-            createProductAndVariations(authHeader, productCreateRequestDTO);
+            ProductEntity newProductEntity = createProductAndVariationsForUpdate(authHeader, productCreateRequestDTO);
             repositoryProduct.delete(thisProductEntity);
             repositoryProduct.flush();
-            logService.logEntryDataBase(tableNameFromEntity(thisProductEntity), thisUserEntity.getUserId(), null, objectMapper.convertValue(thisProductEntity, new TypeReference<Map<String, Object>>() {}), 2);
+            logService.logEntryDataBase(tableNameFromEntity(thisProductEntity), thisUserEntity.getUserId(), objectMapper.convertValue(newProductEntity, new TypeReference<Map<String, Object>>() {}), objectMapper.convertValue(thisProductEntity, new TypeReference<Map<String, Object>>() {}), 2);
             return;
         }
 
@@ -362,13 +476,15 @@ public class CatalogService {
             product_x_categoryEntityList.add(thisProduct_X_CategoryEntity);
         }
         repositoryProduct.save(thisProductEntity);
-        logService.logEntryDataBase(tableNameFromEntity(thisProductEntity), thisUserEntity.getUserId(), objectMapper.convertValue(thisProductEntity, new TypeReference<Map<String, Object>>() {}), null, 1);
+        logService.logEntryDataBase(tableNameFromEntity(thisProductEntity), thisUserEntity.getUserId(), objectMapper.convertValue(thisProductEntity, new TypeReference<Map<String, Object>>() {}), objectMapper.convertValue(oldProductEntity, new TypeReference<Map<String, Object>>() {}), 2);
     }
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
 
     @Transactional
-    public void deleteProductCascade(String modelOfProduct) {
+    public void deleteProductCascade(String authHeader, String modelOfProduct) {
+        UserEntity thisUserEntity =  existsUserWithToken(authHeader).get();
+
         Optional<ProductEntity> optionalProduct = repositoryProduct.findByModelName(modelOfProduct);
         if(optionalProduct.isEmpty()){
             throw new ResourceNotFoundException("Product not found");
@@ -376,6 +492,7 @@ public class CatalogService {
 
         ProductEntity thisProductEntity = optionalProduct.get();
         repositoryProduct.delete(thisProductEntity);
+        logService.logEntryDataBase(tableNameFromEntity(thisProductEntity), thisUserEntity.getUserId(), null, objectMapper.convertValue(thisProductEntity, new TypeReference<Map<String, Object>>() {}), 3);
     }
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
@@ -527,17 +644,6 @@ public class CatalogService {
             productResponseDTOList.add(productResponseDTO);
         }
         return productResponseDTOList;
-    }
-
-    // ----------------------------------------------------------------------------------------------------------------------------------------//
-
-    private Optional<UserEntity> existsUserWithToken(String authHeader) {
-        String uniqueEmailForUser = jwtService.extractEmail(authHeader);
-        Optional<UserEntity> optionalUser = repositoryUser.findByEmail(uniqueEmailForUser);
-        if (optionalUser.isEmpty()) {
-            throw new UserIDNotMatchException("User not Found, Cannot create or access to Collection");
-        }
-        return optionalUser;
     }
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//

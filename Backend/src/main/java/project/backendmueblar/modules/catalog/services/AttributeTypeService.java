@@ -46,14 +46,18 @@ public class AttributeTypeService {
         return entityClass.getSimpleName().toLowerCase();
     }
 
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
+
     private Optional<UserEntity> existsUserWithToken(String authHeader) {
         String uniqueEmailForUser = jwtService.extractEmail(authHeader);
         Optional<UserEntity> optionalUser = userRepository.findByEmail(uniqueEmailForUser);
         if (optionalUser.isEmpty()) {
-            throw new UserIDNotMatchException("User not Found, Cannot create or access to Collection");
+            throw new UserIDNotMatchException("User not Found");
         }
         return optionalUser;
     }
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
 
     public AttributeTypeResponseDTO getSpecificAttributeType(String attributeTypeId) {
         Optional<AttributeTypeEntity> optionalAttributeType = repositoryAttributeType.findByAttributeTypeId(attributeTypeId);

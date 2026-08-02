@@ -35,22 +35,24 @@ public class RestControllerUser {
     }
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<?> createUser(@Valid @RequestBody UserCreateRequestDTO userCreateRequestDTO){
-        userService.createUser(userCreateRequestDTO);
+    public ResponseEntity<?> createUser(@RequestHeader("Authorization") String authHeader, @Valid @RequestBody UserCreateRequestDTO userCreateRequestDTO){
+        userService.createUser(authHeader, userCreateRequestDTO);
         return ResponseEntity.status(201).build();
     }
 
     @PutMapping(value = "/{id}", consumes = "application/json")
-    public ResponseEntity<?> updateUser(@PathVariable("id") Long userId,
+    public ResponseEntity<?> updateUser(@RequestHeader("Authorization") String authHeader,
+                                        @PathVariable("id") Long userId,
                                         @Valid @RequestBody UserUpdateRequestDTO userUpdateRequestDTO
     ){
-        userService.updateUser(userId, userUpdateRequestDTO);
+        userService.updateUser(authHeader, userId, userUpdateRequestDTO);
         return ResponseEntity.status(200).build();
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable("id") Long userId) {
-        userService.deleteUser(userId);
+    public ResponseEntity<?> deleteUser(@RequestHeader("Authorization") String authHeader,
+                                        @PathVariable("id") Long userId) {
+        userService.deleteUser(authHeader, userId);
         return ResponseEntity.status(204).build();
     }
 }

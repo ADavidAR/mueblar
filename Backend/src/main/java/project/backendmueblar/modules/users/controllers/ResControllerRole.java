@@ -30,22 +30,23 @@ public class ResControllerRole {
     }
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<?> createRole(@Valid @RequestBody RoleCreateRequestDTO roleCreateRequestDTO){
-        roleService.createRole(roleCreateRequestDTO);
+    public ResponseEntity<?> createRole(@RequestHeader("Authorization") String authHeader, @Valid @RequestBody RoleCreateRequestDTO roleCreateRequestDTO){
+        roleService.createRole(authHeader, roleCreateRequestDTO);
         return ResponseEntity.status(201).build();
     }
 
     @PutMapping(value = "/{id}", consumes = "application/json")
-    public ResponseEntity<?> updateRole(@PathVariable("id") Long roleId,
+    public ResponseEntity<?> updateRole(@RequestHeader("Authorization") String authHeader,
+                                        @PathVariable("id") Long roleId,
                                         @Valid @RequestBody RoleCreateRequestDTO roleUpdateRequestDTO
     ){
-        roleService.updateRole(roleId, roleUpdateRequestDTO);
+        roleService.updateRole(authHeader, roleId, roleUpdateRequestDTO);
         return ResponseEntity.status(200).build();
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<?> deleteRoleSpecific(@PathVariable("id") Long roleId){
-        roleService.deleteRoleSpecific(roleId);
+    public ResponseEntity<?> deleteRoleSpecific(@RequestHeader("Authorization") String authHeader, @PathVariable("id") Long roleId){
+        roleService.deleteRoleSpecific(authHeader, roleId);
         return ResponseEntity.status(204).build();
     }
 }

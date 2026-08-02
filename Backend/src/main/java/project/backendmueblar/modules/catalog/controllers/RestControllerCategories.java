@@ -23,20 +23,20 @@ public class RestControllerCategories {
     }
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<?> createCategory(@Valid @RequestBody CategoryCreateRequestDTO categoryCreateRequestDTO) {
-        categoryService.createCategory(categoryCreateRequestDTO);
+    public ResponseEntity<?> createCategory(@RequestHeader("Authorization") String authHeader, @Valid @RequestBody CategoryCreateRequestDTO categoryCreateRequestDTO) {
+        categoryService.createCategory(authHeader, categoryCreateRequestDTO);
         return ResponseEntity.status(201).build();
     }
 
     @PutMapping(value = "/{id_categoria}", consumes = "application/json")
-    public ResponseEntity<?> updateCategory(@PathVariable ("id_categoria") Long categoryID, @Valid @RequestBody CategoryCreateRequestDTO categoryCreateRequestDTO) {
-        categoryService.updateCategory(categoryID, categoryCreateRequestDTO);
+    public ResponseEntity<?> updateCategory(@RequestHeader("Authorization") String authHeader, @PathVariable ("id_categoria") Long categoryID, @Valid @RequestBody CategoryCreateRequestDTO categoryCreateRequestDTO) {
+        categoryService.updateCategory(authHeader, categoryID, categoryCreateRequestDTO);
         return ResponseEntity.status(200).build();
     }
 
     @DeleteMapping(value = "/{id_categoria}")
-    public ResponseEntity<?> deleteCategory(@PathVariable ("id_categoria") Long categoryID) {
-        categoryService.deleteCategory(categoryID);
+    public ResponseEntity<?> deleteCategory(@RequestHeader("Authorization") String authHeader, @PathVariable ("id_categoria") Long categoryID) {
+        categoryService.deleteCategory(authHeader, categoryID);
         return ResponseEntity.status(204).build();
     }
 }
