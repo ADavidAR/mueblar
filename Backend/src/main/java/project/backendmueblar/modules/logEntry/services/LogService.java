@@ -62,7 +62,7 @@ public class LogService {
         logRepository.save(logsEntity);
     }
 
-    public List<LogResponseDTO> getLogsFromDBFilter(Integer limit, Integer page){
+    public List<LogResponseDTO> getLogsFromDBFilter(Integer limit, Integer page, String tableName, String operationName){
         if(limit == 0){
             throw new InternalServerException("Cannot throw zero Roles");
         }
@@ -70,8 +70,19 @@ public class LogService {
         List<LogsEntity> logsEntityList;
         List<LogResponseDTO> logResponseDTOList = new ArrayList<>();
         Pageable pageable = PageRequest.of(page, limit);
+        boolean hasTableName = (tableName != null && !tableName.trim().isEmpty());
+        boolean hasOperationName = (operationName != null && !operationName.trim().isEmpty());
 
-        logsEntityList = logRepository.findAll(pageable).getContent();
+        if(hasTableName && hasOperationName){
+            logsEntityList = logRepository.findAllByTableNameContainingIgnoreCaseAndOperationTypeEntity_OperationTypeName(tableName, operationName, pageable);
+        } else if (hasTableName){
+            logsEntityList = logRepository.findAllByTableNameContainingIgnoreCase(tableName, pageable);
+        } else if (hasOperationName){
+            logsEntityList = logRepository.findAllByOperationTypeEntity_OperationTypeName(operationName, pageable);
+        } else {
+            logsEntityList = logRepository.findAll(pageable).getContent();
+        }
+
         for(LogsEntity thisLogsEntity : logsEntityList){
             LogResponseDTO thisLogResponseDTO = new LogResponseDTO();
             thisLogResponseDTO.setLogId(thisLogsEntity.getLogId());

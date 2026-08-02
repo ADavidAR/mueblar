@@ -22,8 +22,10 @@ public class LogController {
 
     @GetMapping(produces = "application/json")
     public ResponseEntity<List<LogResponseDTO>> getLogsFromDBFilter(@NotNull @RequestParam(defaultValue = "10") Integer limit,
-                                                                    @NotNull @RequestParam(defaultValue = "0") Integer page
+                                                                    @NotNull @RequestParam(defaultValue = "0") Integer page,
+                                                                    @RequestParam(required = false) String tableName,
+                                                                    @RequestParam(required = false) String operationName
     ){
-        return ResponseEntity.status(200).body(logService.getLogsFromDBFilter(limit, page));
+        return ResponseEntity.status(200).body(logService.getLogsFromDBFilter(limit, page, tableName, operationName));
     }
 }
