@@ -34,4 +34,4 @@ export const deleteRole = (id) =>
 // ── Permisos ───────────────────────────────────────────────────────────────
 
 export const getPermissions = () =>
-  request('/api/permissions')
+  []//request('/api/permissions')

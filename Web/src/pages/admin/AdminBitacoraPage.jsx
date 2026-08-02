@@ -23,11 +23,11 @@ function AddButton({ label, onClick }) {
   )
 }
 
-export default function AdminRolesPage() {
+export default function AdminBitacoraPage() {
   const { loading: permsLoading, access, create, canDelete, modify } = usePermissions('/view/roles-management')
 
   const navigate          = useNavigate()
-  const [roles, setRoles] = useState([]) 
+  const [logs, setlog] = useState([]) 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [searchQ, setSearchQ] = useState('')

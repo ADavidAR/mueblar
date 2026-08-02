@@ -17,7 +17,7 @@ export const getUser = (id) =>
   request(`/api/users/${id}`)
 
 export const createUser = (payload) =>
-  request('/api/users/add', {
+  request('/api/users', {
     method: 'POST',
     body: JSON.stringify(payload),
   })

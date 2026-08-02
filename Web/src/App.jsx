@@ -19,6 +19,8 @@ import AdminAttributesPage from './pages/admin/AdminAttributesPage'
 import AdminRolesPage from './pages/admin/AdminRolesPage'
 import AdminUsersPage from './pages/admin/AdminUsersPage'
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage'
+import { AdminRoleFromPage } from './pages/admin/AdminRoleFromPage'
+import { AdminUserFromPage } from './pages/admin/AdminUserFromPage'
 
 function AdminRoute({ children }) {
   const { user } = useAuth()
@@ -77,8 +79,26 @@ function App() {
             element={<AdminRoute><AdminRolesPage /></AdminRoute>}
           />
           <Route
+          path="/view/roles/create"
+          element={<AdminRoute><AdminRoleFromPage/></AdminRoute>}
+          />
+
+          <Route
+            path="/view/roles/edit/:id"
+            element={<AdminRoute><AdminRoleFromPage /></AdminRoute>}
+          />
+
+          <Route
             path="/view/users-management"
-            element={<AdminRoute><AdminUsersPage /></AdminRoute>}
+            element={<AdminRoute><AdminUsersPage/></AdminRoute>}
+          />
+           <Route
+            path="/view/users/create"
+            element={<AdminRoute><AdminUserFromPage/></AdminRoute>}
+          />
+            <Route
+            path="/view/users/edit/:id"
+            element={<AdminRoute><AdminUserFromPage/></AdminRoute>}
           />
           <Route
             path="/view/categories-management"
