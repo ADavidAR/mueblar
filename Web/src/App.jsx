@@ -26,10 +26,9 @@ import AdminBitacoraPage from './pages/admin/AdminBitacoraPage'
 function AdminRoute({ children }) {
   const { user } = useAuth()
   if (!user) return <Navigate to="/login" replace />
-  if (!['admin', 'gerente'].includes(user.role)) return <Navigate to="/view/main-view" replace />
+  if (!user.modules || user.modules.length === 0) return <Navigate to="/view/main-view" replace />
   return children
 }
-
 function App() {
   return (
     <BrowserRouter>

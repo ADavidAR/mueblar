@@ -18,6 +18,11 @@ export default function AdminLayout({ children, title, searchPlaceholder, action
   const navigate = useNavigate()
   const { pathname } = useLocation()
 
+   // Un Set con las rutas que el usuario sí puede ver, según lo que
+  // AuthContext ya calculó con permisos reales en el login.
+  const allowedPaths = new Set((user?.modules ?? []).map((m) => m.to))
+  const visibleNav = ADMIN_NAV.filter((item) => allowedPaths.has(item.to))
+
   function handleLogout() {
     logout()
     navigate('/login')

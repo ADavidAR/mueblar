@@ -12,15 +12,12 @@ const MODULE_ICONS = {
   '/view/categories-management': Tag,
 }
 
-const ROLE_LABELS = {
-  admin:   'Administrador',
-  gerente: 'Gerente',
-}
+
 
 export default function AdminDashboardPage() {
   const { user } = useAuth()
   const modules = user?.modules ?? []
-  const roleLabel = ROLE_LABELS[user?.role] ?? user?.role ?? '—'
+  const roleLabel = user?.role ?? '—'
 
   return (
     <AdminLayout title="Dashboard">

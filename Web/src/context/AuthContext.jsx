@@ -12,6 +12,7 @@ const ALL_MODULES = [
   { permission: '/view/roles-management',      label: 'Gestión de Roles',          to: '/view/roles-management' },
   { permission: '/view/users-management',      label: 'Configuración de Usuarios', to: '/view/users-management' },
   { permission: '/view/categories-management', label: 'Categorías',                to: '/view/categories-management' },
+  { permission: '/view/reports',                label: 'Bitácoras',                 to: '/view/reports' }, 
 ]
 
 export function AuthProvider({ children }) {
