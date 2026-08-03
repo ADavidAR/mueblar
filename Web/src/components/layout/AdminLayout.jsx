@@ -41,7 +41,7 @@ export default function AdminLayout({ children, title, searchPlaceholder, action
         </Link>
 
         <nav className="flex flex-col gap-0.5">
-          {ADMIN_NAV.map(({ label, to, icon: Icon }) => (
+          {visibleNav.map(({ label, to, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
