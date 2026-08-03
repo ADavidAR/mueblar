@@ -51,6 +51,11 @@ export default function AdminUsersPage() {
   const [users, setUsers]     = useState([])//lista original traida
   const [userS,setUserS]=useState([])//para hacer busquedas mediante la barra de busqueda
   const [loading, setLoading] = useState(true)
+ 
+  //filtros paginacion y manejos de errore
+  const [nameFilter,setNameFilter] = useState("")
+  const [lastNameFilter,setLastNameFilter] = useState("")
+  
   const [error, setError]     = useState(null)
   const [searchQ, setSearchQ] = useState('')
   const [page, setPage]       = useState(0)
@@ -67,7 +72,11 @@ export default function AdminUsersPage() {
     let cancelled = false
     async function load() {
       try {
-        const res = await getUsers({ limit: PAGE_SIZE, offset: page * PAGE_SIZE })
+        const res = await getUsers({ 
+          limit: PAGE_SIZE,
+           page: page,
+          
+          })
         if (!cancelled) {
           setUsers(Array.isArray(res) ? res : [])
           setUserS(Array.isArray(res) ? res : [])
@@ -163,7 +172,7 @@ export default function AdminUsersPage() {
                 </td>
               </tr>
             ) : (
-              userS.map((u) => (
+              users.map((u) => (
                 confirmDeleteId === u.id ? (
                   
                    <tr key={u.id} className="border-b border-neutral-800">

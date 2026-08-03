@@ -2,10 +2,14 @@ import request from './request'
 
 // ── Usuarios (admin) ───────────────────────────────────────────────────────
 
-export const getUsers = ({ limit, offset } = {}) => {
+export const getUsers = ({ limit, page, email, firstName, lastName } = {}) => {
   const params = new URLSearchParams()
-  if (limit !== undefined)  params.set('limit', limit)
-  if (offset !== undefined) params.set('offset', offset)
+  if (limit !== undefined) params.set('limit', limit)
+  if (page !== undefined)  params.set('page', page)
+  if (email)                params.set('email', email)
+  if (firstName)            params.set('firstName', firstName)
+  if (lastName)              params.set('lastName', lastName)
+ 
   const qs = params.toString()
   return request(`/api/users${qs ? `?${qs}` : ''}`)
 }

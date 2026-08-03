@@ -196,7 +196,7 @@ export default function AdminBitacoraPage() {
     setDateFilter(d)
     setOperationName(o)
 
-
+    
     setLoading(true)
 
     try {

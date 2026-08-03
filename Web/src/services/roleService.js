@@ -2,10 +2,11 @@ import request from './request'
 
 // ── Roles ──────────────────────────────────────────────────────────────────
 
-export const getRoles = ({ limit, offset } = {}) => {
+export const getRoles = ({ limit, page,search} = {}) => {
   const params = new URLSearchParams()
   if (limit !== undefined)  params.set('limit', limit)
-  if (offset !== undefined) params.set('offset', offset)
+  if (page !== undefined) params.set('page', page)
+  if (search)             params.set('search', search)
   const qs = params.toString()
   return request(`/api/roles${qs ? `?${qs}` : ''}`)
 }

@@ -22,7 +22,7 @@ function AddButton({ label, onClick }) {
     </button>
   )
 }
-
+const PAGE_SIZE=10
 export default function AdminRolesPage() {
   const { loading: permsLoading, access, create, canDelete, modify } = usePermissions('/view/roles-management')
 
@@ -31,6 +31,7 @@ export default function AdminRolesPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [searchQ, setSearchQ] = useState('')
+  const [page,setPage]=useState(0)
 
 
  
@@ -45,7 +46,12 @@ export default function AdminRolesPage() {
     let cancelled = false
     async function load() {
       try {
-        const [rolesRes] = await Promise.all([getRoles()])
+        const [rolesRes] = await Promise.all([getRoles({
+           limit: PAGE_SIZE,
+           page: page,
+           search:searchQ
+          
+        })])
         if (!cancelled) {
           setRoles(Array.isArray(rolesRes) ? rolesRes : [])
          
@@ -60,17 +66,30 @@ export default function AdminRolesPage() {
     }
     load()
     return () => { cancelled = true }
-  }, [fetchKey])
+  }, [page, fetchKey])
 
-  async function handleSearch(e) {
-    const q = e.target.value
-    setSearchQ(q)
-    if (!q.trim()) { setLoading(true); setFetchKey((k) => k + 1); return }
-    try {
-     const res = roles.filter((r) => r.name.toLowerCase().includes(q.toLowerCase()))
+  async function handleSearch(s) {
+   
+       const sf =  s!== undefined ? s.target.value : searchQ
       
-      setRoles(Array.isArray(res) ? res : [])
-    } catch { /* mantiene lista actual */ }
+   
+       setSearchQ(sf)
+   
+       setLoading(true)
+   
+       try {
+         const res = await getRoles({
+          limit: PAGE_SIZE,
+           page: page,
+           search:sf
+         })
+         setRoles(Array.isArray(res) ? res : [])
+         setError(null)
+       } catch (err) { setError(err.message) }
+       finally {
+         setLoading(false)
+         setPage(0)
+       }
   }
 
   async function handleDelete(id, name) {
@@ -187,6 +206,28 @@ export default function AdminRolesPage() {
               ))}
             </ul>
           )}
+        </div>
+        <div className="mt-4 flex items-center justify-between text-xs text-neutral-500">
+          <span>Mostrando {roles.length} entradas</span>
+          <div className="flex gap-1">
+            <button
+              disabled={page === 0}
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              className="flex h-7 w-7 items-center justify-center rounded border border-neutral-700 text-neutral-400 disabled:opacity-40 hover:border-copper hover:text-copper-light"
+            >
+              ‹
+            </button>
+            <span className="flex h-7 w-7 items-center justify-center rounded border border-copper bg-copper/10 text-copper-light">
+              {page + 1}
+            </span>
+            <button
+              disabled={roles.length < PAGE_SIZE}
+              onClick={() => setPage((p) => p + 1)}
+              className="flex h-7 w-7 items-center justify-center rounded border border-neutral-700 text-neutral-400 disabled:opacity-40 hover:border-copper hover:text-copper-light"
+            >
+              ›
+            </button>
+          </div>
         </div>
       </section>
 
