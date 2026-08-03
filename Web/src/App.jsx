@@ -21,6 +21,7 @@ import AdminUsersPage from './pages/admin/AdminUsersPage'
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage'
 import { AdminRoleFromPage } from './pages/admin/AdminRoleFromPage'
 import { AdminUserFromPage } from './pages/admin/AdminUserFromPage'
+import AdminBitacoraPage from './pages/admin/AdminBitacoraPage'
 
 function AdminRoute({ children }) {
   const { user } = useAuth()
@@ -103,6 +104,10 @@ function App() {
           <Route
             path="/view/categories-management"
             element={<AdminRoute><AdminCategoriesPage /></AdminRoute>}
+          />
+          <Route
+            path="/view/reports"
+            element={<AdminRoute><AdminBitacoraPage /></AdminRoute>}
           />
         </Routes>
       </AuthProvider>

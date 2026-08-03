@@ -1,6 +1,6 @@
 import { NavLink, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { Package, Shield, Settings, Tag, LogOut, Search, User, ArrowUpRight, Layers, List } from '../ui/icons'
+import { Package, Shield, Settings, Tag, LogOut, Search, User, ArrowUpRight, Layers, List, Logs } from '../ui/icons'
 import PageTransition from './PageTransition'
 
 const ADMIN_NAV = [
@@ -10,6 +10,7 @@ const ADMIN_NAV = [
   { label: 'Categorías',              to: '/view/categories-management',  icon: Tag     },
   { label: 'Tipos de Atributo',       to: '/view/attribute-types',        icon: Layers  },
   { label: 'Atributos',               to: '/view/attributes',             icon: List    },
+  { label: 'Bitácoras',               to: '/view/reports',                icon: Logs    },
 ]
 
 export default function AdminLayout({ children, title, searchPlaceholder, action }) {

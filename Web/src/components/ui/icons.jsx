@@ -264,3 +264,20 @@ export function EyeOff({ className = '' }) {
     </svg>
   )
 }
+export function Logs(props) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <rect x="5" y="3" width="14" height="18" rx="2" />
+      <path d="M9 3v2a1 1 0 001 1h4a1 1 0 001-1V3" />
+      <path d="M8 11h8M8 15h8M8 19h5" />
+    </svg>
+  )
+}
