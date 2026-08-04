@@ -28,10 +28,9 @@ public class RestControllerUser {
     public ResponseEntity<List<UserSummaryResponseDTO>> getAllUsers(@RequestParam(defaultValue = "10") Integer limit,
                                                                     @RequestParam(defaultValue = "0") Integer page,
                                                                     @RequestParam(required = false) String email,
-                                                                    @RequestParam(required = false) String firstName,
-                                                                    @RequestParam(required = false) String lastName
+                                                                    @RequestParam(required = false) String name
     ) {
-        return ResponseEntity.status(200).body(userService.getAllUsers(limit, page, email, firstName, lastName));
+        return ResponseEntity.status(200).body(userService.getAllUsers(limit, page, email, name));
     }
 
     @PostMapping(consumes = "application/json")

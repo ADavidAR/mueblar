@@ -99,7 +99,7 @@ public class ServiceUser {
 
     // ------------------------------------------------------------------------------------------------------- //
 
-    public List<UserSummaryResponseDTO> getAllUsers(Integer limit, Integer page, String emailSearch, String firstNameSearch, String lastNameSearch) {
+    public List<UserSummaryResponseDTO> getAllUsers(Integer limit, Integer page, String emailSearch, String nameSearch) {
         if(limit == 0) {
             throw new InternalServerException("Cannot throw zero Users");
         }
@@ -108,31 +108,34 @@ public class ServiceUser {
         Pageable pageable = PageRequest.of(page, limit);
 
         boolean hasEmail = (emailSearch != null && !emailSearch.trim().isEmpty());
-        boolean hasFirstName = (firstNameSearch != null && !firstNameSearch.trim().isEmpty());
-        boolean hasLastName = (lastNameSearch != null && !lastNameSearch.trim().isEmpty());
+        boolean hasName = (nameSearch != null && !nameSearch.trim().isEmpty());
 
-        if(hasEmail && hasFirstName && hasLastName) {
-            userEntityList = repositoryUser.findAllByEmailContainingIgnoreCaseAndFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCase(emailSearch, firstNameSearch, lastNameSearch, pageable);
-        }
-        else if (hasEmail && hasFirstName) {
-            userEntityList = repositoryUser.findAllByEmailContainingIgnoreCaseAndFirstNameContainingIgnoreCase(emailSearch, firstNameSearch, pageable);
-        }
-        else if (hasEmail && hasLastName) {
-            userEntityList = repositoryUser.findAllByEmailContainingIgnoreCaseAndLastNameContainingIgnoreCase(emailSearch, lastNameSearch, pageable);
-        }
-        else if (hasFirstName && hasLastName) {
-            userEntityList = repositoryUser.findAllByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCase(firstNameSearch, lastNameSearch, pageable);
-        }
-        else if (hasEmail) {
+        if (hasName) {
+            String[] nameParts = nameSearch.trim().split("\\s+");
+
+            if (nameParts.length >= 2) {
+                String firstNameSearch = nameParts[0];
+                String lastNameSearch = nameParts[nameParts.length - 1];
+
+                if (hasEmail) {
+                    userEntityList = repositoryUser.findAllByEmailContainingIgnoreCaseAndFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCase(
+                            emailSearch, firstNameSearch, lastNameSearch, pageable);
+                } else {
+                    userEntityList = repositoryUser.findAllByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCase(
+                            firstNameSearch, lastNameSearch, pageable);
+                }
+            } else {
+                if (hasEmail) {
+                    userEntityList = repositoryUser.findAllByEmailContainingIgnoreCaseOrFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
+                            emailSearch, nameSearch, nameSearch, pageable);
+                } else {
+                    userEntityList = repositoryUser.findAllByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
+                            nameSearch, nameSearch, pageable);
+                }
+            }
+        } else if (hasEmail) {
             userEntityList = repositoryUser.findAllByEmailContainingIgnoreCase(emailSearch, pageable);
-        }
-        else if (hasFirstName) {
-            userEntityList = repositoryUser.findAllByFirstNameContainingIgnoreCase(firstNameSearch, pageable);
-        }
-        else if (hasLastName) {
-            userEntityList = repositoryUser.findAllByLastNameContainingIgnoreCase(lastNameSearch, pageable);
-        }
-        else {
+        } else {
             userEntityList = repositoryUser.findAll(pageable).getContent();
         }
 
@@ -220,8 +223,6 @@ public class ServiceUser {
                 throw new RuntimeException("Invalid Password");
             }
             thisUserEntity.setPasswordHash(passwordEncoder.encode(optionalNewPasswordToHash));
-        } else {
-            throw new RuntimeException("Invalid Password");
         }
 
         repositoryUser.save(thisUserEntity);
