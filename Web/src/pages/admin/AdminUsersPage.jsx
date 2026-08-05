@@ -5,7 +5,7 @@ import { Plus, Pencil, Trash } from '../../components/ui/icons'
 import { usePermissions } from '../../hooks/usePermissions'
 import {
   getUsers,
-  searchUsers,
+
   deleteUser,
 } from '../../services/userAdminService'
 import { useNavigate } from 'react-router-dom'
@@ -53,9 +53,6 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true)
  
   //filtros paginacion y manejos de errore
-  const [nameFilter,setNameFilter] = useState("")
-  
-  
   const [error, setError]     = useState(null)
   const [searchQ, setSearchQ] = useState('')
   const [page, setPage]       = useState(0)
@@ -65,7 +62,7 @@ export default function AdminUsersPage() {
    const [confirmDeleteId, setConfirmDeleteId] = useState(null)
    const [deleting, setDeleting]               = useState(false)
 
-  const [fetchKey, setFetchKey] = useState(0)
+ 
 
   //cargar la data a la hora de cargar la pagina
   useEffect(() => {
@@ -90,7 +87,7 @@ export default function AdminUsersPage() {
     }
     load()
     return () => { cancelled = true }
-  }, [page, fetchKey,refresh])
+  }, [page,refresh])
 
 
 //funcion para realizar busquedas por nombre
@@ -231,6 +228,7 @@ export default function AdminUsersPage() {
                   <td className="py-3 text-right">
                     {u.role.editable?(
                     <div className="inline-flex gap-1">
+                
                       {modify && (
                         <button
                         onClick={()=>navigate(`/view/users/edit/${u.id}`)} 

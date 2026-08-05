@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import {  useNavigate } from 'react-router-dom'
 import AdminLayout from '../../components/layout/AdminLayout'
 import AccessDenied from '../../components/admin/AccessDenied'
 import { Plus, Pencil, Trash } from '../../components/ui/icons'
 import { usePermissions } from '../../hooks/usePermissions'
 import {
   getRoles,
-  searchRoles,
   deleteRole,
 } from '../../services/roleService'
 
@@ -24,8 +23,9 @@ function AddButton({ label, onClick }) {
 }
 const PAGE_SIZE=10
 export default function AdminRolesPage() {
+  //definimos si el susuario tiene los permisos
   const { loading: permsLoading, access, create, canDelete, modify } = usePermissions('/view/roles-management')
-
+//manejo de los roles, carga y errores
   const navigate          = useNavigate()
   const [roles, setRoles] = useState([]) 
   const [loading, setLoading] = useState(true)
@@ -40,8 +40,10 @@ export default function AdminRolesPage() {
    const [confirmDeleteId, setConfirmDeleteId] = useState(null)
    const [deleting, setDeleting]               = useState(false)
 
-  const [fetchKey, setFetchKey] = useState(0)
 
+
+
+  //cargamos los roles
   useEffect(() => {
     let cancelled = false
     async function load() {
@@ -66,8 +68,10 @@ export default function AdminRolesPage() {
     }
     load()
     return () => { cancelled = true }
-  }, [page, fetchKey])
+  }, [page])
 
+
+  //funcion asociada a la barra de busqueda
   async function handleSearch(s) {
    
        const sf =  s!== undefined ? s.target.value : searchQ
@@ -92,13 +96,16 @@ export default function AdminRolesPage() {
        }
   }
 
-  async function handleDelete(id, name) {
-    
+  // eliminacion de role
+  async function handleDelete(id) {
+     setDeleting(true)
     try {
       await deleteRole(id)
       setRoles((prev) => prev.filter((r) => r.id !== id))
+       setConfirmDeleteId(null)
     } catch (err) {
       alert(err.message)
+      setDeleting(false)
     }
   }
 
@@ -182,6 +189,7 @@ export default function AdminRolesPage() {
                         <span className="h-2 w-2 rounded-full bg-copper/60" />
                         <span className="text-sm font-medium text-white">{r.name}</span>
                       </div>
+                      {r.editable?(
                       <div className="flex gap-1">
                         {modify && (
                           <button
@@ -200,6 +208,13 @@ export default function AdminRolesPage() {
                           </button>
                         )}
                       </div>
+                  ):
+                  (
+                         
+                           <p className="py-3 pr-4 text-neutral-300">
+                      Rol No Editable
+                    </p>
+                  )}
                     </div>
                   )}
                 </li>

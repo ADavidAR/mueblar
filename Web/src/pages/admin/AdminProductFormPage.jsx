@@ -12,6 +12,7 @@ import {
 } from '../../services/productService'
 import { getCategories } from '../../services/categoryService'
 
+//inputs para ingresar las dimenciones del modelo
 function DimensionBox({ label, value, onChange }) {
   return (
     <div className="rounded-xl border border-neutral-700 bg-neutral-900 px-4 py-5 text-center">
@@ -27,6 +28,7 @@ function DimensionBox({ label, value, onChange }) {
   )
 }
 
+//checkbos para modal
 function ModalCheckbox({ label, checked, onChange }) {
   return (
     <label className="flex items-center gap-2 text-sm text-neutral-300">
@@ -61,6 +63,15 @@ function DropZone({ label, hint, value, onUrlChange }) {
       />
     </div>
   )
+}
+
+// El id/nombre del tipo de atributo "Color" tal como vive en tu base de
+// datos. Ajusta este string si en tu tabla tipo_atributo el id real es
+// distinto (por ejemplo, si guardaste "Color" en vez de "color").
+const COLOR_TYPE_ID = 'color'
+
+function isColorType(typeId) {
+  return typeId?.toLowerCase() === COLOR_TYPE_ID
 }
 
 let variantSeq = 0
@@ -117,6 +128,14 @@ export default function AdminProductFormPage() {
   const [saving, setSaving]       = useState(false)
   const [saveError, setSaveError] = useState(null)
 
+  // Todos los ids de atributo que pertenecen al tipo Color (puede haber
+  // varios: "Morado", "Rojo", etc.) — se usa para saber cuáles hay que
+  // quitar cuando se agrega un color nuevo, y para pintar el swatch en
+  // los chips de abajo.
+  const colorAttributeIds = new Set(
+    attributes.filter((a) => isColorType(a.atribType?.id)).map((a) => a.id)
+  )
+//en este useEffect se cargan todos los datos que se necesitan para crear el producto 
   useEffect(() => {
     let cancelled = false
     async function loadRefs() {
@@ -201,10 +220,22 @@ export default function AdminProductFormPage() {
   function handleAddAttrib() {
     if (!addAttrTypeId || !addAttrId || !addAttrValue.trim() || typeof selected !== 'number') return
     const v = variants[selected]
-    updateVariant(selected, {
-      attribIds: v.attribIds.includes(addAttrId) ? v.attribIds : [...v.attribIds, addAttrId],
-      attribValues: { ...v.attribValues, [addAttrId]: addAttrValue.trim() },
-    })
+
+    let nextAttribIds = v.attribIds
+    const nextAttribValues = { ...v.attribValues }
+
+    if (isColorType(addAttrTypeId)) {
+      // Único color por variante: primero se quita cualquier atributo de
+      // tipo Color que ya estuviera asignado (aunque fuera un color
+      // distinto, ej. "Rojo"), y recién después se agrega el nuevo.
+      nextAttribIds = nextAttribIds.filter((id) => !colorAttributeIds.has(id))
+      colorAttributeIds.forEach((id) => delete nextAttribValues[id])
+    }
+
+    nextAttribIds = nextAttribIds.includes(addAttrId) ? nextAttribIds : [...nextAttribIds, addAttrId]
+    nextAttribValues[addAttrId] = addAttrValue.trim()
+
+    updateVariant(selected, { attribIds: nextAttribIds, attribValues: nextAttribValues })
     setAddAttrTypeId('')
     setAddAttrId('')
     setAddAttrValue('')
@@ -463,7 +494,10 @@ export default function AdminProductFormPage() {
 
                 <div className="grid grid-cols-2 gap-x-6 gap-y-6">
                   <ModalField label="Tipo Atributo">
-                    <ModalSelect value={addAttrTypeId} onChange={(e) => { setAddAttrTypeId(e.target.value); setAddAttrId('') }}>
+                    <ModalSelect
+                      value={addAttrTypeId}
+                      onChange={(e) => { setAddAttrTypeId(e.target.value); setAddAttrId(''); setAddAttrValue('') }}
+                    >
                       <option value="">Seleccioná un tipo</option>
                       {attributeTypes.map((t) => (
                         <option key={t.id} value={t.id}>{t.id}</option>
@@ -480,9 +514,25 @@ export default function AdminProductFormPage() {
                   </ModalField>
                 </div>
 
-                <ModalField label="Nombre (valor del atributo)">
-                  <ModalInput placeholder="Ej: Roble" value={addAttrValue} onChange={(e) => setAddAttrValue(e.target.value)} />
-                </ModalField>
+                {isColorType(addAttrTypeId) ? (
+                  <ModalField label="Valor del Color">
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="color"
+                        value={addAttrValue || '#000000'}
+                        onChange={(e) => setAddAttrValue(e.target.value)}
+                        className="h-9 w-14 cursor-pointer rounded-lg border border-neutral-700 bg-transparent"
+                      />
+                      <span className="text-xs text-neutral-400">
+                        {addAttrValue || 'Elegí un color'}
+                      </span>
+                    </div>
+                  </ModalField>
+                ) : (
+                  <ModalField label="Nombre (valor del atributo)">
+                    <ModalInput placeholder="Ej: Roble" value={addAttrValue} onChange={(e) => setAddAttrValue(e.target.value)} />
+                  </ModalField>
+                )}
 
                 <button
                   type="button"
@@ -497,6 +547,12 @@ export default function AdminProductFormPage() {
                   <div className="flex flex-wrap gap-2">
                     {selectedVariant.attribIds.map((id) => (
                       <span key={id} className="flex items-center gap-1.5 rounded-full border border-copper/40 bg-copper/10 px-3 py-1 text-xs text-copper-light">
+                        {colorAttributeIds.has(id) && (
+                          <span
+                            className="h-3 w-3 rounded-full border border-white/20"
+                            style={{ backgroundColor: selectedVariant.attribValues[id] }}
+                          />
+                        )}
                         {id}
                         <button type="button" onClick={() => removeAttrib(selected, id)} className="hover:text-white">×</button>
                       </span>

@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
 import AdminLayout from '../../components/layout/AdminLayout'
 import AccessDenied from '../../components/admin/AccessDenied'
-import { Plus, Pencil, Trash } from '../../components/ui/icons'
+
 import { usePermissions } from '../../hooks/usePermissions'
 import { getLogs } from '../../services/logService'
 
@@ -135,9 +134,9 @@ function LogDetailModal({ open, log, onClose }) {
 
 const PAGE_SIZE = 10
 export default function AdminBitacoraPage() {
-  const { loading: permsLoading, access, create, canDelete, modify } = usePermissions('/view/reports')
+  const { loading: permsLoading, access } = usePermissions('/view/reports')
 
-  const navigate = useNavigate()
+  
   const [logs, setLogs] = useState([])
   const [dateFilter, setDateFilter] = useState(null)
   const [operationName, setOperationName] = useState(null)
@@ -150,14 +149,14 @@ export default function AdminBitacoraPage() {
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [searchQ, setSearchQ] = useState('')
+  
 
 
 
 
 
 
-  const [fetchKey, setFetchKey] = useState(0)
+  
 
   useEffect(() => {
     let cancelled = false
@@ -184,7 +183,7 @@ export default function AdminBitacoraPage() {
     }
     load()
     return () => { cancelled = true }
-  }, [page, fetchKey])
+  }, [page])
 
   async function handleSearch({ table, date, operation }) {
 

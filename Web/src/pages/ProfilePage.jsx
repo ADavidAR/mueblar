@@ -29,7 +29,7 @@ export default function ProfilePage() {
   const { user, loading } = useAuth()
 
   const [form, setForm] = useState(() => ({
-    name: user?.name ?? '',
+    name: user?.firstName ?? '',
     lastName: user?.lastName ?? '',
     email: user?.email ?? '',
     password: '',
@@ -140,7 +140,7 @@ export default function ProfilePage() {
                 size="md"
                 onClick={() =>
                   setForm({
-                    name: user.name ?? '',
+                    name: user.firstName ?? '',
                     lastName: user.lastName ?? '',
                     email: user.email ?? '',
                     password: '',

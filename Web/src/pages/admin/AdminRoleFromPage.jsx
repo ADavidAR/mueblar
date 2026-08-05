@@ -1,16 +1,12 @@
 import { useEffect, useState } from 'react'
-import {useParams, useNavigate, Route } from 'react-router-dom'
+import {useParams, useNavigate } from 'react-router-dom'
 import AdminLayout from '../../components/layout/AdminLayout'
 import { User } from '../../components/ui/icons'
 import { getRole,createRole,updateRole } from '../../services/roleService'
-// TODO: reemplazar por el servicio real una vez que tengamos
-// PermissionEntity / Permission_X_RoleEntity / el controlador de /api/roles
-// import { createRole } from '../../services/roleService'
+
 
 /*
-  Grupos de "módulo" para la matriz, armados a partir de las rutas reales
-  que ya confirmamos dentro del JWT (no son nombres inventados). Cada
-  módulo agrupa varios patrones de ruta bajo un mismo conjunto de 4
+ Cada módulo agrupa varios patrones de ruta bajo un mismo conjunto de 4
   interruptores (Acceso/Crear/Eliminar/Modificar).
 */
 const MODULES = [
@@ -52,7 +48,7 @@ const MODULES = [
   },
   {
     key: 7,
-    label: 'Dashboard y Reportes',
+    label: 'Bitácoras',
     
    
   }
@@ -101,11 +97,12 @@ function ToggleSwitch({ checked, onChange, disabled = false }) {
 
 
 export function AdminRoleFromPage() {
-
+  //se definien los estamos para que determinan si la pagina sera para editar o crear un nuevo role
   const {id:routeId}=useParams()
   const navigate = useNavigate()
   const isEdit= Boolean(routeId)
 
+  //aqui los datos almacenados que seran cargados en caso de edicion o llenados en caso de creacion
   const [roleName, setRoleName] = useState('')
   const [editable, setEditable] = useState(true)
   const [permissions, setPermissions] = useState(permissionsInitial )
@@ -145,7 +142,7 @@ export function AdminRoleFromPage() {
   function handleCancel() {
     navigate('/view/roles-management')
   }
-
+//en caso de ser edicion carga los datos 
   useEffect(()=>{
     let cancelled = false
     if(isEdit){
@@ -172,7 +169,7 @@ export function AdminRoleFromPage() {
 },[])
 
 
-
+// guarda los datos
   async function handleSave() {
     if (!roleName.trim()) {
       setError('El nombre del rol es obligatorio.')
@@ -187,10 +184,7 @@ export function AdminRoleFromPage() {
         editable:editable,
         permissions: permissions,
       }
-      // TODO: reemplazar por la llamada real al backend cuando tengamos
-      // confirmado el DTO de creación.
-      console.log('Payload de creación de rol (pendiente de conectar):', payload)
-      // await createRole(payload)
+     //en caso de editar llamamos a la funcion que edtar role y si es crear pues a la de creacion de rol
       if(isEdit){
         await updateRole(routeId,payload)
       }

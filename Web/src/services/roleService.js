@@ -31,8 +31,3 @@ export const updateRole = (id, payload) =>
 
 export const deleteRole = (id) =>
   request(`/api/roles/${id}`, { method: 'DELETE' })
-
-// ── Permisos ───────────────────────────────────────────────────────────────
-
-export const getPermissions = () =>
-  []//request('/api/permissions')

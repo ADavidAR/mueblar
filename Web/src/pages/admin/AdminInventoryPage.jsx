@@ -47,7 +47,7 @@ export default function AdminInventoryPage() {
 
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
   const [deleting, setDeleting]                = useState(false)
-
+  //permite cargar todos los modelos
   useEffect(() => {
     let cancelled = false
     async function load() {
@@ -66,7 +66,7 @@ export default function AdminInventoryPage() {
     load()
     return () => { cancelled = true }
   }, [page, fetchKey])
-
+//funcion de busqueda
   async function handleSearchProducts(e) {
     const q = e.target.value
     setSearchQ(q)
