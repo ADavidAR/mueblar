@@ -97,7 +97,7 @@ export default function AdminInventoryPage() {
   if (!permsLoading && !access) return <AccessDenied />
 
   return (
-    <AdminLayout title="Inventario" searchPlaceholder="Buscar catálogo...">
+    <AdminLayout title="Inventario" >
 
       {/* ── Productos ── */}
       <section className="rounded-2xl border border-neutral-800 bg-neutral-800/40 p-6">

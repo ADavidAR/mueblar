@@ -49,12 +49,12 @@ export default function AdminUsersPage() {
   const navigate= useNavigate()
   //usuarios del backend
   const [users, setUsers]     = useState([])//lista original traida
-  const [userS,setUserS]=useState([])//para hacer busquedas mediante la barra de busqueda
+  
   const [loading, setLoading] = useState(true)
  
   //filtros paginacion y manejos de errore
   const [nameFilter,setNameFilter] = useState("")
-  const [lastNameFilter,setLastNameFilter] = useState("")
+  
   
   const [error, setError]     = useState(null)
   const [searchQ, setSearchQ] = useState('')
@@ -75,11 +75,11 @@ export default function AdminUsersPage() {
         const res = await getUsers({ 
           limit: PAGE_SIZE,
            page: page,
-          
+          name:searchQ
           })
         if (!cancelled) {
           setUsers(Array.isArray(res) ? res : [])
-          setUserS(Array.isArray(res) ? res : [])
+        
           setError(null)
         }
       } catch (err) {
@@ -95,13 +95,26 @@ export default function AdminUsersPage() {
 
 //funcion para realizar busquedas por nombre
   async function handleSearch(e) {
-    const q = e.target.value
-    setSearchQ(q)
-    if (!q.trim()) { setLoading(true); setFetchKey((k) => k + 1); return }
-    try {
-       const res = users.filter((u) => (u.nombre + u.apellido).toLowerCase().includes(q.toLowerCase()))
-      setUserS(Array.isArray(res) ? res : [])
-    } catch { /* mantiene lista actual */ }
+    const sf =  e!== undefined ? e.target.value : searchQ
+         
+      
+          setSearchQ(sf)
+      
+          setLoading(true)
+      
+          try {
+            const res = await getUsers({
+             limit: PAGE_SIZE,
+              page: page,
+              name:sf
+            })
+            setUsers(Array.isArray(res) ? res : [])
+            setError(null)
+          } catch (err) { setError(err.message) }
+          finally {
+            setLoading(false)
+            setPage(0)
+          }
   }
 //funcion para confirmar borrado de un usuario
   async function handleDelete(id, name) {
@@ -216,6 +229,7 @@ export default function AdminUsersPage() {
                     <StatusBadge enabled={u.enabled !== false && u.habilitado !== false} />
                   </td>
                   <td className="py-3 text-right">
+                    {u.role.editable?(
                     <div className="inline-flex gap-1">
                       {modify && (
                         <button
@@ -233,6 +247,12 @@ export default function AdminUsersPage() {
                         </button>
                       )}
                     </div>
+                        ):(
+                         
+                           <p className="py-3 pr-4 text-neutral-300">
+                      Usuario No Editable
+                    </p>
+                        )}
                   </td>
                 </tr>
               )))
