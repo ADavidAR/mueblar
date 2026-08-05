@@ -15,11 +15,13 @@ export async function getSessionToken() {
     try {
         const token = await SecureStore.getItemAsync('user_session');
         if (token) {
-        return token;
+            return token;
         } else {
-        console.log('No session found.');
-        return null;
+            console.log('No session found.');
+            return null;
         }
+
+        // TODO api check session
     } catch (error) {
         console.error('Error fetching session:', error);
         return null;
@@ -35,6 +37,8 @@ async function deleteSessionToken() {
     }
 }
 
+// Wrapper central de fetch: agrega el Bearer token (salvo skipAuth) y
+// normaliza los errores del backend a un solo formato { message, details }.
 export const request = async (path, options = {}) => {
     const { skipAuth = false, ...fetchOptions } = options
     const token = !skipAuth ? await getSessionToken() : null
@@ -121,6 +125,7 @@ export const getPermitsForUrl = async (url) => {
         body: JSON.stringify({url})
     })
 
+    // `permits` es una máscara de bits: 8=acceso, 4=crear, 2=eliminar, 1=modificar.
     return {
         access: Boolean( permits & 8 ),
         create: Boolean( permits & 4 ),

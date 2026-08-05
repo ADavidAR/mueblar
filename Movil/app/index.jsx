@@ -6,6 +6,7 @@ import { COLORS } from '../constants/theme'
 import { isAuthenticated } from '../services/authService'
 
 
+// Portada: decide a dónde entra el usuario según si ya tiene sesión guardada.
 export default function Index() {
   const router = useRouter()
 

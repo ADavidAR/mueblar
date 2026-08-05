@@ -1,5 +1,6 @@
 import { request } from './authService'
 
+// Catálogo de productos: búsqueda paginada + detalle de producto/variación.
 export const fetchProducts = async (
     search = "",
     limit = undefined, 

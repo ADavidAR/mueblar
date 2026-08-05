@@ -27,9 +27,8 @@ export function useProfileForm({ name, lastName, email }, changePassword, trigge
     // Limpia el error de servidor en cuanto el usuario vuelve a escribir.
     const clearServerError = (field= "") => {
         if (requestError) {
-            if (!field) {
-                if ( field in 
-                    ["name", "lastName", "email", "currentPassword", "newPassword",]
+            if (field) {
+                if ( ["name", "lastName", "email", "currentPassword", "newPassword"].includes(field)
                 ) {
                     setRequestError((prev) => ({
                         ...prev,

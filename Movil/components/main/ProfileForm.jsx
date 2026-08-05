@@ -43,7 +43,7 @@ export default function ProfileForm () {
     useEffect(() => {
         if(shouldLoadUserData) {
             const initializeProfileData = async () => {
-                const newCurrentProfileData = {name: "Wombat Filiberto", lastName:"Reyes", email: "wombat.reyes@email.com"} //await fetchProfileData()
+                const newCurrentProfileData = await fetchProfileData()
                 setCurrentProfileData(newCurrentProfileData)
                 setShouldLoadUserData(false)
                 updateFormDefaults( newCurrentProfileData )

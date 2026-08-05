@@ -7,6 +7,10 @@ import { COLORS } from "../../constants/theme"
 import { useFilters } from "../../hooks/useFilters"
 import SerifText from "../ui/SerifText"
 
+// Lista paginada del catálogo (scroll infinito + pull-to-refresh).
+// `loadKey` lo cambia el padre (ej. al aplicar un filtro nuevo) para forzar
+// una recarga completa desde la página 0; `resetKey` se lo pasa a cada
+// AnimatedProductCard para reiniciar su animación de entrada.
 export default function ProductsList({ loadKey }) {
     const { getFilteredProduucts } = useFilters()
     const [products, setProducts] = useState([])

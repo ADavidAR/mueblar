@@ -6,21 +6,23 @@ import { fetchProducts } from "../services/inventoryService"
 
 import data from "../mocks/products.json"
 
+// Filtros de catálogo compartidos (búsqueda/categorías/materiales) +
+// la función que pide la página de productos correspondiente a esos filtros.
 export function useFilters() {
     const { filters, setFilters } = useContext(FiltersContext)
-    
+
     const getFilteredProduucts = useCallback(
         async (page, limit = PRODUCTS_FETCHING.limit) => {
 
-            const res =   await fetchProducts(
+            const filteredProducts =   await fetchProducts(
                 filters.search,
                 limit,
                 page,
                 filters.categories,
                 filters.materials
             )
-            
-            const filteredProducts = await res.json()
+
+            // devuelve el JSON parseado,
             return filteredProducts
         }, [filters])
 

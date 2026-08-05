@@ -5,6 +5,8 @@ import { useForm } from 'react-hook-form'
 import { registerUser, loginUser } from '../services/authService'
 import { mapAuthError } from '../constants/authErrors'
 
+// Lógica del formulario de registro: crea la cuenta y encadena un login
+// automático para dejar al usuario ya logueado.
 export function useRegisterForm() {
   const router = useRouter()
   const [requestError, setRequestError] = useState(null)
@@ -30,7 +32,7 @@ export function useRegisterForm() {
     try {
       await registerUser(name, lastName, email, password)
       await loginUser(email, password)
-      router.replace('/(main)/home')
+      router.replace('/view/catalog')
     } catch (err) {
       setRequestError(mapAuthError(err))
     }

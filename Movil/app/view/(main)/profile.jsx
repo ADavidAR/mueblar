@@ -8,6 +8,8 @@ import ProfileForm from "../../../components/main/ProfileForm"
 export default function Profile() {
     const router = useRouter()
 
+    // esto solo vuelve a la pantalla anterior (el botón "Salir" del
+    // header) — no es el cierre de sesión real, ese vive en ProfileForm.
     const handleLogout = () => {
         router.back()
     }

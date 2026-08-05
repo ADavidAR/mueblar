@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form'
 import { recoveryEmail } from '../services/authService'
 import { mapAuthError } from '../constants/authErrors'
 
+// Lógica del formulario "olvidé mi contraseña": pide el email y solo
+// marca `sent` como feedback — el reset real pasa por el link del correo.
 export function useRecoveryForm() {
   const [requestError, setRequestError] = useState(null)
   const [sent, setSent] = useState(false)

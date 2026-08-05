@@ -13,6 +13,7 @@ import "../../assets/img_placeholder.jpeg"
 import { CubeIcon, FilledHeartIcon, EmptyHeartIcon } from "../Icons"
 import { fetchSingleProduct } from "../../services/inventoryService"
 import { useCollections } from "../../hooks/useCollections"
+import { mapProductError } from "../../constants/authErrors"
 
 /** Construye la vista de datos derivada de una variación concreta. */
 function buildProductData(prod, variation) {
@@ -49,12 +50,17 @@ export default function ProductDetails ({ model, sku }) {
 
     useEffect(() => {
         const loadProduct = async () => {
-            const newProd = data.filter(p => p.model === model)[0] //await fetchSingleProduct(model, false)
-            const newVariation = newProd.variations.find( v => sku ? sku === v.sku : v.top )
-            setProduct(newProd)
-            setSelectedVariation(newVariation)
-            setSelectedImg(newVariation.thumbnail)
-            setProductData(buildProductData(newProd, newVariation))
+            try {
+                const newProd = await fetchSingleProduct(model, false)
+                const newVariation = newProd.variations.find( v => sku ? sku === v.sku : v.top )
+                setProduct(newProd)
+                setSelectedVariation(newVariation)
+                setSelectedImg(newVariation.thumbnail)
+                setProductData(buildProductData(newProd, newVariation))
+
+            } catch (error) {
+                mapProductError(error)
+            }
             
         }
 

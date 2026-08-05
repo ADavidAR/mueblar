@@ -22,6 +22,9 @@ export default function SaveToCollectionModal({ visible, onClose, productId }) {
         resetStates()
     }, [visible])
     
+    // Tocar una colección no la guarda al instante: solo la marca como
+    // pendiente de agregar/quitar. `handleSave` recién ahí aplica todo junto
+    // con `toggleSave`, así el usuario puede tildar varias antes de confirmar.
     const handlePress = (collectionId, added) => {
         setPendingCollectionsChanges( prev => {
             if ( added ) {

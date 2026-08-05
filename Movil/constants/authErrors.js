@@ -1,4 +1,6 @@
 
+// Traduce el status HTTP de login/registro/recuperación a un mensaje único
+// para mostrar en el formulario.
 export function mapAuthError(err) {
   const status = err?.status
   if (status === 409) return 'Ya existe una cuenta con ese correo.'
@@ -10,6 +12,17 @@ export function mapAuthError(err) {
   return err?.message || 'Ocurrió un error. Intentá de nuevo.'
 }
 
+export function mapProductError(err) {
+  const status = err?.status
+  if (status === 400) return 'Ups. Hubo algún error con este producto.'
+  if (status === 404) return 'No pudimos encontrar este porducto.'
+  if (status >= 500) return 'Error del servidor. Intentá de nuevo más tarde.'
+  return err?.message || 'Ocurrió un error. Intentá de nuevo.'
+}
+
+// A diferencia de mapAuthError, esta devuelve un objeto {campo: mensaje}
+// (o {campo: {message}} según el caso) para pintar el error debajo de cada
+// input del formulario de perfil, no un string suelto.
 export function mapUpdateUserError(err) {
   const status = err?.status
   if (status === 400 && err.details) {
@@ -24,7 +37,10 @@ export function mapUpdateUserError(err) {
     newPassword: "",
     server: "Error del servidor. Intentá de nuevo más tarde.",
   }
-  return err?.message || 'Ocurrió un error. Intentá de nuevo.'
+  return {
+    server: err?.message || 'Ocurrió un error. Intentá de nuevo.'
+  } 
+  
 }
 
 /** Reglas de validación reutilizables para react-hook-form. */
