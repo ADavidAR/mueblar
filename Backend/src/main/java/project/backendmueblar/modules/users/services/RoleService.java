@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import project.backendmueblar.exception.auth.RoleNotFoundException;
 import project.backendmueblar.exception.auth.UserIDNotMatchException;
 import project.backendmueblar.exception.catalog.InternalServerException;
+import project.backendmueblar.exception.catalog.ResourceAlreadyExistsException;
 import project.backendmueblar.exception.catalog.ResourceNotFoundException;
 import project.backendmueblar.modules.auth.services.JwtService;
 import project.backendmueblar.modules.logEntry.services.LogService;
@@ -25,10 +26,7 @@ import project.backendmueblar.modules.users.repositories.RepositoryUser;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -222,8 +220,10 @@ public class RoleService {
         }
 
         RoleEntity thisRoleEntity = optionalRoleEntity.get();
-        if(thisRoleEntity.getEditable() == false){
-            throw new RuntimeException("Role is not Modifiable");
+        if(thisRoleEntity.getRoleName().equals("Cliente")){
+            throw new RuntimeException("\"Cliente\" Role is not Modifiable");
+        } else if (thisRoleEntity.getRoleName().equals("Admin")) {
+            throw new RuntimeException("\"Administrador\" Role is not Modifiable");
         }
 
         Map<String, Object> oldValueMap = objectMapper.convertValue(thisRoleEntity, new TypeReference<Map<String, Object>>() {});
@@ -275,12 +275,23 @@ public class RoleService {
             throw new RoleNotFoundException("Role was not found");
         }
 
-        if(optionalRoleEntity.get().getEditable() == false){
-            throw new RuntimeException("Role is not Modifiable. Cannot Delete it");
+        if(optionalRoleEntity.get().getRoleName().equals("Cliente")){
+            throw new RuntimeException("Role \"Cliente\". Cannot Delete it");
+        } else if(optionalRoleEntity.get().getRoleName().equals("Admin")){
+            throw new RuntimeException("Role \"Administrador\". Cannot Delete it");
         }
 
         if(!optionalRoleEntity.get().getUserEntity().isEmpty()) {
-            throw new InternalServerException("Cannot delete role. Still exists Users");
+            List<UserEntity> userEntityList = optionalRoleEntity.get().getUserEntity();
+
+            List<String> users = new ArrayList<>();
+            Map<String, List<String>> mapOfUsers = new HashMap<>();
+
+            for(UserEntity thisSpecificUser : userEntityList) {
+                users.add(String.format("%s %s", thisSpecificUser.getFirstName(), thisSpecificUser.getLastName()));
+            }
+            mapOfUsers.put("users", users);
+            throw new ResourceAlreadyExistsException("The role cannot be deleted because there are users associated with it: " + mapOfUsers);
         }
 
         repositoryRole.delete(optionalRoleEntity.get());
