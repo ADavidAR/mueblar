@@ -87,7 +87,7 @@ export default function AdminUsersPage() {
     }
     load()
     return () => { cancelled = true }
-  }, [page,refresh])
+  }, [page,refresh,searchQ])
 
 
 //funcion para realizar busquedas por nombre

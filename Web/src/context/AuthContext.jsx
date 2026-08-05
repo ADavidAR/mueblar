@@ -7,12 +7,12 @@ const USER_KEY = 'auth_user'
 
 const ALL_MODULES = [
   { permission: '/view/inventory',             label: 'Inventario',                to: '/view/inventory' },
-  { permission: '/view/inventory',             label: 'Tipos de Atributo',         to: '/view/attribute-types' },
-  { permission: '/view/inventory',             label: 'Atributos',                 to: '/view/attributes' },
+  { permission: '/view/attribute-types',       label: 'Tipos de Atributo',         to: '/view/attribute-types' },
+  { permission: '/view/attributes',            label: 'Atributos',                 to: '/view/attributes' },
   { permission: '/view/roles-management',      label: 'Gestión de Roles',          to: '/view/roles-management' },
   { permission: '/view/users-management',      label: 'Configuración de Usuarios', to: '/view/users-management' },
   { permission: '/view/categories-management', label: 'Categorías',                to: '/view/categories-management' },
-  { permission: '/view/reports',                label: 'Bitácoras',                 to: '/view/reports' }, 
+  { permission: '/view/reports',               label: 'Bitácoras',                 to: '/view/reports' }, 
 ]
 
 export function AuthProvider({ children }) {

@@ -142,7 +142,8 @@ export function AdminRoleFromPage() {
   function handleCancel() {
     navigate('/view/roles-management')
   }
-//en caso de ser edicion carga los datos 
+//en caso de ser edicion carga los datos
+
   useEffect(()=>{
     let cancelled = false
     if(isEdit){
@@ -158,15 +159,13 @@ export function AdminRoleFromPage() {
              setPermissions(Array.from(new Map(role[0].permissions.map((p) => [p.id, p])).values()))
              
            }
-           var x=Array.from(new Map(role[0].permissions.map((p) => [p.id, p])).values())
-           console.log(x)
-           console.log(x.filter((p)=>p.id===1)[0][ACTIONS[0].key])
+     
          } catch { /* selectores quedan vacíos si falla */ }
        }
        loadRefs()
       }
        return () => { cancelled = true }
-},[])
+},[isEdit,routeId])
 
 
 // guarda los datos

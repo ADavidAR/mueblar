@@ -68,7 +68,7 @@ export default function AdminRolesPage() {
     }
     load()
     return () => { cancelled = true }
-  }, [page])
+  }, [page,searchQ])
 
 
   //funcion asociada a la barra de busqueda
@@ -145,7 +145,11 @@ export default function AdminRolesPage() {
 
       {/* ── Matriz de Roles (permisos disponibles) ── */}
       <section className="mt-12">
-      
+        {error && (
+          <p className="mb-4 rounded-lg bg-red-900/30 px-4 py-2 text-sm text-red-400">
+            {error}
+          </p>
+        )}
 
         <div className="rounded-2xl border border-neutral-800 bg-neutral-800/40">
           {(permsLoading || loading) ? (

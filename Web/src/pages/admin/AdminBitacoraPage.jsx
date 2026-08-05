@@ -183,7 +183,7 @@ export default function AdminBitacoraPage() {
     }
     load()
     return () => { cancelled = true }
-  }, [page])
+  }, [page,dateFilter,operationName,tableNameFilter])
 
   async function handleSearch({ table, date, operation }) {
 

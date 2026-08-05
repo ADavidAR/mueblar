@@ -2,6 +2,7 @@ import { NavLink, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { Package, Shield, Settings, Tag, LogOut, Search, User, ArrowUpRight, Layers, List, Logs } from '../ui/icons'
 import PageTransition from './PageTransition'
+import { useEffect } from 'react'
 
 const ADMIN_NAV = [
   { label: 'Inventario',              to: '/view/inventory',              icon: Package },
@@ -27,6 +28,7 @@ export default function AdminLayout({ children, title, searchPlaceholder, action
     logout()
     navigate('/login')
   }
+  useEffect(()=>console.log( user?.modules))
 
   return (
     <div className="flex h-screen bg-neutral-900 text-white">
@@ -97,10 +99,13 @@ export default function AdminLayout({ children, title, searchPlaceholder, action
             )}
 
             <div className="flex items-center gap-3">
+              <a href="/view/client-profile">
+
               <div className="text-right">
                 <p className="text-sm font-medium text-white">{user?.email}</p>
-                <p className="text-xs text-neutral-400">Admin del Sistema</p>
+                <p className="text-xs text-neutral-400">{user?.role}</p>
               </div>
+              </a>
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-copper/20">
                 <User className="h-4 w-4 text-copper-light" />
               </div>
