@@ -81,7 +81,7 @@ function ValuePanel({ label, value }) {
   )
 }
 
-
+/* componente del modal para mosrar la información de las bitacoras*/
 function LogDetailModal({ open, log, onClose }) {
   if (!open || !log) return null
 
@@ -134,6 +134,7 @@ function LogDetailModal({ open, log, onClose }) {
 
 const PAGE_SIZE = 10
 export default function AdminBitacoraPage() {
+  
   const { loading: permsLoading, access } = usePermissions('/view/reports')
 
   

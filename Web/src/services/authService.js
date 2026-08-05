@@ -61,6 +61,7 @@ export const getPermitsForUrl = async (url) => {
     skipAuth: false,
     method: 'POST',
     body: JSON.stringify({ url }),
+    
   })
   return {
     access: Boolean(permits & 8),

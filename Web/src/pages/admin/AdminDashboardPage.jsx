@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import AdminLayout from '../../components/layout/AdminLayout'
 import { useAuth } from '../../context/AuthContext'
-import { Package, Shield, Settings, Tag, Layers, List, LayoutDashboard } from '../../components/ui/icons'
+import { Package, Shield, Settings, Tag, Layers, List, LayoutDashboard,Logs } from '../../components/ui/icons'
 
 const MODULE_ICONS = {
   '/view/inventory':             Package,
@@ -10,6 +10,7 @@ const MODULE_ICONS = {
   '/view/roles-management':      Shield,
   '/view/users-management':      Settings,
   '/view/categories-management': Tag,
+  '/view/reports':               Logs    
 }
 
 

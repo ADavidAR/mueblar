@@ -43,7 +43,8 @@ export default function AdminRolesPage() {
 
 
 
-  //cargamos los roles
+  //hacemos llamado al servicio para cargar los roles con los parametros de filtrado 
+  //
   useEffect(() => {
     let cancelled = false
     async function load() {
@@ -71,7 +72,7 @@ export default function AdminRolesPage() {
   }, [page,searchQ])
 
 
-  //funcion asociada a la barra de busqueda
+  //funcion asociada a la barra de busqueda, con lo parametros de filtado 
   async function handleSearch(s) {
    
        const sf =  s!== undefined ? s.target.value : searchQ
@@ -96,7 +97,7 @@ export default function AdminRolesPage() {
        }
   }
 
-  // eliminacion de role
+  // confirma la eliminacon del rol y llama al servicio de delete con el id del rol 
   async function handleDelete(id) {
      setDeleting(true)
     try {

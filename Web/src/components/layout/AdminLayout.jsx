@@ -2,7 +2,7 @@ import { NavLink, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { Package, Shield, Settings, Tag, LogOut, Search, User, ArrowUpRight, Layers, List, Logs } from '../ui/icons'
 import PageTransition from './PageTransition'
-import { useEffect } from 'react'
+
 
 const ADMIN_NAV = [
   { label: 'Inventario',              to: '/view/inventory',              icon: Package },
@@ -28,7 +28,7 @@ export default function AdminLayout({ children, title, searchPlaceholder, action
     logout()
     navigate('/login')
   }
-  useEffect(()=>console.log( user?.modules))
+
 
   return (
     <div className="flex h-screen bg-neutral-900 text-white">

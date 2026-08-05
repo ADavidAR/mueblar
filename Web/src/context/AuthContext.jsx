@@ -7,8 +7,8 @@ const USER_KEY = 'auth_user'
 
 const ALL_MODULES = [
   { permission: '/view/inventory',             label: 'Inventario',                to: '/view/inventory' },
-  { permission: '/view/attribute-types',       label: 'Tipos de Atributo',         to: '/view/attribute-types' },
-  { permission: '/view/attributes',            label: 'Atributos',                 to: '/view/attributes' },
+  { permission: '/api/attribute-types',       label: 'Tipos de Atributo',         to: '/view/attribute-types' },
+  { permission: '/api/attributes',            label: 'Atributos',                 to: '/view/attributes' },
   { permission: '/view/roles-management',      label: 'Gestión de Roles',          to: '/view/roles-management' },
   { permission: '/view/users-management',      label: 'Configuración de Usuarios', to: '/view/users-management' },
   { permission: '/view/categories-management', label: 'Categorías',                to: '/view/categories-management' },
@@ -36,16 +36,16 @@ export function AuthProvider({ children }) {
     const { roleName } = await getRoleFromToken()
     const role = (roleName ?? '').toLowerCase()
 
-    const moduleChecks = await Promise.all(
-      ALL_MODULES.map(async (m) => {
-        try {
-          const { access } = await getPermitsForUrl(m.permission)
-          return access ? m : null
-        } catch {
-          return null
-        }
-      })
-    )
+   const moduleChecks = await Promise.all(
+  ALL_MODULES.map(async (m) => {
+    try {
+      const { access } = await getPermitsForUrl(m.permission)
+      return access ? m : null
+    } catch {
+      return null
+    }
+  })
+)
     const modules = moduleChecks.filter(Boolean)
 
     const userData = { email, role, modules }
