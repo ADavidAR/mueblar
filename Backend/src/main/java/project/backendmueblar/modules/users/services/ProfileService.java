@@ -96,7 +96,7 @@ public class ProfileService {
             }
             thisUserEntity.setPasswordHash(passwordEncoder.encode(optionalNewPasswordToHash));
         }
-
+        //
         repositoryUser.save(thisUserEntity);
         logService.logEntryDataBase(tableNameFromEntity(thisUserEntity), thisUserEntity.getUserId(), objectMapper.convertValue(thisUserEntity, new TypeReference<Map<String, Object>>() {}), oldValueMap, 2);
 
