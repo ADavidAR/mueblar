@@ -43,10 +43,10 @@ export default function ARFurnitureScene(props) {
 
     const [ floorAnchorId, setFloorAnchorId ] = useState()
 
-    // Recalcula el anchor horizontal más bajo sobre los datos EN VIVO de
+    // Recalcula el anchor horizontal más bajo sobre los datos de
     // anchorsRef (no un mínimo histórico): así una lectura ruidosa que
     // ARCore corrige después, o un anchor que se fusiona/descarta, no dejan
-    // "pegado" un suelo incorrecto — siempre se elige el mejor candidato
+    // un suelo incorrecto  siempre se elige el mejor candidato
     // actual entre los planos que siguen existiendo.
     const pickFloorAnchor = () => {
         let idOfLowest = null

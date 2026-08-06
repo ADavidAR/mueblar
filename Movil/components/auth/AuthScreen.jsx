@@ -15,6 +15,8 @@ import Brand from '../ui/Brand'
 import ThemeToggle from '../ui/ThemeToggle'
 import { ArrowLeftIcon } from '../Icons'
 
+// Shell reutilizable para las pantallas de login/registro/recuperación:
+// barra superior opcional (volver, marca, tema) y contenido con fade-in.
 export default function AuthScreen({
     children,
     showBack = false, // Mostrar boton de volver atrás

@@ -2,10 +2,10 @@ import { useEffect, useState } from "react"
 import { Text, View, ScrollView } from "react-native"
 import Modal from "react-native-modal"
 
-import SerifText from "./SerifText"
-import PrimaryButton from "./PrimaryButton"
+import SerifText from "../ui/SerifText"
+import PrimaryButton from "../ui/PrimaryButton"
 import { numberSeparatorFormatter } from "../../utils/formatters"
-import VariationCard from "./VariationCard"
+import VariationCard from "../ui/VariationCard"
 import { fetchSingleProduct } from "../../services/inventoryService"
 
 import products from "../../mocks/products.json"
@@ -27,8 +27,13 @@ export default function VariantsModal({ visible, product, selected, onSelect, on
         if (visible) {
             if(shouldLoadVariants) {
                 const loadVariations = async () => {
-                    const { variations: newVariations } = products.find( (p) => p.model === product.model ) //await fetchSingleProduct(product.model, false)
-                    setFetchedVariations(newVariations)
+                    try {
+                        const data = await fetchSingleProduct(product.model, false)
+                        setFetchedVariations(data?.variations ?? [])
+                    } catch (e) {
+                        console.error('No se pudieron cargar las variantes', e)
+                        setFetchedVariations([])
+                    }
                 }
                 loadVariations()
             }

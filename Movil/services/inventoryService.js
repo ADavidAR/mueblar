@@ -1,8 +1,9 @@
-import {request} from './authService'
+import { request } from './authService'
 
+// Catálogo de productos: búsqueda paginada + detalle de producto/variación.
 export const fetchProducts = async (
     search = "",
-    limit = undefined, 
+    limit = 10, 
     page = 0,
     categories = [],
     materials = []
@@ -10,25 +11,25 @@ export const fetchProducts = async (
     const queryParams = []
     if (search)             queryParams.push(`search=${encodeURIComponent(search)}`) 
     if (limit)              queryParams.push(`limit=${limit}`) 
-    if (page)               queryParams.push(`page=${page}`) 
+    if (typeof page !== "undefined")               queryParams.push(`page=${page}`) 
     if (categories.length)  queryParams.push(`categories=${categories.map(c => encodeURIComponent(c)).join(",")}`) 
     if (materials.length)   queryParams.push(`materials=${materials.join(",")}`)  
 
     return await request(`/api/products/token?${queryParams.join("&")}`, {
-        skipAuth: true,
+        skipAuth: false,
         method: 'GET'
     })
 }
 
 export const fetchSingleProduct = async (model, simpleVariation = true) => 
-    await request(`/api/products/${encodeURIComponent(model)}?simpleVariation=${simpleVariation}`, {
-        skipAuth: true,
+    await request(`/api/products/${encodeURIComponent(model)}/token?simpleVariation=${simpleVariation}`, {
+        skipAuth: false,
         method: 'GET'
     })
 
 export const fetchSingleVariation = async (model, sku) =>
     await request(`/api/products/${encodeURIComponent(model)}/variations/${encodeURIComponent(sku)}`, {
-        skipAuth: true,
+        skipAuth: false,
         method: 'GET'
     })
 
@@ -38,8 +39,13 @@ export const fetchCategories = async () =>
         method: 'GET'
     })
 
-export const fetchMaterials = async () => 
-    await request("/api/attributes/MATERIAL", {
-        skipAuth: true,
+export const fetchMaterials = async () => {
+    const mat = await request("/api/attributes?limit=150", {
+        skipAuth: false,
         method: 'GET'
     })
+
+    return mat.filter((m) => m.atribType.id === "MATERIAL")
+
+}
+

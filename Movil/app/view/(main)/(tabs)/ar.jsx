@@ -18,13 +18,11 @@ try {
 
 export default function ARScreen() {
     // sku/model: la variación concreta que el usuario tocó en "Ver en tu
-    // espacio" (ver ProductDetails.jsx). Sin esto ARFurnitureView no sabe
-    // qué modelo 3D mostrar.
+    // espacio" (ver ProductDetails.jsx).
     const { sku, model } = useLocalSearchParams()
     return (
         // Un solo cache de modelos 3D compartido entre ARFurnitureView,
-        // SceneObjectsModal y OptionsModal (todos montados bajo esta
-        // pantalla) — ver ModelCatalogContext.jsx.
+        // SceneObjectsModal y OptionsModal
         <ModelCatalogProvider>
             <ARView sku={sku} model={model} />
         </ModelCatalogProvider>

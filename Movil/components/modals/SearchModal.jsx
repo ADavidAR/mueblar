@@ -3,19 +3,17 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useCallback, useEffect, useState } from "react"
 import Modal from "react-native-modal"
 
-import cat from "../../mocks/categories.json"
-import mat from "../../mocks/materials.json"
-
 import {
     SearchIcon, CircleCheckIcon, ChevronDownIcon, ChevronUpIcon,
     CouchIcon, UtensilsIcon, TableIcon, BuildingIcon,
     ChairIcon, BedIcon, TreeIcon, LampIcon, BoxIcon,
 } from "../Icons"
 import { COLORS } from "../../constants/theme"
-import { useTheme } from "../../context/ThemeContext"
+import { useTheme } from "../../hooks/useTheme"
 import SerifText from "../ui/SerifText"
 import Checkbox from "../ui/Checkbox"
 import { useFilters } from "../../hooks/useFilters"
+import { fetchCategories, fetchMaterials } from "../../services/inventoryService"
 
 /** Elige un icono según el nombre de la categoría (con respaldo). */
 function CategoryIcon({ name, color, size = 18 }) {
@@ -41,10 +39,13 @@ export default function SearchModal({ visible, onHide, onSearch }) {
 
     useEffect(() => {
         const loadCategoriesMaterials = async () => {
-            const newCats = cat //await fetchCategories()
-            const newMats = mat //await fetchMaterials()
-            setCategories(newCats)
-            setMaterials(newMats)
+            try {
+                const [newCats, newMats] = await Promise.all([fetchCategories(), fetchMaterials()])
+                setCategories(newCats ?? [])
+                setMaterials(newMats ?? [])
+            } catch (e) {
+                console.error('No se pudieron cargar categorías/materiales', e)
+            }
         }
         loadCategoriesMaterials()
     }, [])
@@ -141,11 +142,11 @@ export default function SearchModal({ visible, onHide, onSearch }) {
                             scrollEventThrottle={16}
                             showsVerticalScrollIndicator={false}
                             renderItem={({ item }) => {
-                                const isSelected = filters.categories.includes(item.id)
+                                const isSelected = filters.categories.includes(item.name)
                                 const iconColor = isSelected ? COLORS.copper : mutedColor
                                 return (
                                     <Pressable
-                                        onPress={() => toggleCategory(item.id)}
+                                        onPress={() => toggleCategory(item.name)}
                                         className={`flex-row items-center justify-between rounded-xl px-4 py-3 my-0.5 active:opacity-80 ${isSelected ? "bg-copper/15" : ""}`}
                                     >
                                         <View className="flex-row items-center gap-x-3">

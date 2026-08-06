@@ -2,21 +2,25 @@ import { Link } from "expo-router"
 import { Image, Pressable, Text, View, Animated } from "react-native"
 import { useCallback, useEffect, useRef, useState } from "react"
 
-import { EmptyHeartIcon, FilledHeartIcon } from "../Icons"
+import { CouchIcon, EmptyHeartIcon, FilledHeartIcon } from "../Icons"
 import { numberSeparatorFormatter } from "../../utils/formatters"
+import { useCollections } from "../../hooks/useCollections"
+import SaveToCollectionModal from "../modals/SaveToCollectionModal"
 import SerifText from "./SerifText"
 
 /**
- * Botón de favorito flotante sobre la imagen.
- * El estado es solo visual (aún no hay lógica de favoritos en esta rama):
- * alterna el corazón para dar feedback táctil sin alterar ninguna lógica.
+ * Botón de favorito flotante sobre la imagen. El corazón relleno no
+ * significa "está en Favoritos" — significa "está guardado en al menos una
+ * colección" (isSaved). Tocarlo abre el modal para elegir en cuál(es).
  */
-function FavoriteButton() {
-    const [liked, setLiked] = useState(false)
-    const [scale] = useState(() => new Animated.Value(1))
+function FavoriteButton({ productId }) {
+    const { isSaved } = useCollections()
+    const [ showModal, setShowModal ] = useState(false)
+    const [ scale ] = useState(() => new Animated.Value(1))
+    const saved = isSaved(productId)
 
-    const toggle = () => {
-        setLiked((v) => !v)
+    const openModal = () => {
+        setShowModal(true)
         scale.setValue(0.7)
         Animated.spring(scale, {
             toValue: 1,
@@ -27,22 +31,36 @@ function FavoriteButton() {
     }
 
     return (
-        <Pressable
-            onPress={toggle}
-            hitSlop={8}
-            className="absolute top-3 right-3 h-9 w-9 items-center justify-center rounded-full bg-black/45"
-        >
-            <Animated.View style={{ transform: [{ scale }] }}>
-                {liked
-                    ? <FilledHeartIcon color="#e2685f" size={16} />
-                    : <EmptyHeartIcon color="#ffffff" size={16} />}
-            </Animated.View>
-        </Pressable>
+        <>
+            <Pressable
+                onPress={openModal}
+                hitSlop={8}
+                className="absolute top-3 right-3 h-9 w-9 items-center justify-center rounded-full bg-black/45"
+            >
+                <Animated.View style={{ transform: [{ scale }] }}>
+                    {saved
+                        ? <FilledHeartIcon color="#e2685f" size={16} />
+                        : <EmptyHeartIcon color="#ffffff" size={16} />}
+                </Animated.View>
+            </Pressable>
+            <SaveToCollectionModal
+                visible={showModal}
+                onClose={() => setShowModal(false)}
+                productId={productId}
+            />
+        </>
     )
 }
 
 export function ProductCard ({ item, topVariation, onImageLoad }) {
     const [scale] = useState(() => new Animated.Value(1))
+    const [imageFailed, setImageFailed] = useState(false)
+
+    // Sin thumbnail no se llega a renderizar ningún <Image>, así que nadie
+    // dispara onLoadEnd/onError — sin esto la tarjeta quedaría invisible.
+    useEffect(() => {
+        if (!topVariation?.thumbnail) onImageLoad?.()
+    }, [topVariation?.thumbnail, onImageLoad])
 
     const animateTo = (toValue) =>
         Animated.spring(scale, {
@@ -53,7 +71,7 @@ export function ProductCard ({ item, topVariation, onImageLoad }) {
         }).start()
 
     return (
-        <Link asChild href={`/view/product-details/${item.model}`}>
+        <Link asChild href={`/view/product-details/${item.model}` }>
             <Pressable
                 onPressIn={() => animateTo(0.96)}
                 onPressOut={() => animateTo(1)}
@@ -61,13 +79,31 @@ export function ProductCard ({ item, topVariation, onImageLoad }) {
             >
                 <Animated.View style={{ transform: [{ scale }] }}>
                     <View className="rounded-2xl overflow-hidden bg-white dark:bg-card shadow-sm shadow-black/20">
-                        <Image
-                            source={{ uri: topVariation.thumbnail }}
-                            style={{ height: 200, width: '100%' }}
-                            resizeMode="cover"
-                            onLoadEnd={onImageLoad}
-                        />
-                        <FavoriteButton />
+                        {imageFailed || !topVariation?.thumbnail ? (
+                            <View
+                                style={{ height: 200, width: '100%' }}
+                                className="items-center justify-center bg-stone-100 dark:bg-stone-800"
+                            >
+                                <CouchIcon size={32} color="#a8a29e" />
+                            </View>
+                        ) : (
+                            <Image
+                                source={{ uri: topVariation?.thumbnail }}
+                                style={{ height: 200, width: '100%' }}
+                                resizeMode="cover"
+                                onLoadEnd={onImageLoad}
+                                onError={() => {
+                                    setImageFailed(true)
+                                    // Sin esto, si la imagen falla la tarjeta
+                                    // queda con opacity:0 para siempre (el
+                                    // fade-in de AnimatedProductCard solo se
+                                    // dispara con onLoadEnd) el link sigue
+                                    // activo pero se ve un hueco en blanco.
+                                    onImageLoad?.()
+                                }}
+                            />
+                        )}
+                        <FavoriteButton productId={item.model} />
                     </View>
 
                     <SerifText className="mt-3 text-lg font-semibold text-stone-900 dark:text-stone-50">
@@ -75,7 +111,7 @@ export function ProductCard ({ item, topVariation, onImageLoad }) {
                     </SerifText>
 
                     <Text className="mt-1 text-base font-medium text-copper-dark dark:text-copper-light">
-                        {`L ${numberSeparatorFormatter(topVariation.price)}`}
+                        {`L ${numberSeparatorFormatter(topVariation?.price)}`}
                     </Text>
                 </Animated.View>
             </Pressable>
@@ -104,7 +140,7 @@ export function SceneObjectCard ({ item, onPress }) {
                 <Animated.View style={{ transform: [{ scale }] }}>
                     <View className="rounded-2xl w-full overflow-hidden bg-white dark:bg-card shadow-sm shadow-black/20">
                         <Image
-                            source={{ uri: item.thumbnail }}
+                            source={{ uri: item?.thumbnail }}
                             style={{ height: 200, width: '100%' }}
                             resizeMode="cover"
                         />

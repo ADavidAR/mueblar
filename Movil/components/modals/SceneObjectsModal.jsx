@@ -1,6 +1,6 @@
 import { Alert, FlatList, Pressable, Text, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import Modal from "react-native-modal"
 
 import {
@@ -11,10 +11,9 @@ import {
     TrashIcon,
 } from "../Icons"
 import { COLORS } from "../../constants/theme"
-import { useTheme } from "../../context/ThemeContext"
+import { useTheme } from "../../hooks/useTheme"
 import SerifText from "../ui/SerifText"
 import { SceneObjectCard } from "../ui/ProductCard"
-import { fetchSingleVariation } from "../../services/inventoryService"
 import OptionsModal from "./OptionsModal"
 import { useModelCatalog } from "../../hooks/useModelCatalog"
 
@@ -104,7 +103,7 @@ export default function SceneObjectsModal({ visible, onHide, onSearch, scene }) 
                         </Pressable>
                     </View>
                     <SerifText className="mb-5 text-3xl font-bold color-copper">
-                        Opociones
+                        Opciones
                     </SerifText>
                     <SerifText className=" ml-2 mb-5 text-3xl font-bold text-stone-900 dark:text-stone-50">
                         Selección Actual

@@ -6,13 +6,14 @@ import { COLORS } from '../constants/theme'
 import { isAuthenticated } from '../services/authService'
 
 
+// Portada: decide a dónde entra el usuario según si ya tiene sesión guardada.
 export default function Index() {
   const router = useRouter()
 
   useEffect(() => {
     let active = true
     ;(async () => {
-      const authed = true// await isAuthenticated()
+      const authed = await isAuthenticated()
       if (!active) return
       router.replace(authed ? '/view/catalog' : '/view/login')
     })()

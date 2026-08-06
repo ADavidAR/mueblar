@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { Viro3DObject, ViroNode } from '@reactvision/react-viro'
+import { Viro3DObject, ViroBox, ViroNode, ViroMaterials, ViroAnimations } from '@reactvision/react-viro'
 
 import { isObstructed } from '../../utils/collision'
 
@@ -10,15 +10,28 @@ const GESTURE_END = 3
 const CLICK_UP = 2
 const CLICK_TAP = 3
 
+// Placeholder mientras getModel(sku) todavía no resolvió (con la API real,
+// a diferencia del mock, esto puede tardar): un cubo girando en el mismo
+// punto donde va a aparecer el mueble.
+const LOADING_CUBE_SIZE = 0.3
+ViroMaterials.createMaterials({
+    furnitureLoading: { diffuseColor: 'rgba(181, 116, 90, 0.55)' },
+})
+ViroAnimations.registerAnimations({
+    furnitureLoadingSpin: {
+        properties: { rotateY: '+=360' },
+        duration: 2200,
+    },
+})
+
 /**
  * Un mueble instanciado en la escena AR, con transformación de doble registro:
  *
  * - `object.position` / `object.rotation` transformación CONFIRMADA. Viro la aplica como prop, de modo que los
  *   muebles NO seleccionados quedan bloqueados en su posición absoluta.
- * - Durante un gesto el nodo se mueve en el lado nativo (el drag de Viro no
- *   pasa por React en cada frame). Cada evento se valida contra la lógica de
- *   colisiones AABB: si el punto está libre se registra en `lastValid`; si
- *   está ocupado, el nodo se re-fija con setNativeProps a la última
+ * - Durante un gesto el nodo se mueve en el lado nativo (el drag de Viro nopasa por React 
+ *   en cada frame). Cada evento se valida contra la lógica de colisiones AABB: si el punto está 
+ *   libre se registra en `lastValid`; si está ocupado, el nodo se re-fija con setNativeProps a la última
  *   transformación libre.
  * - Al soltar (CLICK_UP tras drag, o fin del gesto de rotación) se confirma
  *   `lastValid` al estado del padre, que lo persiste.
@@ -58,7 +71,24 @@ export default function FurnitureModel({
         lastValid.current = { position: object.position, rotationY: object.rotation[1] }
     }, [object.position, object.rotation])
     const model = getModel(object.sku)
-    if (!model) return null
+
+    if (!model) {
+        // Todavía no llegó el modelo real, se muestra el cubo girando
+        // apoyado en el mismo punto (`object.position`) donde después va a
+        // aparecer el mueble, sin gestos habilitados.
+        return (
+            <ViroNode position={object.position} rotation={object.rotation}>
+                <ViroBox
+                    position={[0, LOADING_CUBE_SIZE / 2, 0]}
+                    width={LOADING_CUBE_SIZE}
+                    height={LOADING_CUBE_SIZE}
+                    length={LOADING_CUBE_SIZE}
+                    materials={['furnitureLoading']}
+                    animation={{ name: 'furnitureLoadingSpin', run: true, loop: true }}
+                />
+            </ViroNode>
+        )
+    }
 
     const obstructed = (position, rotationY) =>
         isObstructed({

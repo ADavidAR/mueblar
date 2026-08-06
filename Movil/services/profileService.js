@@ -1,7 +1,7 @@
 import { request } from "./authService"
 
-export const updateUserData = (name, lastName, email, newPassword, currentPassword) => {
-    request("/api/profile", {
+export const updateUserData = async (name, lastName, email, newPassword, currentPassword) => 
+    await request("/api/profile", {
         skipAuth: false,
         method: "PUT",
         body: JSON.stringify({
@@ -12,11 +12,10 @@ export const updateUserData = (name, lastName, email, newPassword, currentPasswo
             currentPassword
         }),
     })
-}
 
-export const fetchProfileData = () => {
-    request("/api/profile", {
+
+export const fetchProfileData = async () => 
+    await request("/api/profile", {
         skipAuth: false,
         method: "GET"
     })
-}

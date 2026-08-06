@@ -1,3 +1,5 @@
+// Agrupa un número en bloques de 3 dígitos desde la derecha (separador de
+// miles), sin tocar la parte decimal.
 export const numberSeparatorFormatter = (number, sep=",") => {
     if(!number) return 0.00
     const str = String(number)
@@ -13,6 +15,9 @@ export const numberSeparatorFormatter = (number, sep=",") => {
 
     return numParts.reverse().join(sep)
 }
+// Normaliza `className` a un array de `contentSize` clases (una por
+// columna de la fila): si viene un solo string lo repite, si viene un
+// array corto rellena con la última clase.
 export const tableRowContentClassNameParser = (className, contentSize) => {
     if(!Array.isArray(className))
         return Array(contentSize).fill(className)
@@ -24,11 +29,12 @@ export const tableRowContentClassNameParser = (className, contentSize) => {
     return className
 }
 
-export const parseAttributes = (attibrutes = []) => {
-
-    const color = [attibrutes.filter((at) => at.attribType.id === "COLOR")[0].id]
+// De los `attribs` de una variación, saca el id de color y agrupa los
+// materiales por atributo (ej. "madera: Roble,Nogal").
+export const parseAttributes = (attributes = []) => {
+    const color = [attributes.filter((at) => at.attribType === "COLOR")[0].value]
     let materials = []
-    const tempMat = attibrutes.filter((at) => at.attribType.id === "MATERIAL")
+    const tempMat = attributes.filter((at) => at.attribType === "MATERIAL")
     let attribSet = new Set(tempMat.map((at) => at.id))
     attribSet.forEach((a) => {
         let sameMaterial = tempMat.filter((at) => at.id === a).map((at) => at.value)

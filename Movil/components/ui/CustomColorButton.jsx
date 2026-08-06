@@ -1,9 +1,14 @@
 import GenericButton from './GenericButton'
 
+const SOLID_COLORS = {
+    copper: '#b5745a',
+    terracotta: '#A74331',
+}
+
 /**
  * Variantes:
- *  - "solid"   → relleno cobre (acción primaria, ej. REGISTRARSE).
- *  - "outline" → solo borde (acción secundaria, ej. CANCELAR).
+ *  - "solid"   → relleno cobre.
+ *  - "outline" → solo borde.
  */
 export default function CustomColorButton({
     label,
@@ -16,13 +21,14 @@ export default function CustomColorButton({
     color = "copper"
 }) {
     const isSolid = variant === 'solid'
-    const containerBase = isSolid
-        ? `bg-${color} shadow-lg shadow-${color}/40`
-        : 'border border-stone-300 dark:border-stone-700'
+    const containerBase = isSolid ? 'shadow-lg' : 'border border-stone-300 dark:border-stone-700'
+    const containerStyle = isSolid
+        ? { backgroundColor: SOLID_COLORS[color] ?? SOLID_COLORS.copper }
+        : undefined
     const textColor = isSolid ? 'text-white' : 'text-stone-500 dark:text-stone-300'
 
     return (
-        <GenericButton 
+        <GenericButton
             label={label}
             onPress={onPress}
             loading={loading}
@@ -31,6 +37,7 @@ export default function CustomColorButton({
             icon={icon}
             className={className}
             containerBase={containerBase}
+            containerStyle={containerStyle}
             textColor={textColor}
         />
     )

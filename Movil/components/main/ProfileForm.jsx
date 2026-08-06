@@ -1,4 +1,4 @@
-import { ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import SerifText from "../ui/SerifText";
 import UnderlineField from "../ui/UnderlineField";
 import { useProfileForm } from "../../hooks/useProfileForm";
@@ -9,6 +9,8 @@ import { VALIDATION } from "../../constants/authErrors";
 import PasswordField from "../ui/PasswordField";
 import PrimaryButton from "../ui/PrimaryButton";
 import CustomColorButton from "../ui/CustomColorButton";
+import Checkbox from "../ui/Checkbox";
+import ConfirmModal from "../modals/ConfirmModal";
 import { logoutUser } from "../../services/authService";
 import { useRouter } from "expo-router";
 
@@ -19,12 +21,16 @@ export default function ProfileForm () {
     const router = useRouter()
     // Campos de edición.
     const [ currentProfileData, setCurrentProfileData ] = useState({
-        name: "",
+        firstName: "",
         lastName: "",
         email: "",
     })
     const [ shouldLoadUserData, setShouldLoadUserData ] = useState(true)
     const [ enableEdit, setEnableEdit ] = useState(false)
+    // Decide si el usuario quiere tocar la contraseña en este modo edición;
+    // si está apagado, los campos de contraseña ni se muestran ni se validan.
+    const [ changePassword, setChangePassword ] = useState(false)
+    const [ showConfirm, setShowConfirm ] = useState(false)
     const {
         form : { control, reset, formState: { errors } },
         requestError,
@@ -32,17 +38,25 @@ export default function ProfileForm () {
         submit,
         updateFormDefaults,
         isSubmitting,
-    } = useProfileForm(currentProfileData, () => setShouldLoadUserData(false))
+    } = useProfileForm(currentProfileData, changePassword, () => setShouldLoadUserData(false))
 
     useEffect(() => {
         if(shouldLoadUserData) {
             const initializeProfileData = async () => {
-                const newCurrentProfileData = {name: "Wombat Filiberto", lastName:"Reyes", email: "wombat.reyes@email.com"} //await fetchProfileData()
-                setCurrentProfileData(newCurrentProfileData)
-                setShouldLoadUserData(false)
-                updateFormDefaults( newCurrentProfileData )
+                try {
+                    const newCurrentProfileData = await fetchProfileData()
+                    setCurrentProfileData(newCurrentProfileData)
+                    updateFormDefaults( newCurrentProfileData )
+                } catch (e) {
+                    console.error('No se pudo cargar el perfil', e)
+                } finally {
+                    // Sin esto, si fetchProfileData falla shouldLoadUserData
+                    // queda en true para siempre y este efecto reintenta en
+                    // cada re-render.
+                    setShouldLoadUserData(false)
+                }
             }
-    
+
             initializeProfileData()
         }
     }, [shouldLoadUserData, updateFormDefaults])
@@ -51,6 +65,7 @@ export default function ProfileForm () {
         setEnableEdit( prev => {
             if (prev) {
                 reset()
+                setChangePassword(false)
                 return false
             }
             return true
@@ -59,7 +74,7 @@ export default function ProfileForm () {
 
     const handleLogout = () => {
         logoutUser()
-        router.navigate("/view/login")
+        router.replace("/view/login")
     }
 
     return (
@@ -71,7 +86,7 @@ export default function ProfileForm () {
             {/* Cabecera de usuario */}
             <View className="items-center mt-2 mb-10">
                 <SerifText className="text-3xl font-bold text-stone-900 dark:text-stone-50">
-                    {`${currentProfileData.name} ${currentProfileData.lastName}`}
+                    {`${currentProfileData.firstName} ${currentProfileData.lastName}`}
                 </SerifText>
             </View>
 
@@ -79,7 +94,7 @@ export default function ProfileForm () {
             <View className="gap-y-7">
                 <Controller
                     control={control}
-                    name="name"
+                    name="firstName"
                     rules={VALIDATION.name}
                     render={({ field: { onChange, onBlur, value } }) => (
                         <UnderlineField
@@ -91,9 +106,9 @@ export default function ProfileForm () {
                             onBlur={onBlur}
                             onChangeText={(t) => {
                                 onChange(t)
-                                clearServerError("name")
+                                clearServerError("firstName")
                             }}
-                            error={errors.name?.message || requestError?.name?.message}
+                            error={errors.firstName?.message || requestError?.firstName?.message}
                         />
                     )}
                 />
@@ -143,7 +158,19 @@ export default function ProfileForm () {
 
                 { enableEdit ? (
                     <>
-                    <Controller 
+                    <Pressable
+                        onPress={() => setChangePassword((v) => !v)}
+                        className="flex-row items-center gap-x-3"
+                    >
+                        <Checkbox checked={changePassword} />
+                        <Text className="text-sm text-stone-700 dark:text-stone-200">
+                            Quiero cambiar mi contraseña
+                        </Text>
+                    </Pressable>
+
+                    { changePassword ? (
+                    <>
+                    <Controller
                         control={control}
                         name="currentPassword"
                         rules={VALIDATION.password}
@@ -161,7 +188,7 @@ export default function ProfileForm () {
                             />
                         )}
                     />
-                    
+
                     <Controller
                         control={control}
                         name="newPassword"
@@ -172,7 +199,7 @@ export default function ProfileForm () {
                                 labelClassName={LABEL_CLASS}
                                 value={value}
                                 onBlur={onBlur}
-    
+
                                 onChangeText={(t) => {
                                     onChange(t)
                                     clearServerError("newPassword")
@@ -181,6 +208,8 @@ export default function ProfileForm () {
                             />
                         )}
                     />
+                    </>
+                    ) : null }
                     </>
                 )
                 : (
@@ -191,7 +220,7 @@ export default function ProfileForm () {
                         color={"terracotta"}
                     />
                 ) }
-                
+
             </View>
 
             <View className="flex-1" />
@@ -204,7 +233,7 @@ export default function ProfileForm () {
     
                 <PrimaryButton
                     label="Guardar cambios"
-                    onPress={submit}
+                    onPress={() => setShowConfirm(true)}
                     loading={isSubmitting}
                     className="mt-10"
                 />
@@ -215,6 +244,22 @@ export default function ProfileForm () {
                 onPress={handleEditToggle}
                 className={"mt-10"}
                 color={enableEdit ? "terracotta" : "copper"}
+            />
+
+            <ConfirmModal
+                visible={showConfirm}
+                onClose={() => setShowConfirm(false)}
+                onConfirm={() => {
+                    submit()
+                    handleEditToggle()
+                }}
+                title="Confirmar cambios"
+                message={
+                    changePassword
+                        ? "¿Seguro que querés guardar los cambios en tu perfil, incluida la contraseña nueva?"
+                        : "¿Seguro que querés guardar los cambios en tu perfil?"
+                }
+                confirmLabel="Guardar"
             />
         </ScrollView>
     )

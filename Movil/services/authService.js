@@ -15,11 +15,13 @@ export async function getSessionToken() {
     try {
         const token = await SecureStore.getItemAsync('user_session');
         if (token) {
-        return token;
+            return token;
         } else {
-        console.log('No session found.');
-        return null;
+            console.log('No session found.');
+            return null;
         }
+
+        
     } catch (error) {
         console.error('Error fetching session:', error);
         return null;
@@ -35,22 +37,29 @@ async function deleteSessionToken() {
     }
 }
 
+// Wrapper central de fetch: agrega el Bearer token (salvo skipAuth) y
+// normaliza los errores del backend a un solo formato { message, details }.
 export const request = async (path, options = {}) => {
     const { skipAuth = false, ...fetchOptions } = options
     const token = !skipAuth ? await getSessionToken() : null
+    try {
 
-    const res = await fetch(`${BASE_URL}${path}`, {
-        ...fetchOptions,
-        headers: {
-        'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` }),
-        ...fetchOptions.headers
-        }
-    })
-
-    if (!res.ok) {
+        const res = await fetch(`${BASE_URL}${path}`, {
+            ...fetchOptions,
+            headers: {
+            'Content-Type': 'application/json',
+            ...(token && { Authorization: `Bearer ${token}` }),
+            ...fetchOptions.headers
+            }
+        })
+        
         const text = await res.text()
-        let message = `Error ${res.status}`
+        if (!text) return null
+        try { return JSON.parse(text) } catch { return text }
+    
+    } catch(e) {
+        const text = await e.text()
+        let message = `Error ${e.status}`
         let details = null
 
         try {
@@ -66,17 +75,29 @@ export const request = async (path, options = {}) => {
         }
 
         const err = new Error(message)
-        err.status = res.status
+        err.status = e.status
         err.details = details
         throw err
+
     }
 
-    const text = await res.text()
-    if (!text) return null
-    try { return JSON.parse(text) } catch { return text }
+
 }
 
-export const isAuthenticated = async () => ( await getSessionToken() )
+export const isAuthenticated = async () => {
+    try {
+        request("/api/auth/permits", {
+            skipAuth: false,
+            method: 'POST',
+            body: JSON.stringify({ url: "" })
+        })
+        return true
+    } catch(err) {
+        if ( err.status === 401 ) return false
+        return true
+    }
+
+}
 
 export const loginUser = async (email, password) => {
     const data = await request('/api/auth/mobile/login', {
@@ -121,6 +142,7 @@ export const getPermitsForUrl = async (url) => {
         body: JSON.stringify({url})
     })
 
+    // `permits` es una máscara de bits: 8=acceso, 4=crear, 2=eliminar, 1=modificar.
     return {
         access: Boolean( permits & 8 ),
         create: Boolean( permits & 4 ),
