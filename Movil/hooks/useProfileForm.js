@@ -53,32 +53,43 @@ export function useProfileForm({ firstName, lastName, email }, changePassword, t
         }))
     }
 
-    const submit = form.handleSubmit(async ({ firstName, lastName, email, newPassword, currentPassword }) => {
-        setRequestError({
-            firstName: null,
-            lastName: null,
-            email: null,
-            currentPassword: null,
-            newPassword: null,
-            server: null,
-        })
+    // Devuelve si el guardado tuvo éxito: react-hook-form no reenvía el
+    // valor de retorno del callback a través de handleSubmit(), así que se
+    // captura acá para que quien llama a submit() sepa si puede salir del
+    // modo edición o si debe quedarse mostrando el error.
+    const submit = async () => {
+        let success = false
 
-        try {
-            await updateUserData(
-                firstName,
-                lastName,
-                email,
-                changePassword ? newPassword : undefined,
-                changePassword ? currentPassword : undefined,
-            )
-            if (changePassword) {
-                await loginUser(email, newPassword)
+        await form.handleSubmit(async ({ firstName, lastName, email, newPassword, currentPassword }) => {
+            setRequestError({
+                firstName: null,
+                lastName: null,
+                email: null,
+                currentPassword: null,
+                newPassword: null,
+                server: null,
+            })
+
+            try {
+                await updateUserData(
+                    firstName,
+                    lastName,
+                    email,
+                    changePassword ? newPassword : undefined,
+                    changePassword ? currentPassword : undefined,
+                )
+                if (changePassword) {
+                    await loginUser(email, newPassword)
+                }
+                triggerReload()
+                success = true
+            } catch (err) {
+                setRequestError(mapUpdateUserError(err))
             }
-            triggerReload()
-        } catch (err) {
-            setRequestError(mapUpdateUserError(err))
-        }
-    })
+        })()
+
+        return success
+    }
 
     return {
         form,

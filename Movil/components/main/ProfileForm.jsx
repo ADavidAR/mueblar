@@ -32,13 +32,21 @@ export default function ProfileForm () {
     const [ changePassword, setChangePassword ] = useState(false)
     const [ showConfirm, setShowConfirm ] = useState(false)
     const {
-        form : { control, reset, formState: { errors } },
+        form : { control, reset, unregister, formState: { errors } },
         requestError,
         clearServerError,
         submit,
         updateFormDefaults,
         isSubmitting,
-    } = useProfileForm(currentProfileData, changePassword, () => setShouldLoadUserData(false))
+    } = useProfileForm(currentProfileData, changePassword, () => setShouldLoadUserData(true))
+
+    // Apaga el modo "cambiar contraseña" y saca esos dos campos del form:
+    // sin esto, react-hook-form los deja registrados con su regla `required`
+    // aunque estén ocultos, y el submit los sigue exigiendo.
+    const disablePasswordChange = () => {
+        setChangePassword(false)
+        unregister(["currentPassword", "newPassword"])
+    }
 
     useEffect(() => {
         if(shouldLoadUserData) {
@@ -62,14 +70,13 @@ export default function ProfileForm () {
     }, [shouldLoadUserData, updateFormDefaults])
 
     const handleEditToggle = () => {
-        setEnableEdit( prev => {
-            if (prev) {
-                reset()
-                setChangePassword(false)
-                return false
-            }
-            return true
-        })
+        if (enableEdit) {
+            reset()
+            disablePasswordChange()
+            setEnableEdit(false)
+        } else {
+            setEnableEdit(true)
+        }
     }
 
     const handleLogout = () => {
@@ -159,7 +166,13 @@ export default function ProfileForm () {
                 { enableEdit ? (
                     <>
                     <Pressable
-                        onPress={() => setChangePassword((v) => !v)}
+                        onPress={() => {
+                            if (changePassword) {
+                                disablePasswordChange()
+                            } else {
+                                setChangePassword(true)
+                            }
+                        }}
                         className="flex-row items-center gap-x-3"
                     >
                         <Checkbox checked={changePassword} />
@@ -174,6 +187,7 @@ export default function ProfileForm () {
                         control={control}
                         name="currentPassword"
                         rules={VALIDATION.password}
+                        shouldUnregister
                         render={({ field: { onChange, onBlur, value } }) => (
                             <PasswordField
                                 label="Contraseña actual"
@@ -193,6 +207,7 @@ export default function ProfileForm () {
                         control={control}
                         name="newPassword"
                         rules={VALIDATION.password}
+                        shouldUnregister
                         render={({ field: { onChange, onBlur, value } }) => (
                             <PasswordField
                                 label="Contraseña nueva"
@@ -249,9 +264,11 @@ export default function ProfileForm () {
             <ConfirmModal
                 visible={showConfirm}
                 onClose={() => setShowConfirm(false)}
-                onConfirm={() => {
-                    submit()
-                    handleEditToggle()
+                onConfirm={async () => {
+                    const success = await submit()
+                    if (success) {
+                        handleEditToggle()
+                    }
                 }}
                 title="Confirmar cambios"
                 message={

@@ -28,7 +28,7 @@ const normalize = (raw) => ({
     id: raw.id,
     name: raw.title,
     removable: raw.borrable,
-    productIds: raw.products.map((p) => p.model),
+    productIds: (raw.products ?? []).map((p) => p.model),
 })
 
 export function CollectionsProvider({ children }) {

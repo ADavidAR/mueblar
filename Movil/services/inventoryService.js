@@ -15,7 +15,7 @@ export const fetchProducts = async (
     if (categories.length)  queryParams.push(`categories=${categories.map(c => encodeURIComponent(c)).join(",")}`) 
     if (materials.length)   queryParams.push(`materials=${materials.join(",")}`)  
 
-    return await request(`/api/products/token?${queryParams.join("&")}`, {
+    return  await request(`/api/products/token?${queryParams.join("&")}`, {
         skipAuth: false,
         method: 'GET'
     })

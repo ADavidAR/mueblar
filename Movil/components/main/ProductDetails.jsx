@@ -16,11 +16,12 @@ import { mapProductError } from "../../constants/authErrors"
 
 /** Construye la vista de datos derivada de una variación concreta. */
 function buildProductData(prod, variation) {
+    console.log(prod)
     const { materials, color } = parseAttributes(variation.atribs)
     const dimensions = [
-        `Ancho: ${prod.dimensions.width}cm`,
-        `Profundidad: ${prod.dimensions.depth}cm`,
-        `Alto: ${prod.dimensions.height}cm`,
+        `Ancho: ${prod.dimensions.ancho}cm`,
+        `Alto: ${prod.dimensions.alto}cm`,
+        `Profundidad: ${prod.dimensions.profundidad}cm`,
     ]
     return {
         imgs: [variation.thumbnail, ...variation.imgs],

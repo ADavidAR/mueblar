@@ -69,7 +69,7 @@ export default function CollectionView() {
                         <CollectionSection
                             key={col.id}
                             collection={col}
-                            onProbarAR={() => router.push('/ar')}
+                            //onProbarAR={() => router.push('/ar')}
                             onDelete={() => setPendingDelete(col)}
                         />
                     ))

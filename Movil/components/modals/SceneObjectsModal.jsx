@@ -1,4 +1,4 @@
-import { Alert, FlatList, Pressable, Text, View } from "react-native"
+import { FlatList, Pressable, Text, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useState } from "react"
 import Modal from "react-native-modal"
@@ -15,6 +15,7 @@ import { useTheme } from "../../hooks/useTheme"
 import SerifText from "../ui/SerifText"
 import { SceneObjectCard } from "../ui/ProductCard"
 import OptionsModal from "./OptionsModal"
+import ConfirmModal from "./ConfirmModal"
 import { useModelCatalog } from "../../hooks/useModelCatalog"
 
 // `scene`: la MISMA instancia de useARObjects que ARFurnitureView, pasada
@@ -25,6 +26,7 @@ export default function SceneObjectsModal({ visible, onHide, onSearch, scene }) 
     const { isDark } = useTheme()
     const [ isAtEnd, setIsAtEnd ] = useState(false)
     const [ showOptionsModal, setShowOptionsModal ] = useState(false)
+    const [ showClearConfirm, setShowClearConfirm ] = useState(false)
     const [ selectedIds, setSelectedIds ] = useState({
         objectId: null, 
         productId: null, 
@@ -52,16 +54,7 @@ export default function SceneObjectsModal({ visible, onHide, onSearch, scene }) 
 
     const arrowColor = isDark ? COLORS.copperLight : COLORS.copperDark
 
-    const handleClearScene = () => {
-        Alert.alert(
-            'Vaciar escena',
-            'Se van a eliminar todos los muebles colocados. Esta acción no se puede deshacer.',
-            [
-                { text: 'Cancelar', style: 'cancel' },
-                { text: 'Vaciar', style: 'destructive', onPress: scene.clearScene },
-            ],
-        )
-    }
+    const handleClearScene = () => setShowClearConfirm(true)
     return (
         <>
         <Modal
@@ -182,6 +175,14 @@ export default function SceneObjectsModal({ visible, onHide, onSearch, scene }) 
             productId={selectedIds.productId}
             sku={selectedIds.sku}
             scene={scene}
+        />
+        <ConfirmModal
+            visible={showClearConfirm}
+            onClose={() => setShowClearConfirm(false)}
+            onConfirm={scene.clearScene}
+            title="Vaciar escena"
+            message="Se van a eliminar todos los muebles colocados. Esta acción no se puede deshacer."
+            confirmLabel="Vaciar"
         />
         </>
     )

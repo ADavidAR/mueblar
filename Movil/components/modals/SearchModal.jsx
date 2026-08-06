@@ -37,6 +37,12 @@ export default function SearchModal({ visible, onHide, onSearch }) {
     const [categories, setCategories] = useState([])
     const [materials, setMaterials] = useState([])
 
+    // Para saber si una lista realmente tiene algo que desplazar: si el
+    // contenido entra entero en el contenedor, no hay que mostrar flechas.
+    const [containerHeights, setContainerHeights] = useState({ categories: 0, materials: 0 })
+    const [contentHeights, setContentHeights] = useState({ categories: 0, materials: 0 })
+    const canScroll = (key) => contentHeights[key] > containerHeights[key] + 1
+
     useEffect(() => {
         const loadCategoriesMaterials = async () => {
             try {
@@ -132,13 +138,17 @@ export default function SearchModal({ visible, onHide, onSearch }) {
                         Categorías
                     </Text>
                     <View className="items-center h-4">
-                        {isAtEnd.categories ? <ChevronUpIcon color={arrowColor} size={14} /> : null}
+                        {canScroll("categories") && isAtEnd.categories ? <ChevronUpIcon color={arrowColor} size={14} /> : null}
                     </View>
-                    <View className="h-[34%] border-y border-stone-300 dark:border-white/10">
+                    <View
+                        className="h-[34%] border-y border-stone-300 dark:border-white/10"
+                        onLayout={(e) => setContainerHeights(prev => ({ ...prev, categories: e.nativeEvent.layout.height }))}
+                    >
                         <FlatList
                             data={categories}
                             keyExtractor={(c) => String(c.id)}
                             onScroll={(e) => handleScroll(e, "categories")}
+                            onContentSizeChange={(w, h) => setContentHeights(prev => ({ ...prev, categories: h }))}
                             scrollEventThrottle={16}
                             showsVerticalScrollIndicator={false}
                             renderItem={({ item }) => {
@@ -162,7 +172,7 @@ export default function SearchModal({ visible, onHide, onSearch }) {
                         />
                     </View>
                     <View className="items-center h-4">
-                        {isAtEnd.categories ? null : <ChevronDownIcon color={arrowColor} size={14} />}
+                        {canScroll("categories") && !isAtEnd.categories ? <ChevronDownIcon color={arrowColor} size={14} /> : null}
                     </View>
 
                     {/* Materiales */}
@@ -170,13 +180,17 @@ export default function SearchModal({ visible, onHide, onSearch }) {
                         Materiales
                     </Text>
                     <View className="items-center h-4">
-                        {isAtEnd.materials ? <ChevronUpIcon color={arrowColor} size={14} /> : null}
+                        {canScroll("materials") && isAtEnd.materials ? <ChevronUpIcon color={arrowColor} size={14} /> : null}
                     </View>
-                    <View className="h-[26%] border-y border-stone-300 dark:border-white/10 py-2">
+                    <View
+                        className="h-[26%] border-y border-stone-300 dark:border-white/10 py-2"
+                        onLayout={(e) => setContainerHeights(prev => ({ ...prev, materials: e.nativeEvent.layout.height }))}
+                    >
                         <FlatList
                             data={materials}
                             keyExtractor={(m) => m.id}
                             onScroll={(e) => handleScroll(e, "materials")}
+                            onContentSizeChange={(w, h) => setContentHeights(prev => ({ ...prev, materials: h }))}
                             scrollEventThrottle={16}
                             showsVerticalScrollIndicator={false}
                             numColumns={2}
@@ -199,7 +213,7 @@ export default function SearchModal({ visible, onHide, onSearch }) {
                         />
                     </View>
                     <View className="items-center h-4">
-                        {isAtEnd.materials ? null : <ChevronDownIcon color={arrowColor} size={14} />}
+                        {canScroll("materials") && !isAtEnd.materials ? <ChevronDownIcon color={arrowColor} size={14} /> : null}
                     </View>
 
                     {/* Indicador de swipe */}

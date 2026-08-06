@@ -42,62 +42,50 @@ async function deleteSessionToken() {
 export const request = async (path, options = {}) => {
     const { skipAuth = false, ...fetchOptions } = options
     const token = !skipAuth ? await getSessionToken() : null
-    try {
 
-        const res = await fetch(`${BASE_URL}${path}`, {
-            ...fetchOptions,
-            headers: {
-            'Content-Type': 'application/json',
-            ...(token && { Authorization: `Bearer ${token}` }),
-            ...fetchOptions.headers
-            }
-        })
-        
-        const text = await res.text()
+    const res = await fetch(`${BASE_URL}${path}`, {
+        ...fetchOptions,
+        headers: {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` }),
+        ...fetchOptions.headers
+        }
+    })
+
+    const text = await res.text()
+
+    // fetch no lanza excepción por status HTTP de error (400/401/500...),
+    // solo por fallas de red. Hay que revisar res.ok explícitamente para
+    // que los errores del backend efectivamente lleguen al catch de quien
+    // llama a request().
+    if (res.ok) {
         if (!text) return null
         try { return JSON.parse(text) } catch { return text }
-    
-    } catch(e) {
-        const text = await e.text()
-        let message = `Error ${e.status}`
-        let details = null
-
-        try {
-            const parsed = JSON.parse(text)
-            if (parsed?.errors && typeof(parsed.errors) === "object" && !Array.isArray(parsed.errors)) {
-                details = parsed.errors
-                message = ""
-            } else {
-                message = parsed?.message ?? parsed?.errors?.[0]?.message ?? message
-            }
-        } catch {
-            message = text || message
-        }
-
-        const err = new Error(message)
-        err.status = e.status
-        err.details = details
-        throw err
-
     }
 
+    let message = `Error ${res.status}`
+    let details = null
 
-}
-
-export const isAuthenticated = async () => {
     try {
-        request("/api/auth/permits", {
-            skipAuth: false,
-            method: 'POST',
-            body: JSON.stringify({ url: "" })
-        })
-        return true
-    } catch(err) {
-        if ( err.status === 401 ) return false
-        return true
+        const parsed = JSON.parse(text)
+        if (parsed?.errors && typeof(parsed.errors) === "object" && !Array.isArray(parsed.errors)) {
+            details = parsed.errors
+            message = ""
+        } else {
+            message = parsed?.message ?? parsed?.errors?.[0]?.message ?? message
+        }
+    } catch {
+        message = text || message
     }
 
+    const err = new Error(message)
+    err.status = res.status
+    err.details = details
+    throw err
 }
+
+export const isAuthenticated = async () => 
+    await getSessionToken()
 
 export const loginUser = async (email, password) => {
     const data = await request('/api/auth/mobile/login', {

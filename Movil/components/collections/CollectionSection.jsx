@@ -10,13 +10,27 @@ import { mapCollectionError } from '../../constants/authErrors'
 import ErrorModal from '../modals/ErrorModal'
 import { logoutUser } from '../../services/authService'
 
+// Cuántos productos se piden para la preview — a propósito NO "todos" (ver
+// CollectionDetail.jsx para eso, con paginación real).
+const PREVIEW_LIMIT = 4
+
+// Mismo resguardo que ProductsList.jsx: si la API devuelve algo que no es
+// un array plano, se degrada a "sin resultados" en vez de crashear al mapear.
+const toProductArray = (value) => {
+    if (Array.isArray(value)) return value
+    console.error('Se esperaba un array de productos de colección y llegó otra cosa:', value)
+    return []
+}
+
 /**
  * `CollectionsContext` solo trae `productIds` (refs livianas, sin datos de
  * catálogo) para pintar el thumbnail hay que pedir los productos de ESTA
  * colección puntual contra `fetchCollectionProduct`, que resuelve cada uno a
- * su variación top.
+ * su variación top. Acá solo se pide una preview chica (`PREVIEW_LIMIT`);
+ * para ver la colección completa está el botón "Ver toda la colección" →
+ * CollectionDetail.jsx, que sí pagina.
  */
-export default function CollectionSection({ collection, onProbarAR, onDelete }) {
+export default function CollectionSection({ collection, onDelete }) {
     const router = useRouter()
     const { removeFromCollection } = useCollections()
     const [ items, setItems ] = useState([])
@@ -27,9 +41,9 @@ export default function CollectionSection({ collection, onProbarAR, onDelete }) 
 
     useEffect(() => {
         let cancelled = false
-        fetchCollectionProduct(collection.id)
+        fetchCollectionProduct(collection.id, PREVIEW_LIMIT, 0)
             .then((resolved) => {
-                if (!cancelled) setItems(resolved.slice(0, 3))
+                if (!cancelled) setItems(toProductArray(resolved))
             })
             .catch((e) => {
                 console.error('No se pudieron cargar los productos de la colección', e)
@@ -75,7 +89,7 @@ export default function CollectionSection({ collection, onProbarAR, onDelete }) 
                         className="h-28 overflow-hidden rounded-2xl bg-stone-200 dark:bg-stone-800"
                         style={{ width: '47%' }}
                     >
-                        <Image source={{ uri: p.thumbnail }} className="h-full w-full" resizeMode="cover" />
+                        <Image source={{ uri: p?.variations?.find(v => v.top)?.thumbnail }} className="h-full w-full" resizeMode="cover" />
                         <Pressable
                             onPress={(e) => {
                                 e.stopPropagation()
@@ -103,6 +117,20 @@ export default function CollectionSection({ collection, onProbarAR, onDelete }) 
             <SerifText className="mb-3 text-2xl text-stone-900 dark:text-stone-50">
                 {collection.name}
             </SerifText>
+
+            <Pressable
+                onPress={() =>
+                    router.push({
+                        pathname: `/view/collection/${collection.id}`,
+                        params: { name: collection.name },
+                    })
+                }
+                className="mb-10 flex-row items-center justify-center gap-2 rounded-full border border-copper py-3 active:opacity-70"
+            >
+                <Text className="text-sm font-semibold uppercase tracking-[1px] text-copper">
+                    Ver toda la colección
+                </Text>
+            </Pressable>
 
             {/* <Pressable
                 onPress={onProbarAR}

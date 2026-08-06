@@ -35,21 +35,21 @@ export function mapCollectionError(err) {
 export function mapUpdateUserError(err) {
   const status = err?.status
   if (status === 400 && err.details) {
-    err.details.server ='Revisá los datos ingresados e intentá de nuevo.'
+    err.details.server = { message: 'Revisá los datos ingresados e intentá de nuevo.' }
     return err.details
   }
   if (status >= 500) return {
-    name: "",
-    lastName: "",
-    email: "",
-    currentPassword: "",
-    newPassword: "",
-    server: "Error del servidor. Intentá de nuevo más tarde.",
+    firstName: null,
+    lastName: null,
+    email: null,
+    currentPassword: null,
+    newPassword: null,
+    server: { message: 'Error del servidor. Intentá de nuevo más tarde.' },
   }
   return {
-    server: err?.message || 'Ocurrió un error. Intentá de nuevo.'
-  } 
-  
+    server: { message: err?.message || 'Ocurrió un error. Intentá de nuevo.' }
+  }
+
 }
 
 /** Reglas de validación reutilizables para react-hook-form. */

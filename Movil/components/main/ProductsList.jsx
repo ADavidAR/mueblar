@@ -68,10 +68,9 @@ export default function ProductsList({ loadKey }) {
         setHasMore(true)
         try {
             const freshItems = toProductArray(await getFilteredProduucts(0))
+            setProducts(freshItems)
             if (freshItems.length === 0) {
                 setHasMore(false)
-            } else {
-                setProducts(freshItems)
             }
         } catch (error) {
             console.error("Error reloading data:", error)
@@ -88,15 +87,14 @@ export default function ProductsList({ loadKey }) {
                 animated: true,
 
             })
-            setResetKey(prev => prev + 1)
             setHasMore(true)
             try {
                 const newItems = toProductArray(await getFilteredProduucts(0))
+
                 if (newItems.length === 0) {
                     setHasMore(false)
-                } else {
-                    setProducts(newItems)
                 }
+                setProducts(newItems)
             } catch (error) {
                 console.error("Error fetching data:", error)
             } finally {
@@ -158,6 +156,13 @@ export default function ProductsList({ loadKey }) {
                     </>
                 )}
                 ListFooterComponent={renderFooter}
+                ListEmptyComponent={() =>
+                    !loading ? (
+                        <Text className="mt-6 text-center text-sm text-stone-500 dark:text-stone-400">
+                            No se encontró ningún producto.
+                        </Text>
+                    ) : null
+                }
                 data={products}
                 extraData={products}
                 keyExtractor={(item) => item.model}
