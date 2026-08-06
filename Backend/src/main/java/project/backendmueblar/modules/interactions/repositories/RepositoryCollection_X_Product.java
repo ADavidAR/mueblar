@@ -15,4 +15,6 @@ public interface RepositoryCollection_X_Product extends JpaRepository<Collection
     List<Collection_X_ProductEntity> findByCollectionEntityIn(List<CollectionEntity> collectionEntity);
 
     List<Collection_X_ProductEntity> findAllByCollectionEntityInAndProductEntity(List<CollectionEntity> collectionEntityList, ProductEntity productEntity);
+
+    List<Collection_X_ProductEntity> findAllByCollectionEntity(CollectionEntity thisCollectionEntity);
 }
