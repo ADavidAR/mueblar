@@ -194,7 +194,7 @@ export default function AdminRolesPage() {
                         <span className="h-2 w-2 rounded-full bg-copper/60" />
                         <span className="text-sm font-medium text-white">{r.name}</span>
                       </div>
-                      {r.editable?(
+                      {!(r.name== "Admin" || r.name== "Cliente")?(
                       <div className="flex gap-1">
                         {modify && (
                           <button
