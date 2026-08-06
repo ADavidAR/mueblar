@@ -8,16 +8,21 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
+import project.backendmueblar.modules.auth.EndpointsCacheComponent;
 import project.backendmueblar.modules.auth.services.JwtService;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+    private final EndpointsCacheComponent endpointsCacheComponent;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -29,27 +34,44 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String urlRequested =  request.getRequestURI();
         String httpMethod = request.getMethod().toUpperCase();
 
-        if(authHeader != null && authHeader.startsWith("Bearer ")){
+        if(authHeader != null && authHeader.startsWith("Bearer ")) {
             String userEmail = jwtService.extractEmail(authHeader);
-            Map<String, Integer> endpointPermissionMap = jwtService.extractEndpointAndPermission(authHeader.substring(7), urlRequested);
-            if(endpointPermissionMap.get(urlRequested) != null){
-                if(userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    if (!urlHasEnoughPermissionsAPI(endpointPermissionMap, urlRequested, httpMethod)) {
+
+            for (String thisEndpointWithToken :  endpointsCacheComponent.getAllEndpointsMapWithToken().get("ApisWithToken")) {
+                if (pathMatcher.match(thisEndpointWithToken, urlRequested)) {
+                    if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                        UsernamePasswordAuthenticationToken contextAuthenticationToken = new UsernamePasswordAuthenticationToken(userEmail, null, List.of());
+                        SecurityContextHolder.getContext().setAuthentication(contextAuthenticationToken);
+                        filterChain.doFilter(request, response);
+                        return;
+                    }
+                }
+            }
+
+            Map<String, Integer> endpointPatternPermissionMap = jwtService.extractEndpointAndPermissionMap(authHeader.substring(7), urlRequested, endpointsCacheComponent.getAllEndpointsMap());
+            System.out.println(endpointPatternPermissionMap);
+            if (endpointPatternPermissionMap != null) {
+                if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    if (!urlHasEnoughPermissionsAPI(endpointPatternPermissionMap, httpMethod)) {
                         response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado: No tienes los permisos necesarios para esta acción.");
                         return;
                     }
-                    if (jwtService.validateJWTIntegrity(authHeader.substring(7))) {
-                        UsernamePasswordAuthenticationToken contextAuthenticationToken = new UsernamePasswordAuthenticationToken(userEmail, null);
-                        SecurityContextHolder.getContext().setAuthentication(contextAuthenticationToken);
-                    }
+                    UsernamePasswordAuthenticationToken contextAuthenticationToken = new UsernamePasswordAuthenticationToken(userEmail, null, List.of());
+                    SecurityContextHolder.getContext().setAuthentication(contextAuthenticationToken);
                 }
             }
         }
         filterChain.doFilter(request, response);
     }
 
-    private boolean urlHasEnoughPermissionsAPI(Map<String, Integer> endpointPermissionMap, String urlRequested, String httpMethod) {
-        Integer permissionsInBits = endpointPermissionMap.get(urlRequested);
+    private boolean urlHasEnoughPermissionsAPI(Map<String, Integer> endpointPermissionMap, String httpMethod) {
+        System.out.println(endpointPermissionMap);
+        Integer permissionsInBits = endpointPermissionMap.values().stream().findFirst().orElse(null);
+
+        if(permissionsInBits == null) {
+            return false;
+        }
+
         int requiredBit = switch (httpMethod) {
             case "GET" -> 8;
             case "POST" -> 4;

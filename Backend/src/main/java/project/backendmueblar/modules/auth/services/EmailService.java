@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 public class EmailService {
     private final JavaMailSender mailSender;
 
+    // Metodo de Servicio : Envio de Correo hacia la Direccion de Correo del Usuario Especifico. Construccion de Formato de Envio //
     public void sendRecoveryEmail(String recipientEmail, String token, String id) {
         try {
             MimeMessage message = mailSender.createMimeMessage();

@@ -1,0 +1,57 @@
+package project.backendmueblar.modules.users.controllers;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import project.backendmueblar.modules.users.dtos.request.RoleCreateRequestDTO;
+import project.backendmueblar.modules.users.dtos.response.RoleResponseDTO;
+import project.backendmueblar.modules.users.services.RoleService;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/roles")
+@RequiredArgsConstructor
+public class ResControllerRole {
+    private final RoleService roleService;
+
+    // Obtencion de Rol Especifico del Sistema //
+    @GetMapping(value = "/{id}", produces = "application/json")
+    public ResponseEntity<RoleResponseDTO> getSpecificRole(@PathVariable("id") Long roleId){
+        return ResponseEntity.status(200).body(roleService.getSpecificRole(roleId));
+    }
+
+    // Obtencion de Todo los Roles del Sistema //
+    @GetMapping(produces = "application/json")
+    public ResponseEntity<List<RoleResponseDTO>> getAllRoles(@RequestParam(defaultValue = "10") Integer limit,
+                                                             @RequestParam(defaultValue = "0") Integer page,
+                                                             @RequestParam(required = false) String search
+    ){
+        return ResponseEntity.status(200).body(roleService.getAllRoles(limit, page, search));
+    }
+
+    // Creacion de Rol Especifico dentro del Sistema //
+    @PostMapping(consumes = "application/json")
+    public ResponseEntity<?> createRole(@RequestHeader("Authorization") String authHeader, @Valid @RequestBody RoleCreateRequestDTO roleCreateRequestDTO){
+        roleService.createRole(authHeader, roleCreateRequestDTO);
+        return ResponseEntity.status(201).build();
+    }
+
+    // Actualizacion de Rol Especifico dentro del Sistema //
+    @PutMapping(value = "/{id}", consumes = "application/json")
+    public ResponseEntity<?> updateRole(@RequestHeader("Authorization") String authHeader,
+                                        @PathVariable("id") Long roleId,
+                                        @Valid @RequestBody RoleCreateRequestDTO roleUpdateRequestDTO
+    ){
+        roleService.updateRole(authHeader, roleId, roleUpdateRequestDTO);
+        return ResponseEntity.status(200).build();
+    }
+
+    // Eliminacion de Rol Especifico dentro del Sistema //
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<?> deleteRoleSpecific(@RequestHeader("Authorization") String authHeader, @PathVariable("id") Long roleId){
+        roleService.deleteRoleSpecific(authHeader, roleId);
+        return ResponseEntity.status(204).build();
+    }
+}

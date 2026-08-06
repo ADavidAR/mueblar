@@ -20,7 +20,7 @@ public class Attribute_X_VariationEntity {
     private Long attributeVariationId;
 
     @Column(name = "valor_atributo", nullable = false)
-    private String attribueValue;
+    private String attributeValue;
 
     @JoinColumn(name = "id_variacion", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)

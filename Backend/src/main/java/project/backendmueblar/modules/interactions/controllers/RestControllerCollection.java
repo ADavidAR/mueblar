@@ -1,0 +1,90 @@
+package project.backendmueblar.modules.interactions.controllers;
+
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import project.backendmueblar.modules.catalog.dtos.ProductSummaryDTO;
+import project.backendmueblar.modules.catalog.dtos.response.ProductResponseDTO;
+import project.backendmueblar.modules.interactions.dtos.request.CollectionCreateRequestDTO;
+import project.backendmueblar.modules.interactions.dtos.response.CollectionResponseDTO;
+import project.backendmueblar.modules.interactions.services.CollectionService;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/collections")
+@RequiredArgsConstructor
+public class RestControllerCollection {
+    private final CollectionService collectionService;
+
+    // Creacion de Coleccion Asociado a un Usuario dado el Token JWT //
+    @PostMapping(consumes = "application/json")
+    public ResponseEntity<?> createCollection(@RequestHeader("Authorization") String authHeader, @Valid @RequestBody CollectionCreateRequestDTO collectionCreateRequestDTO) {
+        collectionService.createCollection(collectionCreateRequestDTO, authHeader);
+        return ResponseEntity.status(201).build();
+    }
+
+    // Modificacion de Coleccion Especifica Asociado a un Usuario dado el Token JWT //
+    @PutMapping(value = "/{id_collections}", consumes = "application/json")
+    public ResponseEntity<?> updateCollectionName(@RequestHeader("Authorization") String authHeader,
+                                                  @PathVariable ("id_collections") Long collectionId,
+                                                  @Valid @RequestBody CollectionCreateRequestDTO collectionUpdateRequestDTO
+    ) {
+        collectionService.updateCollectionName(collectionId, collectionUpdateRequestDTO, authHeader);
+        return ResponseEntity.status(200).build();
+    }
+
+    // Eliminacion de Coleccion Especifica Asociado a un Usuario dado el Token JWT //
+    @DeleteMapping(value = "/{id_collections}")
+    public ResponseEntity<?> deleteCollectionAndLogs(@RequestHeader("Authorization") String authHeader,
+                                                     @PathVariable ("id_collections") Long collectionId
+    ) {
+        collectionService.deleteCollectionAndLogs(collectionId, authHeader);
+        return ResponseEntity.status(204).build();
+    }
+
+    // Agregar Producto (y sus Variaciones Asociadas) a una Coleccion Especifica de un Usuario dado el Token JWT //
+    @PostMapping(value = "/{id_collections}")
+    public ResponseEntity<?> addProductsToCollection(@RequestHeader("Authorization") String authHeader,
+                                                     @PathVariable("id_collections") Long collectionId,
+                                                     @Valid @RequestBody ProductSummaryDTO productSummaryDTO
+    ){
+        collectionService.addProductToCollection(collectionId, authHeader, productSummaryDTO);
+        return ResponseEntity.status(201).build();
+    }
+
+    // Eliminacion de Producto (y sus Variaciones Asociadas) a una Coleccion Especifica de un Usuario dado el Token JWT //
+    @DeleteMapping(value = "/{id_collections}/products/{model}")
+    public ResponseEntity<?> deleteProductFromCollection(@RequestHeader("Authorization") String authHeader,
+                                                         @PathVariable("id_collections") Long collectionId,
+                                                         @PathVariable("model") String modelOfProduct
+    ){
+        collectionService.deleteProductFromCollection(authHeader, collectionId, modelOfProduct);
+        return ResponseEntity.status(204).build();
+    }
+
+    // Obtencion de Todos los Productos Asociados a una Coleccion Especifica de un Usuario dado el Token JWT //
+    @GetMapping(value = "/{id_collections}", produces = "application/json")
+    public ResponseEntity<List<ProductResponseDTO>> getProductsFromCollectionFilter(@RequestHeader("Authorization") String authHeader,
+                                                                                    @PathVariable("id_collections") Long  collectionId,
+                                                                                    @RequestParam(defaultValue = "10") Integer limit,
+                                                                                    @RequestParam(defaultValue = "0") Integer page
+    ) {
+        List<ProductResponseDTO> productResponseDTOList = collectionService.getProductsFromCollectionFilter(authHeader, collectionId, limit, page);
+        return ResponseEntity.status(200).body(productResponseDTOList);
+    }
+
+    // Obtencion de Todas las Colecciones Asociadas a un Usuario mediante Busqueda Filtrada //
+    @GetMapping(produces = "application/json")
+    public ResponseEntity<List<CollectionResponseDTO>> getCollectionsFromUserFilter(@RequestHeader("Authorization") String authHeader,
+                                                                                    @RequestParam(defaultValue = "10") Integer limit,
+                                                                                    @RequestParam(defaultValue = "0") Integer page,
+                                                                                    @RequestParam(required = false) String search
+    ) {
+        List<CollectionResponseDTO> collectionResponseDTOList = collectionService.getCollectionsFromUserFilter(authHeader, limit, page, search);
+        return ResponseEntity.status(200).body(collectionResponseDTOList);
+    }
+
+}
