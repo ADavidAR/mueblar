@@ -21,7 +21,7 @@ export async function getSessionToken() {
             return null;
         }
 
-        // TODO api check session
+        
     } catch (error) {
         console.error('Error fetching session:', error);
         return null;
@@ -80,7 +80,20 @@ export const request = async (path, options = {}) => {
     try { return JSON.parse(text) } catch { return text }
 }
 
-export const isAuthenticated = async () => ( await getSessionToken() )
+export const isAuthenticated = async () => {
+    try {
+        request("/api/auth/permits", {
+            skipAuth: false,
+            method: 'POST',
+            body: JSON.stringify({ url: "" })
+        })
+        return true
+    } catch(err) {
+        if ( err.status === 401 ) return false
+        return true
+    }
+
+}
 
 export const loginUser = async (email, password) => {
     const data = await request('/api/auth/mobile/login', {

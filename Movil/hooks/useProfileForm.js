@@ -4,9 +4,9 @@ import { updateUserData } from "../services/profileService";
 import { loginUser } from "../services/authService";
 import { mapUpdateUserError } from "../constants/authErrors";
 
-export function useProfileForm({ name, lastName, email }, changePassword, triggerReload) {
+export function useProfileForm({ firstName, lastName, email }, changePassword, triggerReload) {
     const [requestError, setRequestError] = useState({
-        name: null,
+        firstName: null,
         lastName: null,
         email: null,
         currentPassword: null,
@@ -16,7 +16,7 @@ export function useProfileForm({ name, lastName, email }, changePassword, trigge
 
     const form = useForm({
         defaultValues: {
-            name,
+            firstName,
             lastName,
             email,
             currentPassword: "",
@@ -28,7 +28,7 @@ export function useProfileForm({ name, lastName, email }, changePassword, trigge
     const clearServerError = (field= "") => {
         if (requestError) {
             if (field) {
-                if ( ["name", "lastName", "email", "currentPassword", "newPassword"].includes(field)
+                if ( ["firstName", "lastName", "email", "currentPassword", "newPassword"].includes(field)
                 ) {
                     setRequestError((prev) => ({
                         ...prev,
@@ -44,18 +44,18 @@ export function useProfileForm({ name, lastName, email }, changePassword, trigge
     }
 
     // Actualizar datos por defecto de perfil
-    const updateFormDefaults = ({ name, lastName, email }) => {
+    const updateFormDefaults = ({ firstName, lastName, email }) => {
         form.reset((prev) => ({
             ...prev,
-            name,
+            firstName,
             lastName,
             email
         }))
     }
 
-    const submit = form.handleSubmit(async ({ name, lastName, email, newPassword, currentPassword }) => {
+    const submit = form.handleSubmit(async ({ firstName, lastName, email, newPassword, currentPassword }) => {
         setRequestError({
-            name: null,
+            firstName: null,
             lastName: null,
             email: null,
             currentPassword: null,
@@ -65,7 +65,7 @@ export function useProfileForm({ name, lastName, email }, changePassword, trigge
 
         try {
             await updateUserData(
-                name,
+                firstName,
                 lastName,
                 email,
                 changePassword ? newPassword : undefined,

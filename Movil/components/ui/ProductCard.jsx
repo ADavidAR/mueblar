@@ -73,7 +73,7 @@ export function ProductCard ({ item, topVariation, onImageLoad }) {
                 <Animated.View style={{ transform: [{ scale }] }}>
                     <View className="rounded-2xl overflow-hidden bg-white dark:bg-card shadow-sm shadow-black/20">
                         <Image
-                            source={{ uri: topVariation.thumbnail }}
+                            source={{ uri: topVariation?.thumbnail }}
                             style={{ height: 200, width: '100%' }}
                             resizeMode="cover"
                             onLoadEnd={onImageLoad}
@@ -86,7 +86,7 @@ export function ProductCard ({ item, topVariation, onImageLoad }) {
                     </SerifText>
 
                     <Text className="mt-1 text-base font-medium text-copper-dark dark:text-copper-light">
-                        {`L ${numberSeparatorFormatter(topVariation.price)}`}
+                        {`L ${numberSeparatorFormatter(topVariation?.price)}`}
                     </Text>
                 </Animated.View>
             </Pressable>

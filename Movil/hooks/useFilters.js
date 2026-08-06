@@ -12,8 +12,7 @@ export function useFilters() {
     const { filters, setFilters } = useContext(FiltersContext)
 
     const getFilteredProduucts = useCallback(
-        async (page, limit = PRODUCTS_FETCHING.limit) => {
-
+        async (page, limit = PRODUCTS_FETCHING.limit)  => {
             const filteredProducts =   await fetchProducts(
                 filters.search,
                 limit,

@@ -1,13 +1,4 @@
 import { request } from './authService'
-import {
-    mockFetchCollections,
-    mockFetchCollectionProduct,
-    mockCreateCollection,
-    mockAddProductToCollection,
-    mockUpdateCollectionTitle,
-    mockDeleteCollection,
-    mockDeleteProductFromCollection,
-} from '../mocks/collectionsMock'
 
 export const fetchCollections = async (
     search = "",

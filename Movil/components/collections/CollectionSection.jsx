@@ -6,6 +6,9 @@ import SerifText from '../ui/SerifText'
 import { CouchIcon, TrashIcon, PlusIcon, FilledHeartIcon, XIcon } from '../Icons'
 import { fetchCollectionProduct } from '../../services/collectionsService'
 import { useCollections } from '../../hooks/useCollections'
+import { mapCollectionError } from '../../constants/authErrors'
+import ErrorModal from '../modals/ErrorModal'
+import { logoutUser } from '../../services/authService'
 
 /**
  * `CollectionsContext` solo trae `productIds` (refs livianas, sin datos de
@@ -18,6 +21,9 @@ export default function CollectionSection({ collection, onProbarAR, onDelete }) 
     const { removeFromCollection } = useCollections()
     const [ items, setItems ] = useState([])
     const isFavorites = collection.removable === false
+    const [showErrorModal, setShowErrorModal ] = useState(false)
+    const [ isAuthError, setIsAuthError ] = useState(false)
+    const [errorMessage, setErrorMessage ] = useState("")
 
     useEffect(() => {
         let cancelled = false
@@ -25,13 +31,21 @@ export default function CollectionSection({ collection, onProbarAR, onDelete }) 
             .then((resolved) => {
                 if (!cancelled) setItems(resolved.slice(0, 3))
             })
-            .catch((e) => console.error('No se pudieron cargar los productos de la colección', e))
+            .catch((e) => {
+                console.error('No se pudieron cargar los productos de la colección', e)
+                if ( e.status === 401 ) {
+                    setIsAuthError(true)
+                }
+                setErrorMessage(mapCollectionError(e))
+                setShowErrorModal(true)
+            })
         return () => {
             cancelled = true
         }
     }, [collection.id, collection.productIds])
 
     return (
+        <>
         <View className="mb-9">
             <View className="mb-4 flex-row items-center justify-between">
                 <View className="flex-row items-center gap-2.5">
@@ -100,5 +114,18 @@ export default function CollectionSection({ collection, onProbarAR, onDelete }) 
                 </Text>
             </Pressable> */}
         </View>
+        <ErrorModal
+            error={errorMessage}
+            visible={showErrorModal}
+            onClose={() => {
+                setErrorMessage("")
+                setShowErrorModal(false)
+                if(isAuthError) {
+                    logoutUser()
+                    router.navigate("/view/login")
+                }
+            }} 
+        />
+        </>
     )
 }

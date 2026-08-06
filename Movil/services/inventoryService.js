@@ -29,7 +29,7 @@ export const fetchSingleProduct = async (model, simpleVariation = true) =>
 
 export const fetchSingleVariation = async (model, sku) =>
     await request(`/api/products/${encodeURIComponent(model)}/variations/${encodeURIComponent(sku)}`, {
-        skipAuth: true,
+        skipAuth: false,
         method: 'GET'
     })
 

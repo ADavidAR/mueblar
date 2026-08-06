@@ -33,11 +33,18 @@ const normalize = (raw) => ({
 export function CollectionsProvider({ children }) {
     const [collections, setCollections] = useState([])
     const [ loading, setLoading ] = useState(false)
+    const [ hasAuthError, setHasAuthError ] = useState(false)
 
     const reload = useCallback(() => {
         fetchCollections()
             .then((raw) => setCollections(raw.map(normalize)))
-            .catch((e) => console.error('No se pudieron cargar las colecciones', e))
+            .catch((e) => {
+                console.error('No se pudieron cargar las colecciones', e)
+                if ( e.status === 401 ) {
+                    setHasAuthError(true)
+                }
+            })
+                
     }, [])
 
     useEffect(() => {
@@ -54,6 +61,11 @@ export function CollectionsProvider({ children }) {
     const isSaved = useCallback(
         (productId) => collections.some((c) => c.productIds.includes(productId)),
         [collections]
+    )
+    
+    const toggleHasAuthError = useCallback(
+        () => setHasAuthError(false),
+        []
     )
 
     const toggleFavorite = useCallback(
@@ -181,12 +193,14 @@ export function CollectionsProvider({ children }) {
             collections,
             isFavorite,
             isSaved,
+            toggleHasAuthError,
             toggleFavorite,
             addToCollection,
             removeFromCollection,
             createCollection,
             deleteCollection,
             toggleSave,
+            hasAuthError,
             loading,
         }),
         [
@@ -194,11 +208,13 @@ export function CollectionsProvider({ children }) {
             isFavorite,
             isSaved,
             toggleFavorite,
+            toggleHasAuthError,
             addToCollection,
             removeFromCollection,
             createCollection,
             deleteCollection,
             toggleSave,
+            hasAuthError,
             loading,
         ]
     )

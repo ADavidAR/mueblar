@@ -25,10 +25,7 @@ export function ModelCatalogProvider({ children }) {
         pending.forEach(async ({ model, sku }) => {
             loadingRef.current.add(sku)
             try {
-                //const variation = await fetchSingleVariation(model, sku)
-                //const { description } = await fetchSingleProduct(model)
-                const product = products.find((p) => p.model === model)
-                const variation = product?.variations.find((v) => v.sku === sku)
+                const variation = await fetchSingleVariation(model, sku)
                 if (!variation) throw new Error(`Variación no encontrada: ${model} / ${sku}`)
 
                 cachedModels.current.set(sku, {

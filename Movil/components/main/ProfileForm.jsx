@@ -21,7 +21,7 @@ export default function ProfileForm () {
     const router = useRouter()
     // Campos de edición.
     const [ currentProfileData, setCurrentProfileData ] = useState({
-        name: "",
+        firstName: "",
         lastName: "",
         email: "",
     })
@@ -78,7 +78,7 @@ export default function ProfileForm () {
             {/* Cabecera de usuario */}
             <View className="items-center mt-2 mb-10">
                 <SerifText className="text-3xl font-bold text-stone-900 dark:text-stone-50">
-                    {`${currentProfileData.name} ${currentProfileData.lastName}`}
+                    {`${currentProfileData.firstName} ${currentProfileData.lastName}`}
                 </SerifText>
             </View>
 
@@ -86,7 +86,7 @@ export default function ProfileForm () {
             <View className="gap-y-7">
                 <Controller
                     control={control}
-                    name="name"
+                    name="firstName"
                     rules={VALIDATION.name}
                     render={({ field: { onChange, onBlur, value } }) => (
                         <UnderlineField
@@ -98,9 +98,9 @@ export default function ProfileForm () {
                             onBlur={onBlur}
                             onChangeText={(t) => {
                                 onChange(t)
-                                clearServerError("name")
+                                clearServerError("firstName")
                             }}
-                            error={errors.name?.message || requestError?.name?.message}
+                            error={errors.firstName?.message || requestError?.firstName?.message}
                         />
                     )}
                 />

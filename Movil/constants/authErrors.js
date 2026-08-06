@@ -20,6 +20,15 @@ export function mapProductError(err) {
   return err?.message || 'Ocurrió un error. Intentá de nuevo.'
 }
 
+export function mapCollectionError(err) {
+  const status = err?.status
+  if (status === 400) return 'Ups. Hubo algún error con esta colección.'
+  if (status === 401) return 'La sesión a expirado. Vuelve a Iniciar sesión'
+  if (status === 404) return 'No pudimos encontrar esta collección.'
+  if (status >= 500) return 'Error del servidor. Intentá de nuevo más tarde.'
+  return err?.message || 'Ocurrió un error. Intentá de nuevo.'
+}
+
 // A diferencia de mapAuthError, esta devuelve un objeto {campo: mensaje}
 // (o {campo: {message}} según el caso) para pintar el error debajo de cada
 // input del formulario de perfil, no un string suelto.

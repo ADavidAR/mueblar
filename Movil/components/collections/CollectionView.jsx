@@ -10,12 +10,14 @@ import { useCollections } from "../../hooks/useCollections";
 import { useTheme } from "../../hooks/useTheme";
 import { COLORS } from "../../constants/theme";
 import { useMemo, useState } from "react";
+import ErrorModal from "../modals/ErrorModal";
+import { logoutUser } from "../../services/authService";
 
 export default function CollectionView() {
     const insets = useSafeAreaInsets()
     const router = useRouter()
     const { isDark } = useTheme()
-    const { collections, deleteCollection } = useCollections()
+    const { collections, deleteCollection, hasAuthError, toggleHasAuthError } = useCollections()
     const mutedColor = isDark ? COLORS.iconMuted : "#78716c"
 
     const [newOpen, setNewOpen] = useState(false)
@@ -87,6 +89,17 @@ export default function CollectionView() {
                 message={`¿Seguro que deseas eliminar "${pendingDelete?.name}"? Esta acción no podrá deshacerse.`}
                 confirmLabel="Eliminar"
             />
+
+            <ErrorModal
+                error={"La sesión a expirado. Vuelve a Iniciar sesión"}
+                visible={hasAuthError}
+                onClose={() => {
+                    toggleHasAuthError()
+                    logoutUser()
+                    router.navigate("/view/login")
+                }} 
+            />
+            
         </View>
     )
 }
