@@ -13,7 +13,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'https://mueblar-backend-c7btgpbwfehqc6et.eastus-01.azurewebsites.net',
         changeOrigin: true,
       },
     },
