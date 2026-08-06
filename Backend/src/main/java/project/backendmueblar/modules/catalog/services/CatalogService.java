@@ -730,7 +730,7 @@ public class CatalogService {
 
             attributeSummaryResponseDTO.setId(thisAttributeEntity.getAttributeId());
             attributeSummaryResponseDTO.setValue(thisAttribute_X_VariationEntity.getAttributeValue());
-
+            attributeSummaryResponseDTO.setAttribType(thisAttributeEntity.getAttributeTypeEntity().getAttributeTypeId());
             attributeSummaryResponseDTOList.add(attributeSummaryResponseDTO);
         }
         return attributeSummaryResponseDTOList;
