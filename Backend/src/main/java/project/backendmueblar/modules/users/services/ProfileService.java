@@ -9,6 +9,7 @@ import project.backendmueblar.exception.auth.EmailAlreadyExistsException;
 import project.backendmueblar.exception.auth.UserIDNotMatchException;
 import project.backendmueblar.exception.catalog.ResourceNotFoundException;
 import project.backendmueblar.modules.auth.dtos.UserCreateRequestDTO;
+import project.backendmueblar.modules.auth.dtos.UserUpdateRequestDTO;
 import project.backendmueblar.modules.auth.services.JwtService;
 import project.backendmueblar.modules.logEntry.services.LogService;
 import project.backendmueblar.modules.users.dtos.response.UserProfileSummaryResponseDTO;
@@ -72,7 +73,7 @@ public class ProfileService {
 
     // Metodo de Servicio : Modificacion de Perfil de Uusuario Especifico //
     @Transactional
-    public void modifyProfile(String authHeader, UserCreateRequestDTO userUpdateRequestDTO){
+    public void modifyProfile(String authHeader, UserUpdateRequestDTO userUpdateRequestDTO){
         UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
 
         Optional<UserEntity> optionalUserWithEmail = repositoryUser.findByEmail(userUpdateRequestDTO.getEmail());
@@ -86,12 +87,15 @@ public class ProfileService {
         thisUserEntity.setFirstName(userUpdateRequestDTO.getName());
         thisUserEntity.setLastName(userUpdateRequestDTO.getLastName());
 
-        if(!(userUpdateRequestDTO.getPassword() != null && !userUpdateRequestDTO.getPassword().trim().isEmpty())) {
-            throw new ResourceNotFoundException("Password Missing");
-        }
+        String optionalNewPasswordToHash = userUpdateRequestDTO.getPassword();
 
-        thisUserEntity.setPasswordHash(passwordEncoder.encode(userUpdateRequestDTO.getPassword()));
-        thisUserEntity.setEnabled(userUpdateRequestDTO.getEnabled());
+        if (optionalNewPasswordToHash != null && !optionalNewPasswordToHash.trim().isEmpty()) {
+            String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$";
+            if (!optionalNewPasswordToHash.matches(regex)) {
+                throw new RuntimeException("Invalid Password");
+            }
+            thisUserEntity.setPasswordHash(passwordEncoder.encode(optionalNewPasswordToHash));
+        }
 
         repositoryUser.save(thisUserEntity);
         logService.logEntryDataBase(tableNameFromEntity(thisUserEntity), thisUserEntity.getUserId(), objectMapper.convertValue(thisUserEntity, new TypeReference<Map<String, Object>>() {}), oldValueMap, 2);
