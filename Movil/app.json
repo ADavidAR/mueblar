@@ -19,7 +19,7 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.greenocarina.Movil"
+      "package": "com.greenocarina.MueblAR"
     },
     "web": {
       "favicon": "./assets/favicon.png",
