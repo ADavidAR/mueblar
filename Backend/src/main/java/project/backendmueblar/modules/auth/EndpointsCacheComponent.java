@@ -59,12 +59,13 @@ public class EndpointsCacheComponent {
         List<String> endpointsForModuleEntity = new ArrayList<>();
 
         endpointsForModuleEntity.add("/api/products/token");
-        endpointsForModuleEntity.add("/api/auth/permits");
+        endpointsForModuleEntity.add("/api/products/{model}/token");
         endpointsForModuleEntity.add("/api/collections");
         endpointsForModuleEntity.add("/api/collections/{id_collections}");
         endpointsForModuleEntity.add("/api/collections/{id_collections}/products/{model}");
         endpointsForModuleEntity.add("/api/auth/role");
         endpointsForModuleEntity.add("/api/profile");
+        endpointsForModuleEntity.add("/api/auth/permits");
 
         allEndpointsMapWithToken.put("ApisWithToken", endpointsForModuleEntity);
     }

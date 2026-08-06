@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RepositoryCollection_X_Product extends JpaRepository<Collection_X_ProductEntity, CollectionProductId> {
+//    boolean existsByCollectionEntityInAndProductEntity(List<CollectionEntity> collections, ProductEntity product);
     Optional<Collection_X_ProductEntity> findByProductEntityAndCollectionEntity(ProductEntity productEntity, CollectionEntity collectionEntity);
     List<Collection_X_ProductEntity> findByCollectionEntityIn(List<CollectionEntity> collectionEntity);
+
+    List<Collection_X_ProductEntity> findAllByCollectionEntityInAndProductEntity(List<CollectionEntity> collectionEntityList, ProductEntity productEntity);
 }

@@ -79,7 +79,7 @@ public class CollectionService {
     public void createCollection(CollectionCreateRequestDTO collectionCreateRequestDTO, String authHeader) {
         UserEntity thisUserEntity =  existsUserWithToken(authHeader).get();
 
-        Optional<CollectionEntity> optionalCollection = collectionRepository.findByTitle(collectionCreateRequestDTO.getTitle());
+        Optional<CollectionEntity> optionalCollection = collectionRepository.findByTitleAndUserEntity(collectionCreateRequestDTO.getTitle(), thisUserEntity);
         if (optionalCollection.isPresent()) {
             throw new ResourceAlreadyExistsException("The Collection already exists");
         }

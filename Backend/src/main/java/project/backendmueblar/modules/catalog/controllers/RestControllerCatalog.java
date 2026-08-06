@@ -17,14 +17,6 @@ import java.util.List;
 public class RestControllerCatalog {
 
     private final CatalogService catalogService;
-
-    // Obtencion de Producto Especifico (Modelo Especifico) en el Sistema //
-    @GetMapping(value = "/{model}", produces = "application/json")
-    public ResponseEntity<?> getSpecificProduct(@PathVariable("model") String modelOfProduct, @RequestParam(required = false) boolean simpleVariation) {
-        ProductResponseDTO specificProduct = catalogService.getSpecificProduct(modelOfProduct, simpleVariation);
-        return ResponseEntity.status(200).body(specificProduct);
-    }
-
     // Creacion de Producto en el Sistema (y sus Variaciones Asociadas) (Uso de DTOs) //
     @PostMapping(consumes = "application/json")
     public ResponseEntity<?> createProduct(@RequestHeader("Authorization") String authHeader, @Valid @RequestBody ProductCreateRequestDTO productCreateDTO) {
@@ -76,5 +68,19 @@ public class RestControllerCatalog {
     ){
         List<ProductResponseDTO> productResponseList = catalogService.getAllProducts(authHeader, limit, page, categories, search, materials);
         return ResponseEntity.status(200).body(productResponseList);
+    }
+
+    // Obtencion de Producto Especifico (Modelo Especifico) en el Sistema dado un Token JWT//
+    @GetMapping(value = "/{model}/token", produces = "application/json")
+    public ResponseEntity<ProductResponseDTO> getSpecificProductToken(@RequestHeader("Authorization") String authHeader, @PathVariable("model") String modelOfProduct, @RequestParam(required = false) boolean simpleVariation){
+        ProductResponseDTO specificProduct = catalogService.getSpecificProduct(authHeader, modelOfProduct, simpleVariation);
+        return ResponseEntity.status(200).body(specificProduct);
+    }
+
+    // Obtencion de Producto Especifico (Modelo Especifico) en el Sistema //
+    @GetMapping(value = "/{model}", produces = "application/json")
+    public ResponseEntity<ProductResponseDTO> getSpecificProduct(@PathVariable("model") String modelOfProduct, @RequestParam(required = false) boolean simpleVariation) {
+        ProductResponseDTO specificProduct = catalogService.getSpecificProduct(modelOfProduct, simpleVariation);
+        return ResponseEntity.status(200).body(specificProduct);
     }
 }

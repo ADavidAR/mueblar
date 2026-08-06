@@ -43,7 +43,6 @@ public class CatalogService {
     private final RepositoryCategory repositoryCategory;
     private final RepositoryAttribute repositoryAttribute;
     private final RepositoryVariation repositoryVariation;
-    private final RepositoryUser repositoryUser;
     private final RepositoryCollection repositoryCollection;
     private final RepositoryCollection_X_Product repositoryCollection_X_Product;
 
@@ -102,6 +101,11 @@ public class CatalogService {
             thisVariationEntity.setVariationName(thisVariationRequestDTO.getName());
             thisVariationEntity.setInstationParameters(thisVariationRequestDTO.getInstance_params());
             thisVariationEntity.setModel3dPath(thisVariationRequestDTO.getModel_3d());
+
+            if(thisVariationRequestDTO.getPrice() < 0){
+                throw new RuntimeException("Price cannot be negative");
+            }
+
             thisVariationEntity.setPrice(thisVariationRequestDTO.getPrice());
             thisVariationEntity.setIsTop(thisVariationRequestDTO.getTop());
             thisVariationEntity.setEnabled(thisVariationRequestDTO.getEnabled());
@@ -204,7 +208,7 @@ public class CatalogService {
             thisVariationEntity.setInstationParameters(thisVariationRequestDTO.getInstance_params());
             thisVariationEntity.setModel3dPath(thisVariationRequestDTO.getModel_3d());
 
-            if(thisVariationEntity.getPrice() < 0){
+            if(thisVariationRequestDTO.getPrice() < 0){
                 throw new RuntimeException("Price cannot be negative");
             }
 
@@ -357,7 +361,7 @@ public class CatalogService {
                 thisVariationEntity.setInstationParameters(thisVariationRequestDTO.getInstance_params());
                 thisVariationEntity.setModel3dPath(thisVariationRequestDTO.getModel_3d());
 
-                if(thisVariationEntity.getPrice() < 0){
+                if(thisVariationRequestDTO.getPrice() < 0){
                     throw new RuntimeException("Price cannot be negative");
                 }
 
@@ -416,6 +420,11 @@ public class CatalogService {
 
                 thisVariationEntity.setVariationName(thisVariationRequestDTO.getName());
                 thisVariationEntity.setInstationParameters(thisVariationRequestDTO.getInstance_params());
+
+                if(thisVariationRequestDTO.getPrice() < 0){
+                    throw new RuntimeException("Price cannot be negative");
+                }
+
                 thisVariationEntity.setModel3dPath(thisVariationRequestDTO.getModel_3d());
                 thisVariationEntity.setPrice(thisVariationRequestDTO.getPrice());
                 thisVariationEntity.setIsTop(thisVariationRequestDTO.getTop());
@@ -658,6 +667,34 @@ public class CatalogService {
         }
         return productResponseDTOList;
     }
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
+
+    public ProductResponseDTO getSpecificProduct(String authHeader, String modelOfProduct, boolean simpleVariation) {
+        Optional<UserEntity> optionalUser = existsUserWithToken(authHeader);
+        if(optionalUser.isEmpty()) {
+            throw new UserIDNotMatchException("User Not Found");
+        }
+
+        Optional<ProductEntity> optionalProduct = repositoryProduct.findByModelName(modelOfProduct);
+        if(optionalProduct.isEmpty()) {
+            throw new ResourceNotFoundException("Product Not Found");
+        }
+
+        UserEntity thisUserEntity = optionalUser.get();
+
+        List<CollectionEntity> collectionEntityList = repositoryCollection.findAllByUserEntity(thisUserEntity);
+        List<Collection_X_ProductEntity> collectionXProductEntityList = repositoryCollection_X_Product.findAllByCollectionEntityInAndProductEntity(collectionEntityList, optionalProduct.get());
+
+        if(collectionXProductEntityList.isEmpty()){
+            ProductResponseDTO productResponseDTO = mapToProductDTO(optionalProduct.get(), simpleVariation);
+            productResponseDTO.setIsInCollection(false);
+            return productResponseDTO;
+        } else {
+            ProductResponseDTO productResponseDTO = mapToProductDTO(optionalProduct.get(), simpleVariation);
+            productResponseDTO.setIsInCollection(true);
+            return productResponseDTO;
+        }
+    }
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
 
@@ -738,6 +775,8 @@ public class CatalogService {
             }
 
         } else {
+
+            // SOLAMENTE SE USA CUANDO SE ESTA CREANDO / MODIFICANDO / ELIMINANDO / VIENDO el PANEL DE UN PRODUCTO DESDE ADMINISTRADOR (EN FORMA DE FICHA) //
 
             for(VariationEntity thisVariationEntity : variationEntityList) {
                 VariationResponseDTO thisVariationResponseDTO = new VariationResponseDTO();
