@@ -13,7 +13,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://purple-sky-006152910.7.azurestaticapps.net',
+        target: 'mueblar-backend-c7btgpbwfehqc6et.eastus-01.azurewebsites.net',
         changeOrigin: true,
       },
     },
