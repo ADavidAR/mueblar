@@ -83,7 +83,7 @@ export default function AdminAttributeTypesPage() {
     setSaveError(null)
     setModalOpen(true)
   }
-
+// hace las validadciones 
   async function handleSave() {
     if (!name.trim())        { setSaveError('El nombre es requerido.'); return }
     if (!description.trim()) { setSaveError('La descripción es requerida.'); return }

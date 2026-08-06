@@ -17,6 +17,7 @@ function DimensionBox({ label, value, onChange }) {
     <div className="rounded-xl border border-neutral-700 bg-neutral-900 px-4 py-5 text-center">
       <input
         type="number"
+        min="0"
         value={value}
         onChange={onChange}
         placeholder="0"
@@ -70,7 +71,9 @@ function newVariant() {
     key: `new-${variantSeq}`,
     sku: '', name: `Variante_${variantSeq}`, model3d: '', thumbnail: '',
     imgs: [''], price: '', top: false, enabled: true,
-    instanceParamsJson: '{}', attribIds: [], attribValues: {},
+    // La app móvil lee `collisionBox` de acá para detectar choques entre muebles en AR.
+    instanceParamsJson: JSON.stringify({ collisionBox: [1, 1, 1] }, null, 2),
+    attribIds: [], attribValues: {},
   }
 }
 
@@ -235,6 +238,9 @@ export default function AdminProductFormPage() {
     if (!product.ancho || !product.alto || !product.profundidad) {
       setSaveError('Las 3 dimensiones son requeridas.'); selectPane(null); return
     }
+    if (Number(product.ancho) <= 0 || Number(product.alto) <= 0 || Number(product.profundidad) <= 0) {
+      setSaveError('Las dimensiones deben ser mayores a 0.'); selectPane(null); return
+    }
     if (!product.categoryId) { setSaveError('Seleccioná una categoría.'); selectPane(null); return }
 
     for (let i = 0; i < variants.length; i++) {
@@ -245,7 +251,8 @@ export default function AdminProductFormPage() {
       if (!v.name.trim())      issues.push('el nombre')
       if (!v.model3d.trim())   issues.push('la URL del modelo 3D')
       if (!v.thumbnail.trim()) issues.push('la URL de la miniatura')
-      if (!v.price)            issues.push('el precio')
+      if (!v.price)                 issues.push('el precio')
+      else if (Number(v.price) < 0) issues.push('un precio que no sea negativo')
       if (v.imgs.map((s) => s.trim()).filter(Boolean).length === 0) issues.push('al menos una imagen adicional')
 
       if (v.attribIds.length === 0) {
@@ -514,11 +521,15 @@ export default function AdminProductFormPage() {
                   </summary>
                   <div className="mt-3">
                     <ModalTextarea
-                      placeholder='{ "escala": 1 }'
+                      placeholder='{ "collisionBox": [1, 1, 1] }'
                       value={selectedVariant.instanceParamsJson}
                       onChange={(e) => updateVariant(selected, { instanceParamsJson: e.target.value })}
-                      rows={3}
+                      rows={4}
                     />
+                    <p className="mt-2 text-xs text-neutral-500">
+                      <span className="text-copper-light">collisionBox</span>: [ancho, alto, profundidad] — caja
+                      que la app móvil usa para detectar choques entre muebles en Realidad Aumentada.
+                    </p>
                   </div>
                 </details>
               </div>

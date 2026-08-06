@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { getProduct, getAttributes } from '../services/productService'
+import { getProduct, getProductAuth, getAttributes } from '../services/productService'
 import {
   getOrCreateFavoritesCollection,
   addProductToCollection,
@@ -30,23 +30,20 @@ export default function ProductDetailPage() {
     async function load() {
       setLoading(true)
       try {
+        // Con sesión se pide la variante /token del endpoint: es la única que el
+        // backend deja consultar con un token de Cliente, y además devuelve
+        // `isInCollection` para saber si ya está en favoritos.
+        const fetchProduct = isAuthenticated ? getProductAuth : getProduct
         const [prod, attrs] = await Promise.all([
-          getProduct(model),
+          fetchProduct(model),
           getAttributes({ limit: 200 }).catch(() => []),
         ])
         if (cancelled) return
         setProduct(prod)
         setAttributesFull(Array.isArray(attrs) ? attrs : [])
         setVariationIndex(0)
+        setFavorited(prod?.isInCollection === true)
         setError(null)
-
-        if (isAuthenticated) {
-          const col = await getOrCreateFavoritesCollection().catch(() => null)
-          if (!cancelled && col) {
-            setFavoritesId(col.id)
-            setFavorited((col.products ?? []).some((p) => p.model === model))
-          }
-        }
       } catch (err) {
         if (!cancelled) setError(err.message)
       } finally {

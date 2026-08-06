@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import AdminLayout from '../../components/layout/AdminLayout'
 import { useAuth } from '../../context/AuthContext'
-import { Package, Shield, Settings, Tag, Layers, List, LayoutDashboard } from '../../components/ui/icons'
+import { Package, Shield, Settings, Tag, Layers, List, LayoutDashboard,Logs } from '../../components/ui/icons'
 
 const MODULE_ICONS = {
   '/view/inventory':             Package,
@@ -10,17 +10,15 @@ const MODULE_ICONS = {
   '/view/roles-management':      Shield,
   '/view/users-management':      Settings,
   '/view/categories-management': Tag,
+  '/view/reports':               Logs    
 }
 
-const ROLE_LABELS = {
-  admin:   'Administrador',
-  gerente: 'Gerente',
-}
+
 
 export default function AdminDashboardPage() {
   const { user } = useAuth()
   const modules = user?.modules ?? []
-  const roleLabel = ROLE_LABELS[user?.role] ?? user?.role ?? '—'
+  const roleLabel = user?.role ?? '—'
 
   return (
     <AdminLayout title="Dashboard">

@@ -1,7 +1,8 @@
 import { NavLink, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { Package, Shield, Settings, Tag, LogOut, Search, User, ArrowUpRight, Layers, List } from '../ui/icons'
+import { Package, Shield, Settings, Tag, LogOut, Search, User, ArrowUpRight, Layers, List, Logs } from '../ui/icons'
 import PageTransition from './PageTransition'
+
 
 const ADMIN_NAV = [
   { label: 'Inventario',              to: '/view/inventory',              icon: Package },
@@ -10,6 +11,7 @@ const ADMIN_NAV = [
   { label: 'Categorías',              to: '/view/categories-management',  icon: Tag     },
   { label: 'Tipos de Atributo',       to: '/view/attribute-types',        icon: Layers  },
   { label: 'Atributos',               to: '/view/attributes',             icon: List    },
+  { label: 'Bitácoras',               to: '/view/reports',                icon: Logs    },
 ]
 
 export default function AdminLayout({ children, title, searchPlaceholder, action }) {
@@ -17,10 +19,16 @@ export default function AdminLayout({ children, title, searchPlaceholder, action
   const navigate = useNavigate()
   const { pathname } = useLocation()
 
+   // Un Set con las rutas que el usuario sí puede ver, según lo que
+  // AuthContext ya calculó con permisos reales en el login.
+  const allowedPaths = new Set((user?.modules ?? []).map((m) => m.to))
+  const visibleNav = ADMIN_NAV.filter((item) => allowedPaths.has(item.to))
+
   function handleLogout() {
     logout()
     navigate('/login')
   }
+
 
   return (
     <div className="flex h-screen bg-neutral-900 text-white">
@@ -35,7 +43,7 @@ export default function AdminLayout({ children, title, searchPlaceholder, action
         </Link>
 
         <nav className="flex flex-col gap-0.5">
-          {ADMIN_NAV.map(({ label, to, icon: Icon }) => (
+          {visibleNav.map(({ label, to, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
@@ -91,10 +99,13 @@ export default function AdminLayout({ children, title, searchPlaceholder, action
             )}
 
             <div className="flex items-center gap-3">
+              <a href="/view/client-profile">
+
               <div className="text-right">
                 <p className="text-sm font-medium text-white">{user?.email}</p>
-                <p className="text-xs text-neutral-400">Admin del Sistema</p>
+                <p className="text-xs text-neutral-400">{user?.role}</p>
               </div>
+              </a>
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-copper/20">
                 <User className="h-4 w-4 text-copper-light" />
               </div>

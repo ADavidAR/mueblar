@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { getCurrentUser, updateProfile } from '../services/authService'
 import Field from '../components/ui/Field'
 import Button from '../components/ui/Button'
 import { Eyebrow } from '../components/ui/Tags'
@@ -26,19 +27,43 @@ function AccountSidebar() {
 }
 
 export default function ProfilePage() {
-  const { user, loading } = useAuth()
+  const { user, loading: authLoading } = useAuth()
 
-  const [form, setForm] = useState(() => ({
-    name: user?.name ?? '',
-    lastName: user?.lastName ?? '',
-    email: user?.email ?? '',
-    password: '',
-    confirm: ''
-  }))
+  const [form, setForm] = useState({ name: '', lastName: '', email: '', password: '', confirm: '' })
+  // Último estado confirmado en el backend, para que "Cancelar" revierta a esto y no a datos vacíos.
+  const [savedProfile, setSavedProfile] = useState(null)
 
-  const [status, setStatus] = useState(null)
+  const [profileLoading, setProfileLoading] = useState(true)
+  const [status, setStatus]                 = useState(null)
+  const [saving, setSaving]                 = useState(false)
 
+  // Trae el perfil real del backend al montar (useAuth ya no guarda nombre/apellido).
+  useEffect(() => {
+    if (!user) return
+    let cancelled = false
 
+    getCurrentUser()
+      .then((data) => {
+        if (cancelled) return
+        const loaded = {
+          name: data.firstName ?? '',
+          lastName: data.lastName ?? '',
+          email: data.email ?? '',
+        }
+        setSavedProfile(loaded)
+        setForm({ ...loaded, password: '', confirm: '' })
+      })
+      .catch((err) => {
+        if (!cancelled) setStatus({ type: 'error', msg: err.message })
+      })
+      .finally(() => {
+        if (!cancelled) setProfileLoading(false)
+      })
+
+    return () => { cancelled = true }
+  }, [user])
+
+  // Genera un onChange distinto por cada campo, sin repetir código.
   const update = (field) => (e) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }))
 
@@ -46,17 +71,50 @@ export default function ProfilePage() {
     e.preventDefault()
     setStatus(null)
 
-    if (form.password && form.password !== form.confirm) {
+    // El backend exige contraseña en cada actualización (UserCreateRequestDTO
+    // valida @NotBlank), así que no se puede guardar sin volver a escribirla.
+    if (!form.password) {
+      setStatus({ type: 'error', msg: 'La contraseña es obligatoria para guardar cambios.' })
+      return
+    }
+    if (form.password !== form.confirm) {
       setStatus({ type: 'error', msg: 'Las contraseñas no coinciden.' })
       return
     }
 
-    setForm((prev) => ({ ...prev, password: '', confirm: '' }))
-    setStatus({ type: 'ok', msg: 'Cambios guardados correctamente.' })
+    setSaving(true)
+    try {
+      await updateProfile({
+        name: form.name.trim(),
+        lastName: form.lastName.trim(),
+        email: form.email.trim(),
+        password: form.password,
+        // confirmar con UserCreateRequestDTO.java si "enabled"/"role"
+        // también son obligatorios acá.
+        enabled: true,
+      })
+
+      // Al guardar, lo nuevo pasa a ser el "último confirmado".
+      const updated = { name: form.name.trim(), lastName: form.lastName.trim(), email: form.email.trim() }
+      setSavedProfile(updated)
+      setForm({ ...updated, password: '', confirm: '' })
+      setStatus({ type: 'ok', msg: 'Cambios guardados correctamente.' })
+    } catch (err) {
+      setStatus({ type: 'error', msg: err.message })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // Descarta ediciones sin guardar, vuelve a los datos confirmados.
+  function handleCancel() {
+    if (!savedProfile) return
+    setForm({ ...savedProfile, password: '', confirm: '' })
+    setStatus(null)
   }
 
   // Estados de carga / sin sesión
-  if (loading) {
+  if (authLoading || profileLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center text-muted">
         Cargando…
@@ -64,6 +122,7 @@ export default function ProfilePage() {
     )
   }
   if (!user) return <Navigate to="/login" replace />
+
   return (
     <div className="mx-auto max-w-[1280px] px-6 pb-24 pt-32 md:px-10">
       <div className="grid gap-10 md:grid-cols-[240px_1fr]">
@@ -79,13 +138,13 @@ export default function ProfilePage() {
           <form onSubmit={handleSubmit} noValidate className="mt-10">
             <div className="grid gap-6 md:grid-cols-2">
               <Field
-                label="name"
+                label="Nombre"
                 value={form.name}
                 onChange={update('name')}
                 autoComplete="given-name"
               />
               <Field
-                label="lastName"
+                label="Apellido"
                 value={form.lastName}
                 onChange={update('lastName')}
                 autoComplete="family-name"
@@ -99,7 +158,7 @@ export default function ProfilePage() {
                 autoComplete="email"
               />
               <div className="flex items-end">
-                <Eyebrow tone="muted">Cambiar contraseña</Eyebrow>
+                <Eyebrow tone="muted">Confirma tu contraseña para guardar</Eyebrow>
               </div>
 
               <Field
@@ -109,7 +168,7 @@ export default function ProfilePage() {
                 value={form.password}
                 onChange={update('password')}
                 placeholder="••••••••"
-                autoComplete="new-password"
+                autoComplete="current-password"
               />
               <Field
                 label="Confirmar"
@@ -118,7 +177,7 @@ export default function ProfilePage() {
                 value={form.confirm}
                 onChange={update('confirm')}
                 placeholder="••••••••"
-                autoComplete="new-password"
+                autoComplete="current-password"
               />
             </div>
 
@@ -134,24 +193,11 @@ export default function ProfilePage() {
             )}
 
             <div className="mt-12 flex items-center justify-end gap-4">
-              <Button
-                type="button"
-                variant="ghost"
-                size="md"
-                onClick={() =>
-                  setForm({
-                    name: user.name ?? '',
-                    lastName: user.lastName ?? '',
-                    email: user.email ?? '',
-                    password: '',
-                    confirm: ''
-                  })
-                }
-              >
+              <Button type="button" variant="ghost" size="md" onClick={handleCancel}>
                 Cancelar
               </Button>
-              <Button type="submit" variant="primary" size="md">
-                Guardar Cambios
+              <Button type="submit" variant="primary" size="md" disabled={saving}>
+                {saving ? 'Guardando...' : 'Guardar Cambios'}
               </Button>
             </div>
           </form>

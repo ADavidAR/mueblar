@@ -19,14 +19,16 @@ import AdminAttributesPage from './pages/admin/AdminAttributesPage'
 import AdminRolesPage from './pages/admin/AdminRolesPage'
 import AdminUsersPage from './pages/admin/AdminUsersPage'
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage'
+import { AdminRoleFromPage } from './pages/admin/AdminRoleFromPage'
+import { AdminUserFromPage } from './pages/admin/AdminUserFromPage'
+import AdminBitacoraPage from './pages/admin/AdminBitacoraPage'
 
 function AdminRoute({ children }) {
   const { user } = useAuth()
   if (!user) return <Navigate to="/login" replace />
-  if (!['admin', 'gerente'].includes(user.role)) return <Navigate to="/view/main-view" replace />
+  if (!user.modules || user.modules.length === 0) return <Navigate to="/view/main-view" replace />
   return children
 }
-
 function App() {
   return (
     <BrowserRouter>
@@ -77,12 +79,34 @@ function App() {
             element={<AdminRoute><AdminRolesPage /></AdminRoute>}
           />
           <Route
+          path="/view/roles/create"
+          element={<AdminRoute><AdminRoleFromPage/></AdminRoute>}
+          />
+
+          <Route
+            path="/view/roles/edit/:id"
+            element={<AdminRoute><AdminRoleFromPage /></AdminRoute>}
+          />
+
+          <Route
             path="/view/users-management"
-            element={<AdminRoute><AdminUsersPage /></AdminRoute>}
+            element={<AdminRoute><AdminUsersPage/></AdminRoute>}
+          />
+           <Route
+            path="/view/users/create"
+            element={<AdminRoute><AdminUserFromPage/></AdminRoute>}
+          />
+            <Route
+            path="/view/users/edit/:id"
+            element={<AdminRoute><AdminUserFromPage/></AdminRoute>}
           />
           <Route
             path="/view/categories-management"
             element={<AdminRoute><AdminCategoriesPage /></AdminRoute>}
+          />
+          <Route
+            path="/view/reports"
+            element={<AdminRoute><AdminBitacoraPage /></AdminRoute>}
           />
         </Routes>
       </AuthProvider>
