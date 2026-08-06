@@ -246,15 +246,11 @@ public class CollectionService {
 
         Pageable pageable = PageRequest.of(page, limit);
 
-        List<ProductEntity> productEntityList = repositoryProduct.findAll(pageable).getContent();
-        if(productEntityList.isEmpty()) {
-            throw new ResourceNotFoundException("Not Exists Any Product");
-        }
-
+        List<Collection_X_ProductEntity> collectionXProductEntityList = repositoryCollectionXProduct.findAllByCollectionEntity(thisCollectionEntity);
         List<ProductResponseDTO> productResponseDTOList = new ArrayList<>();
 
-        for (ProductEntity productEntity : productEntityList) {
-            ProductResponseDTO thisProductResponseDTO = catalogService.getSpecificProduct(productEntity.getModelName(), true);
+        for (Collection_X_ProductEntity thisCollectionXProductEntity : collectionXProductEntityList) {
+            ProductResponseDTO thisProductResponseDTO = catalogService.getSpecificProduct(thisCollectionXProductEntity.getProductEntity().getModelName(), false);
             productResponseDTOList.add(thisProductResponseDTO);
         }
 
