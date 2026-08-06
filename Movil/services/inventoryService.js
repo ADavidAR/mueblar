@@ -3,7 +3,7 @@ import { request } from './authService'
 // Catálogo de productos: búsqueda paginada + detalle de producto/variación.
 export const fetchProducts = async (
     search = "",
-    limit = undefined, 
+    limit = 10, 
     page = 0,
     categories = [],
     materials = []
@@ -16,14 +16,14 @@ export const fetchProducts = async (
     if (materials.length)   queryParams.push(`materials=${materials.join(",")}`)  
 
     return await request(`/api/products/token?${queryParams.join("&")}`, {
-        skipAuth: true,
+        skipAuth: false,
         method: 'GET'
     })
 }
 
 export const fetchSingleProduct = async (model, simpleVariation = true) => 
-    await request(`/api/products/${encodeURIComponent(model)}?simpleVariation=${simpleVariation}`, {
-        skipAuth: true,
+    await request(`/api/products/${encodeURIComponent(model)}/token?simpleVariation=${simpleVariation}`, {
+        skipAuth: false,
         method: 'GET'
     })
 
