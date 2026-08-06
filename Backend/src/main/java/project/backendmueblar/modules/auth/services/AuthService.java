@@ -45,6 +45,7 @@ public class AuthService {
     @Value("${EXPIRATION_TIME_RECOVERY_TOKEN}")
     private long expirationTimeRecoveryToken;
 
+    // Extraccion del Nombre de la Tabla en la Base de Datos asociado a una Entidad Cualquiera //
     private String tableNameFromEntity(Object entity){
         Class<?> entityClass = entity.getClass();
         Table tableAnnotation = entityClass.getAnnotation(Table.class);
@@ -55,6 +56,7 @@ public class AuthService {
         return entityClass.getSimpleName().toLowerCase();
     }
 
+    // Metodo de Servicio: Registro de Usuario //
     @Transactional
     public void registerUser(@NonNull UserCreateRequestDTO userCreateRequestDTO){
         Optional<UserEntity> user = repositoryUser.findByEmail(userCreateRequestDTO.getEmail());
@@ -82,6 +84,7 @@ public class AuthService {
         logService.logEntryDataBase(tableNameFromEntity(userEntity), userEntity.getUserId(), objectMapper.convertValue(userEntity, new TypeReference<Map<String, Object>>() {}), null, 1);
     }
 
+    // Metodo de Servicio: Autenticacion de Usuario //
     public String authenticationUser(UserAuthRequestDTO userAuthRequestDTO, Long expirationTime){
         System.out.println(expirationTime);
         Optional<UserEntity> optionalUser = repositoryUser.findByEmail(userAuthRequestDTO.getEmail());
@@ -112,6 +115,7 @@ public class AuthService {
         return jwtService.generateToken(user, modulesMapWithPermissionsBitWithID, expirationTime);
     }
 
+    // Metodo de Servicio : Recuperacion de Cuenta : Recuperacion por Correo y Generacion de Token de Vencimiento en la Base de Datos //
     @Transactional
     public void recoveryEmailAndGenerateToken(EmailAuthRequestDTO emailAuthRequestDTO) {
         Optional<UserEntity> optionalUser = repositoryUser.findByEmail(emailAuthRequestDTO.getEmail());
@@ -136,6 +140,7 @@ public class AuthService {
         logService.logEntryDataBase(tableNameFromEntity(recoveryTokenEntity), user.getUserId(), objectMapper.convertValue(recoveryTokenEntity, new TypeReference<Map<String, Object>>() {}), null, 1);
     }
 
+    // Metodo de Servicio : Reseteo de Contraseña, Generacion de Nueva Contraseña para el Usuario //
     @Transactional
     public void resetPassword(ResetPasswordRequestDTO resetPasswordRequestDTO) {
         Optional<RecoveryTokenEntity> optionalRecoveryToken = repositoryRecoveryToken.findByToken(resetPasswordRequestDTO.getTokenReset());
@@ -160,6 +165,7 @@ public class AuthService {
         logService.logEntryDataBase(tableNameFromEntity(recoveryTokenEntity), userEntity.getUserId(), null, objectMapper.convertValue(recoveryTokenEntity, new TypeReference<Map<String, Object>>() {}), 3);
     }
 
+    // Metodo de Servicio : Verificacion de Token de Expiracion //
     public void getTokenVerification(String verificationToken) {
         Optional<RecoveryTokenEntity> optionalRecoveryToken = repositoryRecoveryToken.findByToken(verificationToken);
         if(!(optionalRecoveryToken.isPresent())){
@@ -174,6 +180,7 @@ public class AuthService {
         }
     }
 
+    // Metodo de Servicio : Extraccion de Permisos asociado a un Endpoint API o Vista segun el Token ligado a Usuario Brindado //
     public Integer extractPermissionForEndpoint(String authHeader, UrlRequestDTO urlRequestDTO) {
         UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
 
@@ -194,6 +201,7 @@ public class AuthService {
 
     }
 
+    // Metodo de Servicio : Extraccion de Rol Asociado de Token de Usuario Brindado //
     public Map<Long, String> getRoleAssociatedToToken(String authHeader){
         UserEntity userEntity = existsUserWithToken(authHeader).get();
         Map<Long, String> mapRole = new HashMap<>();
@@ -211,12 +219,13 @@ public class AuthService {
         return optionalUser;
     }
 
-
+    // Metodo de Servicio PRIVADO : Generacion del Token de Recuperacion de Tipo UUID //
     private static String generateTokenRecovery(){
         UUID uuid = UUID.randomUUID();
         return uuid.toString().replace("-", "");
     }
 
+    // Metodo de Servicio PRIVADO : Calculo de Bit de Permiso (0-15 ; 8 <= X <= 15) Asociado a Tabla Intermedia existente entre Rol y Usuario Brindado //
     private static @NonNull Integer getInteger(Module_X_RoleEntity moduleXRoleEntity) {
         Integer accessBit1;
         Integer creationBit2;

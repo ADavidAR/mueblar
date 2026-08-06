@@ -15,11 +15,13 @@ public class RestControllerProfile {
 
     private final ProfileService profileService;
 
+    // Obtencion de Perfil de Usuario dado su Token JWT //
     @GetMapping(produces = "application/json")
     public ResponseEntity<UserProfileSummaryResponseDTO> getProfile(@RequestHeader("Authorization") String authHeader){
         return ResponseEntity.status(200).body(profileService.getProfileSpecificForUser(authHeader));
     }
 
+    // Actualizacion de Perfil de un Usuario dado su Token JWT //
     @PutMapping(consumes = "application/json")
     public ResponseEntity<?> modifyProfile(@RequestHeader("Authorization") String authHeader,
                                            @Valid @RequestBody UserCreateRequestDTO userUpdateRequestDTO

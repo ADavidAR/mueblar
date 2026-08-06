@@ -27,6 +27,7 @@ public class JwtService {
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
+    // Metodo de Servicio : Generacion de Token JWT dado el Usuario Especifico, Permisos para cada Modulo dado su Rol y Tiempo de Expiracion (Diferencia entre Web y Movil //
     public String generateToken(UserEntity userEntity, Map<Long, Integer> modules, Long expirationTime) {
         return Jwts.builder()
                 .id(userEntity.getUserId().toString())
@@ -39,11 +40,13 @@ public class JwtService {
                         .compact();
     }
 
+    // Metodo de Servicio : LLave Secreta para la Firma de Token JWT (Evitar Modificacion al Token JWT) //
     private SecretKey getSecretKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    // Metodo de Servicio : Extraccion de Correo Asociado a Usuario a traves del Token JWT //
     public String extractEmail(String authHeader) {
         String token = authHeader.substring(7);
         Claims claims;
@@ -63,6 +66,7 @@ public class JwtService {
 
     }
 
+    // Metodo de Servicio PRIVADO : Extraccion de Permisos relacionado al Endpoint en la API en Uso //
     private String extractPatternEndpointAndPermission(String token, String endpointURI, Map<Long,List<String>> allEndpointsMapCache) {
         Claims claims = Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token).getPayload();
 
@@ -85,6 +89,7 @@ public class JwtService {
         return null;
     }
 
+    // Metodo de Servicio : Extraccion de Permisos relacionado al Endpoint en la API en Uso (Conversion a Mapa) //
     public Map<String, Integer> extractEndpointAndPermissionMap(String token, String endpointURI, Map<Long,List<String>> allEndpointsMapCache) {
         // Private Method
         String possibleEndpoint = extractPatternEndpointAndPermission(token, endpointURI, allEndpointsMapCache);

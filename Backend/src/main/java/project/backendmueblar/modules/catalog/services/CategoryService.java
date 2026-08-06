@@ -33,6 +33,7 @@ public class CategoryService {
     private final ObjectMapper objectMapper;
     private final RepositoryUser userRepository;
 
+    // Metodo de Servicio PRIVATE : Extraccion del Nombre de la Tabla en la Base de Datos asociado a una Entidad Cualquiera //
     private String tableNameFromEntity(Object entity){
         Class<?> entityClass = entity.getClass();
         Table tableAnnotation = entityClass.getAnnotation(Table.class);
@@ -45,6 +46,7 @@ public class CategoryService {
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
 
+    // Metodo de Servicio PRIVATE : Comprobacion de Existencia de Usuario mediante Token JWT brindado //
     private Optional<UserEntity> existsUserWithToken(String authHeader) {
         String uniqueEmailForUser = jwtService.extractEmail(authHeader);
         Optional<UserEntity> optionalUser = userRepository.findByEmail(uniqueEmailForUser);
@@ -56,7 +58,7 @@ public class CategoryService {
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
 
-
+    // Metodo de Servicio : Obtencion de Todas las Categorias Existentes del Sistema //
     public List<CategoryResponseDTO> getAllCategories() {
         List<CategoryEntity> optionalCategoryList =  repositoryCategory.findAll();
         if(optionalCategoryList.isEmpty()) {
@@ -77,6 +79,7 @@ public class CategoryService {
 
     // ------------------------------------------------------------------------------------------------------//
 
+    // Metodo de Servicio : Creacion de Categoria Especifica en el Sistema //
     @Transactional
     public void createCategory(String authHeader, CategoryCreateRequestDTO categoryCreateRequestDTO) {
         UserEntity thisUserEntity =  existsUserWithToken(authHeader).get();
@@ -93,6 +96,8 @@ public class CategoryService {
     }
 
     // ------------------------------------------------------------------------------------------------------//
+
+    // Metodo de Servicio : Modificacion de Categoria Especifica del Sistema //
     @Transactional
     public void updateCategory(String authHeader, Long categoryID, CategoryCreateRequestDTO categoryUpdateRequestDTO) {
         UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
@@ -131,6 +136,7 @@ public class CategoryService {
 
     // ------------------------------------------------------------------------------------------------------//
 
+    // Metodo de Servicio : Eliminacion de Catgeoria Especifica del Sistema //
     @Transactional
     public void deleteCategory(String authHeader, Long categoryID) {
         UserEntity thisUserEntity =  existsUserWithToken(authHeader).get();

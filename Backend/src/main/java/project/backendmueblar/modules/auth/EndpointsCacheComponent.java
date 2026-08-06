@@ -31,6 +31,8 @@ public class EndpointsCacheComponent {
 
     @Transactional
     @EventListener(ApplicationReadyEvent.class)
+
+    // Metodo de Servicio : Recuperacion de Todos los Modulos del Sistema ; Almacenamiento en Cache del Servidor (Evitar Consultas Constantes a la Base de Datos //
     public void initCache() {
         List<ModuleEntity> moduleEntityList = repositoryModule.findAll();
 
@@ -38,6 +40,7 @@ public class EndpointsCacheComponent {
         loadEndpointsWithToken();
     }
 
+    // Metodo de Servcio : Carga de Todos los Endpoints (API y Vista) asociados a cada Modulo del Sistema ; Almacenamiento en Cache del Servidor (Evitar Consultas Constantes a la Base de Datos) //
     private void loadEndpointsFromDB(List<ModuleEntity> moduleEntityList) {
         for(ModuleEntity thisModuleEntity : moduleEntityList) {
             List<String> endpointsForModuleEntity = new ArrayList<>();
@@ -51,6 +54,7 @@ public class EndpointsCacheComponent {
         }
     }
 
+    // Metodo de Servicio : Carga de Endpoints que Necesiten Token JWT para su Uso pero no se encuentren Asociado a un Modulo X Rol Especifico //
     private void loadEndpointsWithToken() {
         List<String> endpointsForModuleEntity = new ArrayList<>();
 

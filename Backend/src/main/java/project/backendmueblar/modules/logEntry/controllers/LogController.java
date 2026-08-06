@@ -22,6 +22,7 @@ import java.util.List;
 public class LogController {
     private final LogService logService;
 
+    // Obtencion de Todos los Registros de la Base de Datos mediante la Busqueda Filtrada //
     @GetMapping(produces = "application/json")
     public ResponseEntity<List<LogResponseDTO>> getLogsFromDBFilter(@NotNull @RequestParam(defaultValue = "10") Integer limit,
                                                                     @NotNull @RequestParam(defaultValue = "0") Integer page,

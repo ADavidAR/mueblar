@@ -33,6 +33,7 @@ public class LogService {
     private final RepositoryUser repositoryUser;
     private final OperationTypeRepository operationTypeRepository;
 
+    // Metodo de Servicio : Entrada de Registro (Dado el NombreTabla, Uusuario, EntidadNueva, EntidadVieja y TipoOperacion) en la Base de Datos del Sistema //
     public void logEntryDataBase(String tableName,
                                  Long userId,
                                  Map<String, Object> specificNewEntity,
@@ -65,6 +66,7 @@ public class LogService {
         logRepository.save(logsEntity);
     }
 
+    // Metodo de Servicio : Obtencion de Todos los Registros (Bitacora) del Sistema mediante el uso de Filtros //
     public List<LogResponseDTO> getLogsFromDBFilter(Integer limit,
                                                     Integer page,
                                                     String tableName, String operationName,

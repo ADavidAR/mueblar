@@ -50,6 +50,7 @@ public class CollectionService {
     private final ObjectMapper objectMapper;
     private final RepositoryUser userRepository;
 
+    // Metodo de Servicio PRIVATE : Extraccion del Nombre de la Tabla en la Base de Datos asociado a una Entidad Cualquiera //
     private String tableNameFromEntity(Object entity){
         Class<?> entityClass = entity.getClass();
         Table tableAnnotation = entityClass.getAnnotation(Table.class);
@@ -62,6 +63,7 @@ public class CollectionService {
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
 
+    // Metodo de Servicio PRIVATE : Comprobacion de Existencia de Usuario mediante Token JWT brindado //
     private Optional<UserEntity> existsUserWithToken(String authHeader) {
         String uniqueEmailForUser = jwtService.extractEmail(authHeader);
         Optional<UserEntity> optionalUser = userRepository.findByEmail(uniqueEmailForUser);
@@ -73,6 +75,7 @@ public class CollectionService {
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
 
+    // Metodo de Servicio : Creacion de Coleccion Especifica relacionado a un Usuario //
     public void createCollection(CollectionCreateRequestDTO collectionCreateRequestDTO, String authHeader) {
         UserEntity thisUserEntity =  existsUserWithToken(authHeader).get();
 
@@ -93,6 +96,7 @@ public class CollectionService {
 
     // --------------------------------------------------------------------------------------------------------- //
 
+    // Metodo de Servicio : Modificacion de Coleccion Especifica relacionado a un Usuario //
     public void updateCollectionName(Long collectionId, CollectionCreateRequestDTO collectionUpdateRequestDTO, String authHeader) {
         UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
 
@@ -115,6 +119,7 @@ public class CollectionService {
 
     // --------------------------------------------------------------------------------------------------------- //
 
+    // Metodo de Servicio : Eliminacion de Coleccion Especifica relacionado a un Usuario //
     public void deleteCollectionAndLogs(Long collectionId, String authHeader){
         UserEntity thisUserEntity =  existsUserWithToken(authHeader).get();
 
@@ -135,6 +140,7 @@ public class CollectionService {
 
     // --------------------------------------------------------------------------------------------------------- //
 
+    // Metodo de Servicio : Agregar Producto Especifico a Coleccion de Usuario //
     public void addProductToCollection(Long collectionId, String authHeader, ProductSummaryDTO productSummaryDTO) {
         UserEntity thisUserEntity =  existsUserWithToken(authHeader).get();
 
@@ -170,6 +176,7 @@ public class CollectionService {
 
     // --------------------------------------------------------------------------------------------------------- //
 
+    // Metodo de Servicio : Eliminar Producto Especifico de Coleccion de Usuario //
     public void deleteProductFromCollection(String authHeader, Long collectionId, String modelOfProduct){
         UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
 
@@ -203,6 +210,7 @@ public class CollectionService {
 
     // --------------------------------------------------------------------------------------------------------- //
 
+    // Metodo de Servicio : Obtener Todos los Productos Relacionados a Coleccion Especifica de Usuario //
     public List<ProductResponseDTO> getProductsFromCollectionFilter(String authHeader, Long collectionId, Integer limit, Integer page) {
         UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
 
@@ -238,6 +246,7 @@ public class CollectionService {
         return productResponseDTOList;
     }
 
+    // Metodo de Servicio : Obtencion de todos las Colecciones de Usuario mediante Filtro //
     public List<CollectionResponseDTO> getCollectionsFromUserFilter(String authHeader, Integer limit, Integer page, String search) {
         UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
 
@@ -258,6 +267,7 @@ public class CollectionService {
         return collectionResponseDTOList;
     }
 
+    // Metodo de Servicio : Conversion de Entidad "Coleccion" a una DTO de Respuesta para la API //
     private void convertCollectionEntityToResponseDTO(List<CollectionEntity> collectionEntityList, List<CollectionResponseDTO> collectionResponseDTOList) {
         for(CollectionEntity thisCollectionEntity : collectionEntityList) {
             CollectionResponseDTO collectionResponseDTO = new  CollectionResponseDTO();

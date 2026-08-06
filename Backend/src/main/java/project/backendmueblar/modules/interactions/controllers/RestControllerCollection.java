@@ -19,12 +19,14 @@ import java.util.List;
 public class RestControllerCollection {
     private final CollectionService collectionService;
 
+    // Creacion de Coleccion Asociado a un Usuario dado el Token JWT //
     @PostMapping(consumes = "application/json")
     public ResponseEntity<?> createCollection(@RequestHeader("Authorization") String authHeader, @Valid @RequestBody CollectionCreateRequestDTO collectionCreateRequestDTO) {
         collectionService.createCollection(collectionCreateRequestDTO, authHeader);
         return ResponseEntity.status(201).build();
     }
 
+    // Modificacion de Coleccion Especifica Asociado a un Usuario dado el Token JWT //
     @PutMapping(value = "/{id_collections}", consumes = "application/json")
     public ResponseEntity<?> updateCollectionName(@RequestHeader("Authorization") String authHeader,
                                                   @PathVariable ("id_collections") Long collectionId,
@@ -34,6 +36,7 @@ public class RestControllerCollection {
         return ResponseEntity.status(200).build();
     }
 
+    // Eliminacion de Coleccion Especifica Asociado a un Usuario dado el Token JWT //
     @DeleteMapping(value = "/{id_collections}")
     public ResponseEntity<?> deleteCollectionAndLogs(@RequestHeader("Authorization") String authHeader,
                                                      @PathVariable ("id_collections") Long collectionId
@@ -42,6 +45,7 @@ public class RestControllerCollection {
         return ResponseEntity.status(204).build();
     }
 
+    // Agregar Producto (y sus Variaciones Asociadas) a una Coleccion Especifica de un Usuario dado el Token JWT //
     @PostMapping(value = "/{id_collections}")
     public ResponseEntity<?> addProductsToCollection(@RequestHeader("Authorization") String authHeader,
                                                      @PathVariable("id_collections") Long collectionId,
@@ -51,6 +55,7 @@ public class RestControllerCollection {
         return ResponseEntity.status(201).build();
     }
 
+    // Eliminacion de Producto (y sus Variaciones Asociadas) a una Coleccion Especifica de un Usuario dado el Token JWT //
     @DeleteMapping(value = "/{id_collections}/products/{model}")
     public ResponseEntity<?> deleteProductFromCollection(@RequestHeader("Authorization") String authHeader,
                                                          @PathVariable("id_collections") Long collectionId,
@@ -60,6 +65,7 @@ public class RestControllerCollection {
         return ResponseEntity.status(204).build();
     }
 
+    // Obtencion de Todos los Productos Asociados a una Coleccion Especifica de un Usuario dado el Token JWT //
     @GetMapping(value = "/{id_collections}", produces = "application/json")
     public ResponseEntity<List<ProductResponseDTO>> getProductsFromCollectionFilter(@RequestHeader("Authorization") String authHeader,
                                                                                     @PathVariable("id_collections") Long  collectionId,
@@ -70,6 +76,7 @@ public class RestControllerCollection {
         return ResponseEntity.status(200).body(productResponseDTOList);
     }
 
+    // Obtencion de Todas las Colecciones Asociadas a un Usuario mediante Busqueda Filtrada //
     @GetMapping(produces = "application/json")
     public ResponseEntity<List<CollectionResponseDTO>> getCollectionsFromUserFilter(@RequestHeader("Authorization") String authHeader,
                                                                                     @RequestParam(defaultValue = "10") Integer limit,

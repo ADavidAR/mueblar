@@ -45,6 +45,7 @@ public class ServiceUser {
     private final JwtService jwtService;
     private final RepositoryUser userRepository;
 
+    // Metodo de Servicio PRIVATE : Extraccion del Nombre de la Tabla en la Base de Datos asociado a una Entidad Cualquiera //
     private String tableNameFromEntity(Object entity){
         Class<?> entityClass = entity.getClass();
         Table tableAnnotation = entityClass.getAnnotation(Table.class);
@@ -57,6 +58,7 @@ public class ServiceUser {
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
 
+    // Metodo de Servicio PRIVATE : Comprobacion de Existencia de Usuario mediante Token JWT brindado //
     private Optional<UserEntity> existsUserWithToken(String authHeader) {
         String uniqueEmailForUser = jwtService.extractEmail(authHeader);
         Optional<UserEntity> optionalUser = userRepository.findByEmail(uniqueEmailForUser);
@@ -68,7 +70,7 @@ public class ServiceUser {
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
 
-
+    // Metodo de Servicio PRIVADO : Conversion de Entidad "Usuario a Mapa Respuesta DTO //
     private UserSummaryResponseDTO mapToUserSummaryDTO(UserEntity thisUserEntity) {
         UserSummaryResponseDTO dto = new UserSummaryResponseDTO();
         dto.setEmail(thisUserEntity.getEmail());
@@ -88,6 +90,7 @@ public class ServiceUser {
 
     // ------------------------------------------------------------------------------------------------------- //
 
+    // Metodo de Servicio : Obtencion de Usuario Especifico dentro del Sistema //
     public UserSummaryResponseDTO getUserSpecific(Long userId) {
         Optional<UserEntity> optionalUser = repositoryUser.findById(userId);
         if(optionalUser.isEmpty()) {
@@ -99,6 +102,7 @@ public class ServiceUser {
 
     // ------------------------------------------------------------------------------------------------------- //
 
+    // Metodo de Servicio : Obtencion de Todos los Usuarios Exsitentes dentro del Sistema //
     public List<UserSummaryResponseDTO> getAllUsers(Integer limit, Integer page, String emailSearch, String nameSearch) {
         if(limit == 0) {
             throw new InternalServerException("Cannot throw zero Users");
@@ -147,6 +151,8 @@ public class ServiceUser {
     }
 
     // ------------------------------------------------------------------------------------------------------- //
+
+    // Metodo de Servicio : Creacion de Usuario Especifico dentro del Sistema //
     @Transactional
     public void createUser(String authHeader, UserCreateRequestDTO userCreateRequestDTO){
         UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
@@ -180,6 +186,8 @@ public class ServiceUser {
     }
 
     // ------------------------------------------------------------------------------------------------------- //
+
+    // Metodo de Servicio : Modificacion de Usuario Especifico dentro del Sistema //
     @Transactional
     public void updateUser(String authHeader, Long userId, UserUpdateRequestDTO userUpdateRequestDTO){
         UserEntity userEntity = existsUserWithToken(authHeader).get();
@@ -229,6 +237,7 @@ public class ServiceUser {
         logService.logEntryDataBase(tableNameFromEntity(thisUserEntity), userEntity.getUserId(), objectMapper.convertValue(thisUserEntity, new TypeReference<Map<String, Object>>() {}), oldValueMap, 2);
     }
 
+    // Metodo de Servicio : Eliminacion de Usuario Especifico dentro del Sistema //
     @Transactional
     public void deleteUser(String authHeader, Long userId) {
         UserEntity userEntity = existsUserWithToken(authHeader).get();

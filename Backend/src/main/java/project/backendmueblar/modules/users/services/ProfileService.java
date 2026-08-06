@@ -32,6 +32,7 @@ public class ProfileService {
     private final JwtService jwtService;
     private final RepositoryUser userRepository;
 
+    // Metodo de Servicio PRIVATE : Extraccion del Nombre de la Tabla en la Base de Datos asociado a una Entidad Cualquiera //
     private String tableNameFromEntity(Object entity){
         Class<?> entityClass = entity.getClass();
         Table tableAnnotation = entityClass.getAnnotation(Table.class);
@@ -44,6 +45,7 @@ public class ProfileService {
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
 
+    // Metodo de Servicio PRIVATE : Comprobacion de Existencia de Usuario mediante Token JWT brindado //
     private Optional<UserEntity> existsUserWithToken(String authHeader) {
         String uniqueEmailForUser = jwtService.extractEmail(authHeader);
         Optional<UserEntity> optionalUser = userRepository.findByEmail(uniqueEmailForUser);
@@ -55,6 +57,7 @@ public class ProfileService {
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
 
+    // Metodo de Servicio : Obtencion de Perfil Especifico de un Usuario //
     public UserProfileSummaryResponseDTO getProfileSpecificForUser(String authHeader){
         UserEntity userEntity = existsUserWithToken(authHeader).get();
 
@@ -66,6 +69,8 @@ public class ProfileService {
     }
 
     // ----------------------------------------------------------------------------------------------------------- //
+
+    // Metodo de Servicio : Modificacion de Perfil de Uusuario Especifico //
     @Transactional
     public void modifyProfile(String authHeader, UserCreateRequestDTO userUpdateRequestDTO){
         UserEntity thisUserEntity = existsUserWithToken(authHeader).get();

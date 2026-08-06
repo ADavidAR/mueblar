@@ -203,6 +203,11 @@ public class CatalogService {
             thisVariationEntity.setVariationName(thisVariationRequestDTO.getName());
             thisVariationEntity.setInstationParameters(thisVariationRequestDTO.getInstance_params());
             thisVariationEntity.setModel3dPath(thisVariationRequestDTO.getModel_3d());
+
+            if(thisVariationEntity.getPrice() < 0){
+                throw new RuntimeException("Price cannot be negative");
+            }
+
             thisVariationEntity.setPrice(thisVariationRequestDTO.getPrice());
             thisVariationEntity.setIsTop(thisVariationRequestDTO.getTop());
             thisVariationEntity.setEnabled(thisVariationRequestDTO.getEnabled());
@@ -351,6 +356,11 @@ public class CatalogService {
                 thisVariationEntity.setVariationName(thisVariationRequestDTO.getName());
                 thisVariationEntity.setInstationParameters(thisVariationRequestDTO.getInstance_params());
                 thisVariationEntity.setModel3dPath(thisVariationRequestDTO.getModel_3d());
+
+                if(thisVariationEntity.getPrice() < 0){
+                    throw new RuntimeException("Price cannot be negative");
+                }
+
                 thisVariationEntity.setPrice(thisVariationRequestDTO.getPrice());
                 thisVariationEntity.setIsTop(thisVariationRequestDTO.getTop());
                 thisVariationEntity.setEnabled(thisVariationRequestDTO.getEnabled());

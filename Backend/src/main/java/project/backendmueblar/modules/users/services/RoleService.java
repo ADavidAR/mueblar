@@ -41,6 +41,7 @@ public class RoleService {
     private final JwtService jwtService;
     private final RepositoryUser userRepository;
 
+    // Metodo de Servicio PRIVATE : Extraccion del Nombre de la Tabla en la Base de Datos asociado a una Entidad Cualquiera //
     private String tableNameFromEntity(Object entity){
         Class<?> entityClass = entity.getClass();
         Table tableAnnotation = entityClass.getAnnotation(Table.class);
@@ -53,6 +54,7 @@ public class RoleService {
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
 
+    // Metodo de Servicio PRIVATE : Comprobacion de Existencia de Usuario mediante Token JWT brindado //
     private Optional<UserEntity> existsUserWithToken(String authHeader) {
         String uniqueEmailForUser = jwtService.extractEmail(authHeader);
         Optional<UserEntity> optionalUser = userRepository.findByEmail(uniqueEmailForUser);
@@ -64,7 +66,7 @@ public class RoleService {
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
 
-
+    // Metodo de Servicio PRIVATE : Obtencion de Bit Entero de Permiso dado el Modulo y Rol Especifico //
     private static @NonNull Integer getInteger(Module_X_RoleEntity moduleXRoleEntity) {
         Integer accessBit1;
         Integer creationBit2;
@@ -97,6 +99,7 @@ public class RoleService {
 
     // ------------------------------------------------------------------------------------------------------------- //
 
+    // Metodo de Servicio : Obtencion de Rol Especifico del Sistema //
     public RoleResponseDTO getSpecificRole(Long roleId){
         Optional<RoleEntity> optionalRole = repositoryRole.findByRoleId(roleId);
         if(optionalRole.isEmpty()){
@@ -130,6 +133,7 @@ public class RoleService {
 
     // ------------------------------------------------------------------------------------------------------------- //
 
+    // Metodo de Servicio : Obtencion de Todos los Roles Especifico del Sistema //
     public List<RoleResponseDTO> getAllRoles(Integer limit, Integer page, String search){
         if(limit == 0){
             throw new InternalServerException("Cannot throw zero Roles");
@@ -164,6 +168,7 @@ public class RoleService {
 
     // ------------------------------------------------------------------------------------------------------------- //
 
+    // Metodo de Servicio : Creacion de Rol Especifico en el Sistema //
     @Transactional
     public void createRole(String authHeader, RoleCreateRequestDTO roleCreateRequestDTO){
         UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
@@ -210,6 +215,8 @@ public class RoleService {
     }
 
     // ------------------------------------------------------------------------------------------------------------- //
+
+    // Metodo de Servicio : Modificacion de Rol Especifico dentro del Sistema //
     @Transactional
     public void updateRole(String authHeader, Long roleId, RoleCreateRequestDTO roleUpdateRequestDTO){
         UserEntity thisUserEntity = existsUserWithToken(authHeader).get();
@@ -266,6 +273,8 @@ public class RoleService {
     }
 
     // ------------------------------------------------------------------------------------------------------------- //
+
+    // Metodo de Servicio : Eliminacion de Rol Especifico del Sistema //
     @Transactional
     public void deleteRoleSpecific(String authHeader, Long roleId){
         UserEntity thisUserEntity = existsUserWithToken(authHeader).get();

@@ -19,11 +19,13 @@ public class RestControllerUser {
 
     private final ServiceUser userService;
 
+    // Obtencion de Usuario No Cliente Especifico dentro del Sistema //
     @GetMapping(value = "/{id}", produces = "application/json")
     public ResponseEntity<UserSummaryResponseDTO> getUserSpecific(@PathVariable("id") Long userId) {
         return ResponseEntity.status(200).body(userService.getUserSpecific(userId));
     }
 
+    // Obtencion de Todos los Usuarios No Clientes Existentes en el Sistema mediante el Uso de Busqueda Filtrada //
     @GetMapping(produces = "application/json")
     public ResponseEntity<List<UserSummaryResponseDTO>> getAllUsers(@RequestParam(defaultValue = "10") Integer limit,
                                                                     @RequestParam(defaultValue = "0") Integer page,
@@ -33,12 +35,14 @@ public class RestControllerUser {
         return ResponseEntity.status(200).body(userService.getAllUsers(limit, page, email, name));
     }
 
+    // Creacion de Usuario No Cliente Especifico dentro del Sistema //
     @PostMapping(consumes = "application/json")
     public ResponseEntity<?> createUser(@RequestHeader("Authorization") String authHeader, @Valid @RequestBody UserCreateRequestDTO userCreateRequestDTO){
         userService.createUser(authHeader, userCreateRequestDTO);
         return ResponseEntity.status(201).build();
     }
 
+    // Modificacion de Usuario No Cliente Especifico dentro del Sistema //
     @PutMapping(value = "/{id}", consumes = "application/json")
     public ResponseEntity<?> updateUser(@RequestHeader("Authorization") String authHeader,
                                         @PathVariable("id") Long userId,
@@ -48,6 +52,7 @@ public class RestControllerUser {
         return ResponseEntity.status(200).build();
     }
 
+    // Eliminacion de Usuario No Cliente Especifico dentro del Sistema //
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<?> deleteUser(@RequestHeader("Authorization") String authHeader,
                                         @PathVariable("id") Long userId) {
