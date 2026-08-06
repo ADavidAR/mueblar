@@ -27,7 +27,6 @@ public class RestControllerAuth {
     @PostMapping(value = "/register", consumes = "application/json")
     public ResponseEntity<?> registerUser(@Valid @RequestBody UserCreateRequestDTO userCreateRequestDTO) {
         authService.registerUser(userCreateRequestDTO);
-
         return ResponseEntity.status(201).body("User registered successfully");
     }
 

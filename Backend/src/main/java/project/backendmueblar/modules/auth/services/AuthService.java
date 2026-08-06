@@ -12,6 +12,7 @@ import project.backendmueblar.modules.auth.EndpointsCacheComponent;
 import project.backendmueblar.modules.auth.dtos.*;
 import project.backendmueblar.modules.auth.repositories.RepositoryRecoveryToken;
 import project.backendmueblar.modules.auth.entities.RecoveryTokenEntity;
+import project.backendmueblar.modules.interactions.services.CollectionService;
 import project.backendmueblar.modules.logEntry.services.LogService;
 import project.backendmueblar.modules.users.entities.ModuleEntity;
 import project.backendmueblar.modules.users.entities.Module_X_RoleEntity;
@@ -33,7 +34,7 @@ public class AuthService {
     private final RepositoryRecoveryToken repositoryRecoveryToken;
     private final RepositoryModule repositoryModule;
     private final RepositoryModule_X_Role repositoryModule_X_Role;
-
+    private final CollectionService collectionService;
     private final JwtService jwtService;
     private final EmailService emailService;
 
@@ -67,7 +68,7 @@ public class AuthService {
         }
         Optional<RoleEntity> roleEntity = repositoryRole.findByRoleName("Cliente");
         if(!(roleEntity.isPresent())){
-            throw new RoleNotFoundException("Role does not exist");
+            throw new RoleNotFoundException("Cannot Create a User with Different Role");
         }
 
         // Good Response
@@ -80,6 +81,8 @@ public class AuthService {
         userEntity.setEnabled(true);
         userEntity.setRoleEntity(roleEntity.get());
         repositoryUser.save(userEntity);
+
+        collectionService.createDefaultCollectionForUser(userEntity.getUserId());
 
         logService.logEntryDataBase(tableNameFromEntity(userEntity), userEntity.getUserId(), objectMapper.convertValue(userEntity, new TypeReference<Map<String, Object>>() {}), null, 1);
     }

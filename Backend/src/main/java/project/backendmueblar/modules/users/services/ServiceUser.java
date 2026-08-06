@@ -17,6 +17,7 @@ import project.backendmueblar.exception.catalog.InternalServerException;
 import project.backendmueblar.modules.auth.dtos.UserCreateRequestDTO;
 import project.backendmueblar.modules.auth.dtos.UserUpdateRequestDTO;
 import project.backendmueblar.modules.auth.services.JwtService;
+import project.backendmueblar.modules.interactions.services.CollectionService;
 import project.backendmueblar.modules.logEntry.services.LogService;
 import project.backendmueblar.modules.users.dtos.response.RoleSummaryResponseDTO;
 import project.backendmueblar.modules.users.dtos.response.UserSummaryResponseDTO;
@@ -39,7 +40,7 @@ public class ServiceUser {
     private final RepositoryUser repositoryUser;
     private final PasswordEncoder passwordEncoder;
     private final RepositoryRole repositoryRole;
-
+    private final CollectionService collectionService;
     private final LogService logService;
     private final ObjectMapper objectMapper;
     private final JwtService jwtService;
@@ -182,6 +183,9 @@ public class ServiceUser {
 
         userEntity.setRoleEntity(thisRoleEntity);
         repositoryUser.save(userEntity);
+
+        collectionService.createDefaultCollectionForUser(userEntity.getUserId());
+
         logService.logEntryDataBase(tableNameFromEntity(userEntity), thisUserEntity.getUserId(), objectMapper.convertValue(userEntity, new TypeReference<Map<String, Object>>() {}), null, 1);
     }
 

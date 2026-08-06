@@ -75,6 +75,21 @@ public class CollectionService {
 
     // ----------------------------------------------------------------------------------------------------------------------------------------//
 
+    public void createDefaultCollectionForUser(Long userId) {
+        Optional<UserEntity> optionalUser = userRepository.findById(userId);
+        if(optionalUser.isEmpty()){
+            throw new ResourceNotFoundException("User not found / User has not been created yet");
+        }
+
+        CollectionEntity collectionEntity = new CollectionEntity();
+        collectionEntity.setTitle("Favoritos");
+        collectionEntity.setErasable(false);
+        collectionEntity.setUserEntity(optionalUser.get());
+        collectionRepository.save(collectionEntity);
+    }
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------//
+
     // Metodo de Servicio : Creacion de Coleccion Especifica relacionado a un Usuario //
     public void createCollection(CollectionCreateRequestDTO collectionCreateRequestDTO, String authHeader) {
         UserEntity thisUserEntity =  existsUserWithToken(authHeader).get();
