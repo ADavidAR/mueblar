@@ -42,19 +42,24 @@ async function deleteSessionToken() {
 export const request = async (path, options = {}) => {
     const { skipAuth = false, ...fetchOptions } = options
     const token = !skipAuth ? await getSessionToken() : null
+    try {
 
-    const res = await fetch(`${BASE_URL}${path}`, {
-        ...fetchOptions,
-        headers: {
-        'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` }),
-        ...fetchOptions.headers
-        }
-    })
-
-    if (!res.ok) {
+        const res = await fetch(`${BASE_URL}${path}`, {
+            ...fetchOptions,
+            headers: {
+            'Content-Type': 'application/json',
+            ...(token && { Authorization: `Bearer ${token}` }),
+            ...fetchOptions.headers
+            }
+        })
+        
         const text = await res.text()
-        let message = `Error ${res.status}`
+        if (!text) return null
+        try { return JSON.parse(text) } catch { return text }
+    
+    } catch(e) {
+        const text = await e.text()
+        let message = `Error ${e.status}`
         let details = null
 
         try {
@@ -70,14 +75,13 @@ export const request = async (path, options = {}) => {
         }
 
         const err = new Error(message)
-        err.status = res.status
+        err.status = e.status
         err.details = details
         throw err
+
     }
 
-    const text = await res.text()
-    if (!text) return null
-    try { return JSON.parse(text) } catch { return text }
+
 }
 
 export const isAuthenticated = async () => {

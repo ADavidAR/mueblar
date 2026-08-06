@@ -11,7 +11,7 @@ export const fetchProducts = async (
     const queryParams = []
     if (search)             queryParams.push(`search=${encodeURIComponent(search)}`) 
     if (limit)              queryParams.push(`limit=${limit}`) 
-    if (page)               queryParams.push(`page=${page}`) 
+    if (typeof page !== "undefined")               queryParams.push(`page=${page}`) 
     if (categories.length)  queryParams.push(`categories=${categories.map(c => encodeURIComponent(c)).join(",")}`) 
     if (materials.length)   queryParams.push(`materials=${materials.join(",")}`)  
 
@@ -39,8 +39,13 @@ export const fetchCategories = async () =>
         method: 'GET'
     })
 
-export const fetchMaterials = async () => 
-    await request("/api/attributes/MATERIAL", {
-        skipAuth: true,
+export const fetchMaterials = async () => {
+    const mat = await request("/api/attributes?limit=150", {
+        skipAuth: false,
         method: 'GET'
     })
+
+    return mat.filter((m) => m.atribType.id === "MATERIAL")
+
+}
+

@@ -27,8 +27,13 @@ export default function VariantsModal({ visible, product, selected, onSelect, on
         if (visible) {
             if(shouldLoadVariants) {
                 const loadVariations = async () => {
-                    const { variations: newVariations } = products.find( (p) => p.model === product.model ) //await fetchSingleProduct(product.model, false)
-                    setFetchedVariations(newVariations)
+                    try {
+                        const data = await fetchSingleProduct(product.model, false)
+                        setFetchedVariations(data?.variations ?? [])
+                    } catch (e) {
+                        console.error('No se pudieron cargar las variantes', e)
+                        setFetchedVariations([])
+                    }
                 }
                 loadVariations()
             }

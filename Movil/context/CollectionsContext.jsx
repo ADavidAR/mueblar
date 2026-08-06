@@ -7,6 +7,7 @@ import {
     deleteProductFromCollection,
     deleteCollection as deleteCollectionRequest,
 } from '../services/collectionsService'
+import { isAuthenticated } from '../services/authService'
 
 /**
  * Estado global de colecciones y favoritos.
@@ -48,7 +49,11 @@ export function CollectionsProvider({ children }) {
     }, [])
 
     useEffect(() => {
-        reload()
+        (async () => {
+            const authed = await isAuthenticated()
+            if(authed)
+                reload()
+        })()
     }, [reload])
 
     const favorites = useMemo(() => collections.find((c) => c.removable === false), [collections])

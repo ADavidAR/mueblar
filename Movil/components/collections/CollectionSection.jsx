@@ -122,7 +122,7 @@ export default function CollectionSection({ collection, onProbarAR, onDelete }) 
                 setShowErrorModal(false)
                 if(isAuthError) {
                     logoutUser()
-                    router.navigate("/view/login")
+                    router.replace("/view/login")
                 }
             }} 
         />

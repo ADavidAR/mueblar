@@ -43,12 +43,20 @@ export default function ProfileForm () {
     useEffect(() => {
         if(shouldLoadUserData) {
             const initializeProfileData = async () => {
-                const newCurrentProfileData = await fetchProfileData()
-                setCurrentProfileData(newCurrentProfileData)
-                setShouldLoadUserData(false)
-                updateFormDefaults( newCurrentProfileData )
+                try {
+                    const newCurrentProfileData = await fetchProfileData()
+                    setCurrentProfileData(newCurrentProfileData)
+                    updateFormDefaults( newCurrentProfileData )
+                } catch (e) {
+                    console.error('No se pudo cargar el perfil', e)
+                } finally {
+                    // Sin esto, si fetchProfileData falla shouldLoadUserData
+                    // queda en true para siempre y este efecto reintenta en
+                    // cada re-render.
+                    setShouldLoadUserData(false)
+                }
             }
-    
+
             initializeProfileData()
         }
     }, [shouldLoadUserData, updateFormDefaults])
@@ -66,7 +74,7 @@ export default function ProfileForm () {
 
     const handleLogout = () => {
         logoutUser()
-        router.navigate("/view/login")
+        router.replace("/view/login")
     }
 
     return (
@@ -241,7 +249,10 @@ export default function ProfileForm () {
             <ConfirmModal
                 visible={showConfirm}
                 onClose={() => setShowConfirm(false)}
-                onConfirm={submit}
+                onConfirm={() => {
+                    submit()
+                    handleEditToggle()
+                }}
                 title="Confirmar cambios"
                 message={
                     changePassword

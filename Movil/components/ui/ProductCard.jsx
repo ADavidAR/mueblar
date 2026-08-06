@@ -2,7 +2,7 @@ import { Link } from "expo-router"
 import { Image, Pressable, Text, View, Animated } from "react-native"
 import { useCallback, useEffect, useRef, useState } from "react"
 
-import { EmptyHeartIcon, FilledHeartIcon } from "../Icons"
+import { CouchIcon, EmptyHeartIcon, FilledHeartIcon } from "../Icons"
 import { numberSeparatorFormatter } from "../../utils/formatters"
 import { useCollections } from "../../hooks/useCollections"
 import SaveToCollectionModal from "../modals/SaveToCollectionModal"
@@ -54,6 +54,13 @@ function FavoriteButton({ productId }) {
 
 export function ProductCard ({ item, topVariation, onImageLoad }) {
     const [scale] = useState(() => new Animated.Value(1))
+    const [imageFailed, setImageFailed] = useState(false)
+
+    // Sin thumbnail no se llega a renderizar ningún <Image>, así que nadie
+    // dispara onLoadEnd/onError — sin esto la tarjeta quedaría invisible.
+    useEffect(() => {
+        if (!topVariation?.thumbnail) onImageLoad?.()
+    }, [topVariation?.thumbnail, onImageLoad])
 
     const animateTo = (toValue) =>
         Animated.spring(scale, {
@@ -64,7 +71,7 @@ export function ProductCard ({ item, topVariation, onImageLoad }) {
         }).start()
 
     return (
-        <Link asChild href={`/view/product-details/${item.model}`}>
+        <Link asChild href={`/view/product-details/${item.model}` }>
             <Pressable
                 onPressIn={() => animateTo(0.96)}
                 onPressOut={() => animateTo(1)}
@@ -72,12 +79,30 @@ export function ProductCard ({ item, topVariation, onImageLoad }) {
             >
                 <Animated.View style={{ transform: [{ scale }] }}>
                     <View className="rounded-2xl overflow-hidden bg-white dark:bg-card shadow-sm shadow-black/20">
-                        <Image
-                            source={{ uri: topVariation?.thumbnail }}
-                            style={{ height: 200, width: '100%' }}
-                            resizeMode="cover"
-                            onLoadEnd={onImageLoad}
-                        />
+                        {imageFailed || !topVariation?.thumbnail ? (
+                            <View
+                                style={{ height: 200, width: '100%' }}
+                                className="items-center justify-center bg-stone-100 dark:bg-stone-800"
+                            >
+                                <CouchIcon size={32} color="#a8a29e" />
+                            </View>
+                        ) : (
+                            <Image
+                                source={{ uri: topVariation?.thumbnail }}
+                                style={{ height: 200, width: '100%' }}
+                                resizeMode="cover"
+                                onLoadEnd={onImageLoad}
+                                onError={() => {
+                                    setImageFailed(true)
+                                    // Sin esto, si la imagen falla la tarjeta
+                                    // queda con opacity:0 para siempre (el
+                                    // fade-in de AnimatedProductCard solo se
+                                    // dispara con onLoadEnd) el link sigue
+                                    // activo pero se ve un hueco en blanco.
+                                    onImageLoad?.()
+                                }}
+                            />
+                        )}
                         <FavoriteButton productId={item.model} />
                     </View>
 
@@ -115,7 +140,7 @@ export function SceneObjectCard ({ item, onPress }) {
                 <Animated.View style={{ transform: [{ scale }] }}>
                     <View className="rounded-2xl w-full overflow-hidden bg-white dark:bg-card shadow-sm shadow-black/20">
                         <Image
-                            source={{ uri: item.thumbnail }}
+                            source={{ uri: item?.thumbnail }}
                             style={{ height: 200, width: '100%' }}
                             resizeMode="cover"
                         />

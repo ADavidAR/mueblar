@@ -13,6 +13,17 @@ import { logoutUser } from "../../services/authService"
 // `loadKey` lo cambia el padre (ej. al aplicar un filtro nuevo) para forzar
 // una recarga completa desde la página 0; `resetKey` se lo pasa a cada
 // AnimatedProductCard para reiniciar su animación de entrada.
+// La API puede devolver algo que no sea un array plano (ej. filtrando por
+// categoría/material) — sin este chequeo, el spread de abajo tira
+// "iterator method is not callable" y crashea la app. Acá se degrada a
+// "sin resultados" en vez de crashear, y se loguea la forma real para
+// poder diagnosticar contra qué está respondiendo la API.
+const toProductArray = (value) => {
+    if (Array.isArray(value)) return value
+    console.error('Se esperaba un array de productos y llegó otra cosa:', value)
+    return []
+}
+
 export default function ProductsList({ loadKey }) {
     const { getFilteredProduucts } = useFilters()
     const [products, setProducts] = useState([])
@@ -31,7 +42,7 @@ export default function ProductsList({ loadKey }) {
         if (loading || !hasMore) return
         setLoading(true)
         try {
-            const newItems = await getFilteredProduucts(page) 
+            const newItems = toProductArray(await getFilteredProduucts(page))
             if (newItems.length === 0) {
                 setHasMore(false)
             } else {
@@ -56,7 +67,7 @@ export default function ProductsList({ loadKey }) {
         setRefreshing(true)
         setHasMore(true)
         try {
-            const freshItems = await getFilteredProduucts(0)
+            const freshItems = toProductArray(await getFilteredProduucts(0))
             if (freshItems.length === 0) {
                 setHasMore(false)
             } else {
@@ -80,7 +91,7 @@ export default function ProductsList({ loadKey }) {
             setResetKey(prev => prev + 1)
             setHasMore(true)
             try {
-                const newItems = await getFilteredProduucts(0)
+                const newItems = toProductArray(await getFilteredProduucts(0))
                 if (newItems.length === 0) {
                     setHasMore(false)
                 } else {
@@ -94,7 +105,7 @@ export default function ProductsList({ loadKey }) {
             }
         }
         initialLoad()
-    },[loadKey, getFilteredProduucts]) 
+    },[loadKey]) 
 
     const renderFooter = () => {
         if (!loading) return null
@@ -141,7 +152,7 @@ export default function ProductsList({ loadKey }) {
                             setErrorMessage("")
                             setShowErrorModal(false)
                             logoutUser()
-                            router.navigate("/view/login")
+                            router.replace("/view/login")
                         }} 
                     />
                     </>

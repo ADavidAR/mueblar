@@ -96,7 +96,7 @@ export default function CollectionView() {
                 onClose={() => {
                     toggleHasAuthError()
                     logoutUser()
-                    router.navigate("/view/login")
+                    router.replace("/view/login")
                 }} 
             />
             

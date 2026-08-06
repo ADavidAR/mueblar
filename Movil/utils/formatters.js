@@ -31,11 +31,10 @@ export const tableRowContentClassNameParser = (className, contentSize) => {
 
 // De los `attribs` de una variación, saca el id de color y agrupa los
 // materiales por atributo (ej. "madera: Roble,Nogal").
-export const parseAttributes = (attibrutes = []) => {
-
-    const color = [attibrutes.filter((at) => at.attribType.id === "COLOR")[0].id]
+export const parseAttributes = (attributes = []) => {
+    const color = [attributes.filter((at) => at.attribType === "COLOR")[0].value]
     let materials = []
-    const tempMat = attibrutes.filter((at) => at.attribType.id === "MATERIAL")
+    const tempMat = attributes.filter((at) => at.attribType === "MATERIAL")
     let attribSet = new Set(tempMat.map((at) => at.id))
     attribSet.forEach((a) => {
         let sameMaterial = tempMat.filter((at) => at.id === a).map((at) => at.value)

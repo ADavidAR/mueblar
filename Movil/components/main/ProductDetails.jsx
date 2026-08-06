@@ -2,14 +2,13 @@ import { FlatList, Image, Pressable, ScrollView, Text, View } from "react-native
 import { useEffect, useState } from "react"
 import { useRouter } from "expo-router"
 
-import data from "../../mocks/products.json"
 import { numberSeparatorFormatter, parseAttributes } from "../../utils/formatters"
 import SpecificationTable from "../ui/SpecificationTable"
 import SerifText from "../ui/SerifText"
 import PrimaryButton from "../ui/PrimaryButton"
 import VariantsModal from "../modals/VariantsModal"
 import SaveToCollectionModal from "../modals/SaveToCollectionModal"
-import "../../assets/img_placeholder.jpeg"
+import imgPlaceholder from "../../assets/img_placeholder.jpeg"
 import { CubeIcon, FilledHeartIcon, EmptyHeartIcon } from "../Icons"
 import { fetchSingleProduct } from "../../services/inventoryService"
 import { useCollections } from "../../hooks/useCollections"
@@ -17,7 +16,7 @@ import { mapProductError } from "../../constants/authErrors"
 
 /** Construye la vista de datos derivada de una variación concreta. */
 function buildProductData(prod, variation) {
-    const { materials, color } = parseAttributes(variation.attribs)
+    const { materials, color } = parseAttributes(variation.atribs)
     const dimensions = [
         `Ancho: ${prod.dimensions.width}cm`,
         `Profundidad: ${prod.dimensions.depth}cm`,
@@ -54,16 +53,19 @@ export default function ProductDetails ({ model, sku }) {
     useEffect(() => {
         const loadProduct = async () => {
             try {
+                setHasError(false)
                 const newProd = await fetchSingleProduct(model, false)
+
                 const newVariation = newProd.variations.find( v => sku ? sku === v.sku : v.top )
                 setProduct(newProd)
                 setSelectedVariation(newVariation)
                 setSelectedImg(newVariation.thumbnail)
                 setProductData(buildProductData(newProd, newVariation))
+                setErrorMessage("")
 
             } catch (error) {
-                setErrorMessage(mapProductError(error))
                 setHasError(true)
+                setErrorMessage(mapProductError(error))
             }
             
         }
@@ -88,9 +90,9 @@ export default function ProductDetails ({ model, sku }) {
 
             { hasError ? (
                 <View
-                    className="flex-1 justify-center items-center"
+                    className="flex-1 justify-center items-center mt-10"
                 >
-                    <SerifText className={"mt-5"}>
+                    <SerifText className={"text-4xl font-bold text-stone-900 dark:text-stone-50"}>
                         Lo Sentimos
                     </SerifText>
                     <Text className="mt-4 text-base leading-7 text-stone-600 dark:text-stone-300">
@@ -103,7 +105,7 @@ export default function ProductDetails ({ model, sku }) {
                 {/* Imagen principal */}
                 <View className="mt-2 rounded-3xl overflow-hidden bg-white dark:bg-card shadow-lg shadow-black/30">
                     <Image
-                        source={{ uri: selectedImg || "../../../../assets/img_placeholder.jpeg"}}
+                        source={selectedImg ? { uri: selectedImg } : imgPlaceholder}
                         style={{ width: "100%", height: 380 }}
                         resizeMode="cover"
                     />
