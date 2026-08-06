@@ -8,4 +8,5 @@ import lombok.Setter;
 public class AttributeSummaryResponseDTO {
     private String id;
     private String value;
+    private String attribType;
 }
