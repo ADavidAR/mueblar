@@ -5,10 +5,12 @@ import { Plus, Pencil, Trash } from '../../components/ui/icons'
 import { usePermissions } from '../../hooks/usePermissions'
 import {
   getUsers,
-  searchUsers,
+
   deleteUser,
 } from '../../services/userAdminService'
+import { useNavigate } from 'react-router-dom'
 
+// componente de boton 
 function AddButton({ label, onClick }) {
   return (
     <button
@@ -20,7 +22,7 @@ function AddButton({ label, onClick }) {
     </button>
   )
 }
-
+// componente que muestra el estado del usuario
 function StatusBadge({ enabled }) {
   return (
     <span
@@ -37,24 +39,44 @@ function StatusBadge({ enabled }) {
 
 const PAGE_SIZE = 10
 
-export default function AdminUsersPage() {
-  const { loading: permsLoading, access, create, canDelete, modify } = usePermissions('/view/users-management')
 
-  const [users, setUsers]     = useState([])
+
+// pagina de usuario
+export default function AdminUsersPage() {
+  //verifica los permisos
+  const { loading: permsLoading, access, create, canDelete, modify } = usePermissions('/view/users-management')
+  //useStates para almacenar datos prevnientes de backen y manejo de errores
+  const navigate= useNavigate()
+  //usuarios del backend
+  const [users, setUsers]     = useState([])//lista original traida
+  
   const [loading, setLoading] = useState(true)
+ 
+  //filtros paginacion y manejos de errore
   const [error, setError]     = useState(null)
   const [searchQ, setSearchQ] = useState('')
   const [page, setPage]       = useState(0)
+  const[refresh,setRefresh]   =useState(null)
 
-  const [fetchKey, setFetchKey] = useState(0)
+//estados para cuando se realiza borrado
+   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
+   const [deleting, setDeleting]               = useState(false)
 
+ 
+
+  //cargar la data a la hora de cargar la pagina
   useEffect(() => {
     let cancelled = false
     async function load() {
       try {
-        const res = await getUsers({ limit: PAGE_SIZE, offset: page * PAGE_SIZE })
+        const res = await getUsers({ 
+          limit: PAGE_SIZE,
+           page: page,
+          name:searchQ
+          })
         if (!cancelled) {
           setUsers(Array.isArray(res) ? res : [])
+        
           setError(null)
         }
       } catch (err) {
@@ -65,25 +87,46 @@ export default function AdminUsersPage() {
     }
     load()
     return () => { cancelled = true }
-  }, [page, fetchKey])
+  }, [page,refresh,searchQ])
 
+
+//funcion para realizar busquedas por nombre
   async function handleSearch(e) {
-    const q = e.target.value
-    setSearchQ(q)
-    if (!q.trim()) { setLoading(true); setFetchKey((k) => k + 1); return }
-    try {
-      const res = await searchUsers(q)
-      setUsers(Array.isArray(res) ? res : [])
-    } catch { /* mantiene lista actual */ }
+    const sf =  e!== undefined ? e.target.value : searchQ
+         
+      
+          setSearchQ(sf)
+      
+          setLoading(true)
+      
+          try {
+            const res = await getUsers({
+             limit: PAGE_SIZE,
+              page: page,
+              name:sf
+            })
+            setUsers(Array.isArray(res) ? res : [])
+            setError(null)
+          } catch (err) { setError(err.message) }
+          finally {
+            setLoading(false)
+            setPage(0)
+          }
   }
-
+//funcion para confirmar borrado de un usuario
   async function handleDelete(id, name) {
+    setDeleting(true)
     if (!confirm(`¿Eliminar el usuario "${name}"?`)) return
     try {
       await deleteUser(id)
       setUsers((prev) => prev.filter((u) => u.id !== id))
+      setConfirmDeleteId(null)
+      
     } catch (err) {
       alert(err.message)
+    } finally {
+      setDeleting(false)
+      setRefresh(refresh? false:true)
     }
   }
 
@@ -103,7 +146,9 @@ export default function AdminUsersPage() {
               onChange={handleSearch}
               className="w-52 rounded-full border border-neutral-700 bg-neutral-800 py-1.5 pl-4 pr-4 text-sm text-white placeholder:text-neutral-500 focus:border-copper/50 focus:outline-none"
             />
-            {create && <AddButton label="Crear Usuario" />}
+            {create && <AddButton
+            onClick={()=>navigate('/view/users/create')}
+            label="Crear Usuario" />}
           </div>
         </div>
 
@@ -138,10 +183,39 @@ export default function AdminUsersPage() {
               </tr>
             ) : (
               users.map((u) => (
+                confirmDeleteId === u.id ? (
+                  
+                   <tr key={u.id} className="border-b border-neutral-800">
+                    <td colSpan={4} className="py-3 ">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm text-red-400">
+                          ¿Estás seguro de eliminar al ususario {' '}
+                          <span className="font-medium text-white">" {u.nombre} {u.apellido}"</span>?
+                        </p>
+                        <div className="inline-flex gap-2">
+                          <button
+                            onClick={() => setConfirmDeleteId(null)}
+                            className="rounded-full border border-neutral-700 px-4 py-1.5 text-xs text-neutral-400 transition-colors hover:border-neutral-500 hover:text-white"
+                          >
+                            Cancelar
+                          </button>
+                          <button
+                            onClick={() => handleDelete(u.id)}
+                            disabled={deleting}
+                            className="rounded-full bg-red-700/70 px-4 py-1.5 text-xs text-red-200 transition-opacity hover:bg-red-700 disabled:opacity-50"
+                          >
+                            {deleting ? 'Eliminando...' : 'Sí, eliminar'}
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ):
+                (
                 <tr key={u.id} className="border-b border-neutral-800 hover:bg-neutral-800/40">
                   <td className="py-3 pr-4">
                     <p className="font-medium text-white">
-                      {u.name} {u.lastName}
+                      {u.nombre} {u.apellido}
                     </p>
                   </td>
                   <td className="py-3 pr-4 text-neutral-300">{u.email ?? u.correo}</td>
@@ -152,24 +226,34 @@ export default function AdminUsersPage() {
                     <StatusBadge enabled={u.enabled !== false && u.habilitado !== false} />
                   </td>
                   <td className="py-3 text-right">
+                    {u.role.editable?(
                     <div className="inline-flex gap-1">
+                
                       {modify && (
-                        <button className="rounded p-1.5 text-neutral-400 hover:bg-neutral-700 hover:text-white">
+                        <button
+                        onClick={()=>navigate(`/view/users/edit/${u.id}`)} 
+                        className="rounded p-1.5 text-neutral-400 hover:bg-neutral-700 hover:text-white">
                           <Pencil className="h-3.5 w-3.5" />
                         </button>
                       )}
                       {canDelete && (
                         <button
-                          onClick={() => handleDelete(u.id, `${u.name} ${u.lastName}`)}
+                          onClick={() => setConfirmDeleteId(u.id)}
                           className="rounded p-1.5 text-neutral-400 hover:bg-red-900/40 hover:text-red-400"
                         >
                           <Trash className="h-3.5 w-3.5" />
                         </button>
                       )}
                     </div>
+                        ):(
+                         
+                           <p className="py-3 pr-4 text-neutral-300">
+                      Usuario No Editable
+                    </p>
+                        )}
                   </td>
                 </tr>
-              ))
+              )))
             )}
           </tbody>
         </table>
