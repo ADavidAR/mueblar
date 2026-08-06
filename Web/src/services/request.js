@@ -1,4 +1,6 @@
-const BASE_URL = import.meta.env.VITE_API_URL ?? ''
+const BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? '' : 'https://mueblar-backend-c7btgpbwfehqc6et.eastus-01.azurewebsites.net')
 
 // El backend exige un bit de permiso distinto según el método HTTP
 // (JwtAuthenticationFilter.urlHasEnoughPermissionsAPI): GET→acceso, POST→creación,
