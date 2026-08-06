@@ -31,7 +31,6 @@ public class UserUpdateRequestDTO {
     @Valid
     private RoleSummaryRequestDTO role;
 
-    @NotNull(message = "No se determino si el Usuario esta habilitado o deshabilitado. Esto es un campo obligatorio.")
     private Boolean enabled;
 }
 
